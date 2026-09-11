@@ -9,4 +9,6 @@ captures/
 .cxx/
 *.jks
 *.keystore
+__pycache__/
+*.py[cod]
 app/src/main/assets/databases/pangmao.db
