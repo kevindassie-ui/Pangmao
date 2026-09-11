@@ -142,7 +142,7 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                     if (state.characters.isNotEmpty()) {
                         HorizontalDivider()
                         Text("Caractères", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        state.characters.forEach(::CharacterCard)
+                        state.characters.forEach { character -> CharacterCard(character) }
                     }
 
                     Surface(

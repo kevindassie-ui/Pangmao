@@ -25,7 +25,7 @@ class LongestMatchTokenizer(
             val isChinese = token.codePoints().anyMatch(::isHanCodePoint)
             val next = TextToken(token, entryId, isChinese)
             val previous = result.lastOrNull()
-            if (entryId == null && previous?.entryId == null && previous.isChinese == isChinese) {
+            if (entryId == null && previous != null && previous.entryId == null && previous.isChinese == isChinese) {
                 result[result.lastIndex] = previous.copy(text = previous.text + token)
             } else {
                 result += next
@@ -41,4 +41,3 @@ class LongestMatchTokenizer(
             codepoint in 0xF900..0xFAFF ||
             codepoint in 0x20000..0x323AF
 }
-
