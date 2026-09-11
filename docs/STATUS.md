@@ -1,4 +1,4 @@
-# Pangmao MVP — release status
+# Pangmao Phase 2 — release status
 
 Checkpoint date: 2026-09-11
 
@@ -8,9 +8,17 @@ Checkpoint date: 2026-09-11
 - Simplified/traditional forms, tone-marked and tone-coloured pinyin.
 - Entry details, authentic examples, character metadata and Android TTS.
 - Tappable reader with longest-match dictionary segmentation.
-- Camera and gallery OCR using the bundled ML Kit Chinese model.
+- Camera and gallery OCR using the bundled ML Kit Chinese model, with tappable
+  text-region selection.
+- Pleco-like handwriting canvas with offline recognition after the optional,
+  one-time Chinese handwriting model download.
 - Local history, favourites and SRS flashcards.
-- French-first Material 3 / Compose interface with no INTERNET permission.
+- Rounded Material 3 / Compose interface with Porcelaine light and Sceau de nuit
+  dark palettes.
+- App language selection (system, French, English or Simplified Chinese) and
+  theme selection (system, light or dark), stored locally.
+- Consistent reader actions, including a compact clear control inside the text
+  field.
 - Reproducible dictionary builder and validator.
 - GitHub Actions workflows for build, unit tests, lint and APK artifacts.
 
@@ -27,6 +35,8 @@ Checkpoint date: 2026-09-11
   commit `b48d749`.
 - A persistent RSA-4096 Android release key is stored only in encrypted GitHub
   Actions secrets, allowing later APKs to update the first installation.
+- Phase 2 run `34659129708` passed dictionary validation, all eleven unit tests,
+  Android lint and debug APK assembly on commit `1c92f89`.
 
 ## Published release
 
@@ -37,10 +47,17 @@ Checkpoint date: 2026-09-11
 - SHA-256: `07b8b2aeed103072a3a02f0c63c0fbb4091cc9e66cfa07ff85f1eb6511638081`.
 - Download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.1.0-mvp/Pangmao-v0.1.0-mvp.apk>
 
-## Next iteration
+## Phase 2 publication
 
-Collect device feedback, screenshots and reproducible bug reports. Keep the same
-application ID and GitHub signing secrets so future signed APKs update this install.
+- Target tag: `v0.2.0`.
+- Final CI and signed APK publication are in progress.
+
+## Later iteration
+
+Robust audio and interactive dictionary-source controls are intentionally
+deferred. Collect device feedback, screenshots and reproducible bug reports.
+Keep the same application ID and GitHub signing secrets so future signed APKs
+update this install.
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
