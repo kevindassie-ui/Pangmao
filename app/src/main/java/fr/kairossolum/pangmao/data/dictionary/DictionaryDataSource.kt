@@ -47,7 +47,7 @@ class DictionaryDataSource(private val context: Context) {
                 queryEntries(
                     """
                     SELECT * FROM entries
-                    WHERE simplified LIKE ? ESCAPE '\\' OR traditional LIKE ? ESCAPE '\\'
+                    WHERE simplified LIKE ? ESCAPE '\' OR traditional LIKE ? ESCAPE '\'
                     ORDER BY CASE WHEN simplified = ? OR traditional = ? THEN 0 ELSE 1 END,
                         frequency DESC, length(simplified), id
                     LIMIT ?
@@ -70,7 +70,7 @@ class DictionaryDataSource(private val context: Context) {
                 queryEntries(
                     """
                     SELECT * FROM entries
-                    WHERE pinyin_plain LIKE ?
+                    WHERE pinyin_plain LIKE ? ESCAPE '\'
                     ORDER BY CASE WHEN pinyin_plain = ? THEN 0 ELSE 1 END,
                         frequency DESC, length(simplified), id
                     LIMIT ?
@@ -135,7 +135,7 @@ class DictionaryDataSource(private val context: Context) {
             """
             SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english
             FROM examples
-            WHERE chinese LIKE ? ESCAPE '\\'
+            WHERE chinese LIKE ? ESCAPE '\'
             ORDER BY length(chinese), id
             LIMIT ?
             """.trimIndent(),
@@ -240,4 +240,3 @@ class DictionaryDataSource(private val context: Context) {
             codepoint in 0xF900..0xFAFF ||
             codepoint in 0x20000..0x323AF
 }
-

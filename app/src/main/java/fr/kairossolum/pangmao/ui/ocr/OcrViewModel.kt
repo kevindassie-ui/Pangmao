@@ -2,6 +2,7 @@ package fr.kairossolum.pangmao.ui.ocr
 
 import android.content.Context
 import android.net.Uri
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,6 +45,7 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
         .mapLatest { text -> if (text.isBlank()) emptyList() else dictionary.tokenize(text) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    @androidx.annotation.OptIn(markerClass = [ExperimentalGetImage::class])
     fun analyze(imageProxy: ImageProxy) {
         val now = System.currentTimeMillis()
         if (!_liveEnabled.value || now - lastAnalysisAt < ANALYSIS_INTERVAL_MS || !inFlight.compareAndSet(false, true)) {
@@ -128,4 +130,3 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
         private const val ANALYSIS_INTERVAL_MS = 450L
     }
 }
-
