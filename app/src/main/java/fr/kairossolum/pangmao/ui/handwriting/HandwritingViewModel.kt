@@ -5,13 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
-import com.google.mlkit.vision.digitalink.DigitalInkRecognition
-import com.google.mlkit.vision.digitalink.DigitalInkRecognitionModel
-import com.google.mlkit.vision.digitalink.DigitalInkRecognitionModelIdentifier
-import com.google.mlkit.vision.digitalink.DigitalInkRecognizerOptions
-import com.google.mlkit.vision.digitalink.Ink
-import com.google.mlkit.vision.digitalink.RecognitionContext
-import com.google.mlkit.vision.digitalink.WritingArea
+import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognition
+import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognitionModel
+import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognitionModelIdentifier
+import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognizerOptions
+import com.google.mlkit.vision.digitalink.recognition.Ink
+import com.google.mlkit.vision.digitalink.recognition.RecognitionContext
+import com.google.mlkit.vision.digitalink.recognition.WritingArea
+import fr.kairossolum.pangmao.domain.firstHanCharacter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,7 +119,7 @@ class HandwritingViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(isRecognizing = true, error = null)
         recognizer.recognize(ink, context)
             .addOnSuccessListener { result ->
-                val candidates = result.candidates.mapNotNull { firstHanCodePoint(it.text) }.distinct().take(8)
+                val candidates = result.candidates.mapNotNull { firstHanCharacter(it.text) }.distinct().take(8)
                 _uiState.value = _uiState.value.copy(candidates = candidates, isRecognizing = false)
             }
             .addOnFailureListener { error ->
@@ -129,17 +130,6 @@ class HandwritingViewModel : ViewModel() {
     override fun onCleared() {
         recognizer.close()
         super.onCleared()
-    }
-
-    private fun firstHanCodePoint(value: String): String? {
-        val codePoints = value.codePoints().iterator()
-        while (codePoints.hasNext()) {
-            val codePoint = codePoints.nextInt()
-            if (Character.UnicodeScript.of(codePoint) == Character.UnicodeScript.HAN) {
-                return String(Character.toChars(codePoint))
-            }
-        }
-        return null
     }
 
     private companion object {
