@@ -2,11 +2,12 @@ package fr.kairossolum.pangmao.ui.ocr
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.widget.ImageView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageAnalysis
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,13 +50,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TokenizedText
+import fr.kairossolum.pangmao.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("DEPRECATION")
@@ -71,8 +75,11 @@ fun OcrScreen(
     val liveEnabled by viewModel.liveEnabled.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val selected by viewModel.selectedEntry.collectAsStateWithLifecycle()
+    val frame by viewModel.frame.collectAsStateWithLifecycle()
+    val selectedRegionId by viewModel.selectedRegionId.collectAsStateWithLifecycle()
     val clipboard = LocalClipboardManager.current
     var cameraError by remember { mutableStateOf<String?>(null) }
+    var previewUri by remember { mutableStateOf<Uri?>(null) }
     var cameraPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
     }
@@ -80,7 +87,10 @@ fun OcrScreen(
         cameraPermission = it
     }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri?.let { viewModel.recognizeImage(context, it) }
+        uri?.let {
+            previewUri = it
+            viewModel.recognizeImage(context, it)
+        }
     }
     val analyzer = remember(viewModel) { ImageAnalysis.Analyzer { image -> viewModel.analyze(image) } }
 
@@ -92,14 +102,14 @@ fun OcrScreen(
         TopAppBar(
             title = {
                 Column {
-                    Text("OCR chinois", fontWeight = FontWeight.Bold)
-                    Text("Caméra et images · traitement local", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.ocr_title), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.ocr_subtitle), style = MaterialTheme.typography.labelSmall)
                 }
             },
             actions = {
                 AssistChip(
                     onClick = {},
-                    label = { Text("Hors ligne") },
+                    label = { Text(stringResource(R.string.offline)) },
                     leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
                 )
             },
@@ -113,7 +123,9 @@ fun OcrScreen(
                 .clip(RoundedCornerShape(18.dp))
                 .background(Color.Black),
         ) {
-            if (cameraPermission) {
+            if (previewUri != null) {
+                OcrStillImage(previewUri!!, Modifier.fillMaxSize())
+            } else if (cameraPermission) {
                 CameraPreview(
                     analyzer = analyzer,
                     modifier = Modifier.fillMaxSize(),
@@ -126,9 +138,9 @@ fun OcrScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Icon(Icons.Outlined.PhotoCamera, contentDescription = null, tint = Color.White)
-                    Text("Autorisez la caméra pour l’OCR en direct.", color = Color.White)
+                    Text(stringResource(R.string.ocr_camera_permission), color = Color.White)
                     Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
-                        Text("Autoriser")
+                        Text(stringResource(R.string.allow))
                     }
                 }
             }
@@ -139,6 +151,12 @@ fun OcrScreen(
                     color = Color.White,
                 )
             }
+            OcrRegionOverlay(
+                frame = frame,
+                selectedRegionId = selectedRegionId,
+                onSelectRegion = viewModel::selectRegion,
+                modifier = Modifier.fillMaxSize(),
+            )
             Surface(
                 modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
                 color = Color.Black.copy(alpha = 0.62f),
@@ -148,24 +166,29 @@ fun OcrScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    IconButton(onClick = viewModel::toggleLive) {
+                    IconButton(onClick = {
+                        if (previewUri != null) {
+                            previewUri = null
+                            if (!liveEnabled) viewModel.toggleLive()
+                        } else viewModel.toggleLive()
+                    }) {
                         Icon(
                             if (liveEnabled) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = if (liveEnabled) "Figer" else "Reprendre",
+                            contentDescription = stringResource(if (liveEnabled) R.string.freeze else R.string.resume),
                             tint = Color.White,
                         )
                     }
                     IconButton(onClick = { imagePicker.launch("image/*") }) {
-                        Icon(Icons.Outlined.Image, contentDescription = "Choisir une image", tint = Color.White)
+                        Icon(Icons.Outlined.Image, contentDescription = stringResource(R.string.choose_image), tint = Color.White)
                     }
                     IconButton(
                         onClick = { clipboard.setText(AnnotatedString(recognizedText)) },
                         enabled = recognizedText.isNotBlank(),
                     ) {
-                        Icon(Icons.Outlined.ContentCopy, contentDescription = "Copier", tint = Color.White)
+                        Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.copy), tint = Color.White)
                     }
                     IconButton(onClick = viewModel::clear, enabled = recognizedText.isNotBlank()) {
-                        Icon(Icons.Outlined.Clear, contentDescription = "Effacer", tint = Color.White)
+                        Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.clear), tint = Color.White)
                     }
                 }
             }
@@ -180,7 +203,7 @@ fun OcrScreen(
             )
         }
         Text(
-            if (recognizedText.isBlank()) "Cadrez du texte chinois ou choisissez une image." else "Touchez un mot reconnu pour afficher sa définition.",
+            stringResource(if (recognizedText.isBlank()) R.string.ocr_aim else R.string.ocr_tap_region),
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -193,7 +216,6 @@ fun OcrScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 18.dp, vertical = 6.dp),
-                darkTheme = isSystemInDarkTheme(),
             )
         }
     }
@@ -210,4 +232,18 @@ fun OcrScreen(
             )
         }
     }
+}
+
+@Composable
+private fun OcrStillImage(uri: Uri, modifier: Modifier = Modifier) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                contentDescription = null
+            }
+        },
+        update = { it.setImageURI(uri) },
+        modifier = modifier,
+    )
 }

@@ -1,46 +1,70 @@
 package fr.kairossolum.pangmao.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import fr.kairossolum.pangmao.data.settings.ThemeMode
 
-val PangmaoRed = Color(0xFF9D241F)
-val PangmaoGold = Color(0xFFD78B28)
-val Ink = Color(0xFF241C1A)
-val Paper = Color(0xFFFFF9F5)
+val Jade = Color(0xFF166B5B)
+val Porcelain = Color(0xFFF8FAF7)
+val NightSeal = Color(0xFF07110F)
 
 private val LightColors = lightColorScheme(
-    primary = PangmaoRed,
+    primary = Jade,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFDAD4),
-    onPrimaryContainer = Color(0xFF410002),
-    secondary = Color(0xFF77574F),
-    tertiary = PangmaoGold,
-    background = Paper,
-    surface = Paper,
-    onSurface = Ink,
-    surfaceVariant = Color(0xFFF4DED9),
+    primaryContainer = Color(0xFFD7F2E9),
+    onPrimaryContainer = Color(0xFF052019),
+    secondary = Color(0xFF4F6A63),
+    tertiary = Color(0xFF8A5B3D),
+    background = Porcelain,
+    surface = Color.White,
+    onSurface = Color(0xFF18201D),
+    onSurfaceVariant = Color(0xFF53605C),
+    surfaceVariant = Color(0xFFEAF0EC),
+    outline = Color(0xFF788680),
+    outlineVariant = Color(0xFFCED8D3),
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFFFFB4A9),
-    onPrimary = Color(0xFF610006),
-    primaryContainer = Color(0xFF7E1112),
-    secondary = Color(0xFFE7BDB3),
-    tertiary = Color(0xFFF8BD6F),
-    background = Color(0xFF1B1110),
-    surface = Color(0xFF1B1110),
-    onSurface = Color(0xFFF2DFDB),
+    primary = Color(0xFF75D8BB),
+    onPrimary = Color(0xFF00382D),
+    primaryContainer = Color(0xFF0B4F42),
+    onPrimaryContainer = Color(0xFF9CF5D7),
+    secondary = Color(0xFFB4CCC3),
+    tertiary = Color(0xFFE8B78E),
+    background = NightSeal,
+    surface = Color(0xFF0E1A17),
+    onSurface = Color(0xFFE4EEE9),
+    onSurfaceVariant = Color(0xFFB9C8C2),
+    surfaceVariant = Color(0xFF1A2B26),
+    outline = Color(0xFF83958E),
+    outlineVariant = Color(0xFF344B44),
+)
+
+private val PangmaoShapes = Shapes(
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp),
+    extraLarge = RoundedCornerShape(34.dp),
 )
 
 @Composable
-fun PangmaoTheme(content: @Composable () -> Unit) {
+fun PangmaoTheme(themeMode: ThemeMode = ThemeMode.SYSTEM, content: @Composable () -> Unit) {
+    val darkTheme = when (themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
     MaterialTheme(
-        colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors,
+        colorScheme = if (darkTheme) DarkColors else LightColors,
+        shapes = PangmaoShapes,
         content = content,
     )
 }
-

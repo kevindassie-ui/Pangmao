@@ -1,4 +1,96 @@
 <resources>
     <string name="app_name">Pangmao · 胖猫</string>
-</resources>
+    <string name="back">Retour</string>
+    <string name="clear">Effacer</string>
+    <string name="copy">Copier</string>
+    <string name="open">Ouvrir</string>
+    <string name="paste">Coller</string>
+    <string name="nav_dictionary">Dictionnaire</string>
+    <string name="nav_reader">Lecteur</string>
+    <string name="nav_ocr">OCR</string>
+    <string name="nav_cards">Cartes</string>
 
+    <string name="search_subtitle">Dictionnaire chinois hors ligne</string>
+    <string name="search_hint">Hanzi, pinyin, français ou anglais</string>
+    <string name="search_recent">Consultés récemment</string>
+    <string name="search_frequent">Mots fréquents</string>
+    <string name="search_empty">Aucune entrée pour « %1$s »</string>
+    <string name="search_empty_help">Essayez un mot plus court, le pinyin sans espaces, ou sélectionnez les caractères dans le lecteur.</string>
+    <string name="about_and_licenses">À propos et licences</string>
+    <string name="settings">Paramètres</string>
+    <string name="input_keyboard">Clavier</string>
+    <string name="input_handwriting">Écriture</string>
+    <string name="input_radicals">Radicaux</string>
+
+    <string name="reader_title">Lecteur</string>
+    <string name="reader_subtitle">Touchez un mot pour le définir</string>
+    <string name="reader_field">Texte chinois</string>
+    <string name="reader_placeholder">Collez, partagez ou ouvrez un fichier texte…</string>
+    <string name="reader_segmented">LECTURE SEGMENTÉE</string>
+    <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
+
+    <string name="ocr_title">OCR chinois</string>
+    <string name="ocr_subtitle">Caméra et images · traitement local</string>
+    <string name="offline">Hors ligne</string>
+    <string name="ocr_camera_permission">Autorisez la caméra pour l’OCR en direct.</string>
+    <string name="allow">Autoriser</string>
+    <string name="freeze">Figer</string>
+    <string name="resume">Reprendre</string>
+    <string name="choose_image">Choisir une image</string>
+    <string name="ocr_aim">Cadrez du texte chinois ou choisissez une image.</string>
+    <string name="ocr_tap_region">Touchez une zone encadrée, puis un mot pour afficher sa définition.</string>
+    <string name="ocr_selected_region">Zone sélectionnée</string>
+
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_language">Langue de l’application</string>
+    <string name="settings_language_system">Langue du système</string>
+    <string name="settings_language_french">Français</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_theme">Apparence</string>
+    <string name="settings_theme_system">Thème du système</string>
+    <string name="settings_theme_light">Clair · Porcelaine douce</string>
+    <string name="settings_theme_dark">Sombre · Sceau de nuit</string>
+
+    <string name="handwriting_title">Écriture manuscrite</string>
+    <string name="handwriting_subtitle">Dessinez un caractère chinois</string>
+    <string name="handwriting_download_title">Modèle de reconnaissance requis</string>
+    <string name="handwriting_download_body">Un téléchargement unique d’environ 20 Mo est nécessaire. Il restera ensuite disponible hors ligne.</string>
+    <string name="handwriting_download">Télécharger le modèle</string>
+    <string name="handwriting_downloading">Téléchargement…</string>
+    <string name="handwriting_ready">Écrivez dans la grille, trait par trait.</string>
+    <string name="handwriting_candidates">Résultats proposés</string>
+    <string name="handwriting_undo">Annuler le dernier trait</string>
+    <string name="handwriting_recognize">Reconnaître</string>
+    <string name="handwriting_no_result">Aucun caractère reconnu. Essayez de tracer les traits dans leur ordre naturel.</string>
+
+    <string name="entry_title">Fiche dictionnaire</string>
+    <string name="traditional">Traditionnel : %1$s</string>
+    <string name="pronounce">Prononcer</string>
+    <string name="french">Français</string>
+    <string name="english">English</string>
+    <string name="authentic_examples">Exemples authentiques</string>
+    <string name="characters">Caractères</string>
+    <string name="open_full_entry">Ouvrir la fiche complète</string>
+    <string name="favorite_add">Ajouter aux favoris</string><string name="favorite_remove">Retirer des favoris</string>
+    <string name="card_add">Ajouter aux cartes</string><string name="card_remove">Retirer des cartes</string>
+    <string name="frequent">Fréquent %1$d</string><string name="pronounce_sentence">Prononcer la phrase</string>
+    <string name="entry_sources_note">Définitions : %1$s. Exemples : contributeurs Tatoeba (CC BY 2.0 FR). Informations caractères : Unicode Unihan.</string>
+    <string name="strokes">%1$s traits</string><string name="radical_detail">clé %1$s%2$s</string><string name="simplified_short">simpl. %1$s</string><string name="traditional_short">trad. %1$s</string>
+
+    <string name="cards_title">Cartes</string>
+    <string name="cards_subtitle">Répétition espacée locale</string>
+    <string name="cards_up_to_date">À jour pour aujourd’hui</string><string name="cards_due">%1$d carte(s) à réviser</string>
+    <string name="cards_add_help">Ajoutez une carte depuis n’importe quelle fiche dictionnaire.</string><string name="cards_review_help">Une session courte suffit : affichez la réponse puis évaluez votre rappel.</string>
+    <string name="cards_start">Commencer la révision</string><string name="cards_all">Toutes les cartes · %1$d</string><string name="favorites">Favoris</string>
+    <string name="review_done">Session terminée</string><string name="review_count">%1$d carte(s) révisée(s)</string><string name="finish">Terminer</string><string name="show_answer">Afficher la réponse</string>
+    <string name="rating_again">À revoir</string><string name="rating_hard">Difficile</string><string name="rating_good">Bien</string><string name="rating_easy">Facile</string>
+    <string name="card_schedule">Intervalle %1$d j · %2$d réussite(s)</string><string name="card_delete">Supprimer la carte</string>
+
+    <string name="about_title">À propos et licences</string>
+    <string name="privacy_title">Vie privée par conception</string>
+    <string name="privacy_body">Le dictionnaire, les textes, l’OCR, l’historique et les cartes restent sur cet appareil. Seul le modèle manuscrit est téléchargé une fois à votre demande.</string>
+    <string name="about_version">Pangmao · version %1$s</string><string name="about_description">Dictionnaire et compagnon d’apprentissage chinois, conçu pour un usage personnel, local et sans abonnement.</string>
+    <string name="offline_content">Contenu hors ligne</string><string name="entries">Entrées</string><string name="examples">Exemples</string><string name="sources">Sources linguistiques</string><string name="independence">Indépendance</string>
+    <string name="independence_body">Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.</string>
+</resources>

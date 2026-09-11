@@ -36,10 +36,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.domain.Pinyin
+import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.ui.common.DefinitionList
@@ -56,23 +58,23 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text("Fiche dictionnaire") },
+            title = { Text(stringResource(R.string.entry_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Retour")
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             },
             actions = {
                 IconButton(onClick = viewModel::toggleFavorite) {
                     Icon(
                         if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                        contentDescription = if (isFavorite) "Retirer des favoris" else "Ajouter aux favoris",
+                        contentDescription = stringResource(if (isFavorite) R.string.favorite_remove else R.string.favorite_add),
                     )
                 }
                 IconButton(onClick = viewModel::toggleFlashcard) {
                     Icon(
                         if (isFlashcard) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                        contentDescription = if (isFlashcard) "Retirer des cartes" else "Ajouter aux cartes",
+                        contentDescription = stringResource(if (isFlashcard) R.string.card_remove else R.string.card_add),
                     )
                 }
             },
@@ -108,7 +110,7 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                             )
                             entry.alternateHeadword?.let {
                                 Text(
-                                    "Traditionnel : $it",
+                                    stringResource(R.string.traditional, it),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -117,7 +119,7 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                             PinyinText(entry.pinyin, fontSize = 22.sp, bold = true)
                         }
                         IconButton(onClick = { speaker.speak(entry.simplified) }) {
-                            Icon(Icons.Outlined.RecordVoiceOver, contentDescription = "Prononcer")
+                            Icon(Icons.Outlined.RecordVoiceOver, contentDescription = stringResource(R.string.pronounce))
                         }
                     }
 
@@ -126,22 +128,22 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                             AssistChip(onClick = {}, label = { Text(source) })
                         }
                         if (entry.frequency > 0) {
-                            AssistChip(onClick = {}, label = { Text("Fréquent ${entry.frequency}") })
+                            AssistChip(onClick = {}, label = { Text(stringResource(R.string.frequent, entry.frequency)) })
                         }
                     }
 
-                    DefinitionList("Français", entry.definitionsFrench)
-                    DefinitionList("English", entry.definitionsEnglish)
+                    DefinitionList(stringResource(R.string.french), entry.definitionsFrench)
+                    DefinitionList(stringResource(R.string.english), entry.definitionsEnglish)
 
                     if (state.examples.isNotEmpty()) {
                         HorizontalDivider()
-                        Text("Exemples authentiques", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.authentic_examples), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         state.examples.forEach { ExampleCard(it, onSpeak = { speaker.speak(it.chinese) }) }
                     }
 
                     if (state.characters.isNotEmpty()) {
                         HorizontalDivider()
-                        Text("Caractères", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.characters), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         state.characters.forEach { character -> CharacterCard(character) }
                     }
 
@@ -150,7 +152,7 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
                     ) {
                         Text(
-                            "Définitions : ${entry.sources}. Exemples : contributeurs Tatoeba (CC BY 2.0 FR). Informations caractères : Unicode Unihan.",
+                            stringResource(R.string.entry_sources_note, entry.sources),
                             modifier = Modifier.padding(14.dp),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -174,7 +176,7 @@ private fun ExampleCard(example: ExampleSentence, onSpeak: () -> Unit) {
                 Text(example.chinese, modifier = Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Medium)
                 Spacer(Modifier.width(8.dp))
                 IconButton(onClick = onSpeak) {
-                    Icon(Icons.Outlined.RecordVoiceOver, contentDescription = "Prononcer la phrase")
+                    Icon(Icons.Outlined.RecordVoiceOver, contentDescription = stringResource(R.string.pronounce_sentence))
                 }
             }
             if (example.pinyin.isNotBlank()) {
@@ -202,15 +204,15 @@ private fun CharacterCard(info: CharacterInfo) {
                 Text(
                     listOfNotNull(
                         info.mandarin.takeIf(String::isNotBlank),
-                        info.totalStrokes.takeIf(String::isNotBlank)?.let { "$it traits" },
-                        info.radical?.let { "clé $it${info.additionalStrokes?.let { extra -> " + $extra" }.orEmpty()}" },
+                        info.totalStrokes.takeIf(String::isNotBlank)?.let { stringResource(R.string.strokes, it) },
+                        info.radical?.let { stringResource(R.string.radical_detail, it, info.additionalStrokes?.let { extra -> " + $extra" }.orEmpty()) },
                     ).joinToString(" · "),
                     fontWeight = FontWeight.SemiBold,
                 )
                 if (info.definition.isNotBlank()) Text(info.definition, style = MaterialTheme.typography.bodySmall)
                 val variants = buildList {
-                    if (info.simplifiedVariants.isNotBlank()) add("simpl. ${info.simplifiedVariants}")
-                    if (info.traditionalVariants.isNotBlank()) add("trad. ${info.traditionalVariants}")
+                    if (info.simplifiedVariants.isNotBlank()) add(stringResource(R.string.simplified_short, info.simplifiedVariants))
+                    if (info.traditionalVariants.isNotBlank()) add(stringResource(R.string.traditional_short, info.traditionalVariants))
                 }.joinToString(" · ")
                 if (variants.isNotBlank()) Text(variants, style = MaterialTheme.typography.labelSmall)
                 Text(info.codepoint, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

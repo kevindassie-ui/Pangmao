@@ -2,8 +2,10 @@ package fr.kairossolum.pangmao
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -38,29 +41,42 @@ import fr.kairossolum.pangmao.ui.about.AboutViewModel
 import fr.kairossolum.pangmao.ui.common.viewModelFactory
 import fr.kairossolum.pangmao.ui.entry.EntryScreen
 import fr.kairossolum.pangmao.ui.entry.EntryViewModel
+import fr.kairossolum.pangmao.ui.handwriting.HandwritingScreen
+import fr.kairossolum.pangmao.ui.handwriting.HandwritingViewModel
 import fr.kairossolum.pangmao.ui.ocr.OcrScreen
 import fr.kairossolum.pangmao.ui.ocr.OcrViewModel
 import fr.kairossolum.pangmao.ui.reader.ReaderScreen
 import fr.kairossolum.pangmao.ui.reader.ReaderViewModel
 import fr.kairossolum.pangmao.ui.search.SearchScreen
 import fr.kairossolum.pangmao.ui.search.SearchViewModel
+import fr.kairossolum.pangmao.ui.settings.SettingsScreen
+import fr.kairossolum.pangmao.ui.settings.SettingsViewModel
 import fr.kairossolum.pangmao.ui.study.StudyScreen
 import fr.kairossolum.pangmao.ui.study.StudyViewModel
 import fr.kairossolum.pangmao.ui.theme.PangmaoTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val _sharedText = MutableStateFlow<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         acceptIntent(intent)
         setContent {
-            PangmaoTheme {
+            val container = (application as PangmaoApplication).container
+            val settings by container.settings.settings.collectAsStateWithLifecycle(
+                initialValue = fr.kairossolum.pangmao.data.settings.AppSettings(),
+            )
+            LaunchedEffect(settings.language) {
+                if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != settings.language.languageTag) {
+                    container.settings.applyLanguage(settings.language)
+                }
+            }
+            PangmaoTheme(settings.themeMode) {
                 Surface {
                     PangmaoApp(
-                        container = (application as PangmaoApplication).container,
+                        container = container,
                         sharedText = _sharedText.asStateFlow(),
                         consumeSharedText = { _sharedText.value = null },
                     )
@@ -85,13 +101,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private data class MainDestination(val route: String, val label: String, val icon: ImageVector)
+private data class MainDestination(val route: String, @StringRes val label: Int, val icon: ImageVector)
 
 private val mainDestinations = listOf(
-    MainDestination("dictionary", "Dictionnaire", Icons.Outlined.MenuBook),
-    MainDestination("reader", "Lecteur", Icons.Outlined.TextSnippet),
-    MainDestination("ocr", "OCR", Icons.Outlined.CameraAlt),
-    MainDestination("study", "Cartes", Icons.Outlined.School),
+    MainDestination("dictionary", R.string.nav_dictionary, Icons.Outlined.MenuBook),
+    MainDestination("reader", R.string.nav_reader, Icons.Outlined.TextSnippet),
+    MainDestination("ocr", R.string.nav_ocr, Icons.Outlined.CameraAlt),
+    MainDestination("study", R.string.nav_cards, Icons.Outlined.School),
 )
 
 @Composable
@@ -120,8 +136,8 @@ private fun PangmaoApp(
                         NavigationBarItem(
                             selected = currentRoute == destination.route,
                             onClick = { navController.navigateMain(destination.route) },
-                            icon = { Icon(destination.icon, contentDescription = destination.label) },
-                            label = { Text(destination.label) },
+                            icon = { Icon(destination.icon, contentDescription = stringResource(destination.label)) },
+                            label = { Text(stringResource(destination.label)) },
                         )
                     }
                 }
@@ -130,14 +146,25 @@ private fun PangmaoApp(
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             NavHost(navController = navController, startDestination = "dictionary") {
-                composable("dictionary") {
+                composable("dictionary") { entry ->
                     val model: SearchViewModel = viewModel(
                         factory = viewModelFactory { SearchViewModel(container.dictionary, container.study) }
                     )
+                    val handwritten by entry.savedStateHandle
+                        .getStateFlow("handwritten", "")
+                        .collectAsStateWithLifecycle()
+                    LaunchedEffect(handwritten) {
+                        if (handwritten.isNotBlank()) {
+                            model.setQuery(handwritten)
+                            entry.savedStateHandle["handwritten"] = ""
+                        }
+                    }
                     SearchScreen(
                         viewModel = model,
                         onOpenEntry = { navController.navigate("entry/$it") },
                         onOpenAbout = { navController.navigate("about") },
+                        onOpenSettings = { navController.navigate("settings") },
+                        onOpenHandwriting = { navController.navigate("handwriting") },
                     )
                 }
                 composable("reader") {
@@ -182,6 +209,23 @@ private fun PangmaoApp(
                         factory = viewModelFactory { AboutViewModel(container.dictionary) }
                     )
                     AboutScreen(model, onBack = navController::navigateUp)
+                }
+                composable("settings") {
+                    val model: SettingsViewModel = viewModel(
+                        factory = viewModelFactory { SettingsViewModel(container.settings) }
+                    )
+                    SettingsScreen(model, onBack = navController::navigateUp)
+                }
+                composable("handwriting") {
+                    val model: HandwritingViewModel = viewModel()
+                    HandwritingScreen(
+                        viewModel = model,
+                        onBack = navController::navigateUp,
+                        onSelectCharacter = { character ->
+                            navController.previousBackStackEntry?.savedStateHandle?.set("handwritten", character)
+                            navController.popBackStack()
+                        },
+                    )
                 }
             }
         }

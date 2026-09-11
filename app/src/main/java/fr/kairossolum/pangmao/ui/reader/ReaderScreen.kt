@@ -2,7 +2,6 @@ package fr.kairossolum.pangmao.ui.reader
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -32,11 +32,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TokenizedText
+import fr.kairossolum.pangmao.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,8 +72,8 @@ fun ReaderScreen(
         TopAppBar(
             title = {
                 Column {
-                    Text("Lecteur", fontWeight = FontWeight.Bold)
-                    Text("Touchez un mot pour le définir", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.reader_title), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.reader_subtitle), style = MaterialTheme.typography.labelSmall)
                 }
             }
         )
@@ -83,15 +85,11 @@ fun ReaderScreen(
         ) {
             OutlinedButton(onClick = { filePicker.launch(arrayOf("text/plain", "text/*")) }) {
                 Icon(Icons.Outlined.FolderOpen, contentDescription = null)
-                Text(" Ouvrir")
+                Text(" ${stringResource(R.string.open)}")
             }
             OutlinedButton(onClick = { clipboard.getText()?.text?.let(viewModel::setText) }) {
                 Icon(Icons.Outlined.ContentPaste, contentDescription = null)
-                Text(" Coller")
-            }
-            OutlinedButton(onClick = { viewModel.setText("") }) {
-                Icon(Icons.Outlined.Clear, contentDescription = null)
-                Text(" Effacer")
+                Text(" ${stringResource(R.string.paste)}")
             }
         }
         OutlinedTextField(
@@ -101,8 +99,15 @@ fun ReaderScreen(
                 .fillMaxWidth()
                 .heightIn(min = 120.dp, max = 190.dp)
                 .padding(horizontal = 12.dp),
-            label = { Text("Texte chinois") },
-            placeholder = { Text("Collez, partagez ou ouvrez un fichier texte…") },
+            label = { Text(stringResource(R.string.reader_field)) },
+            placeholder = { Text(stringResource(R.string.reader_placeholder)) },
+            trailingIcon = {
+                if (text.isNotEmpty()) {
+                    IconButton(onClick = { viewModel.setText("") }) {
+                        Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.clear))
+                    }
+                }
+            },
         )
         error?.let {
             Text(
@@ -114,7 +119,7 @@ fun ReaderScreen(
         }
         HorizontalDivider(Modifier.padding(top = 10.dp))
         Text(
-            "LECTURE SEGMENTÉE",
+            stringResource(R.string.reader_segmented),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
@@ -122,7 +127,7 @@ fun ReaderScreen(
         )
         if (tokens.isEmpty()) {
             Text(
-                "Le texte annoté apparaîtra ici.",
+                stringResource(R.string.reader_empty),
                 modifier = Modifier.padding(18.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -134,7 +139,6 @@ fun ReaderScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 18.dp, vertical = 8.dp),
-                darkTheme = isSystemInDarkTheme(),
             )
         }
     }

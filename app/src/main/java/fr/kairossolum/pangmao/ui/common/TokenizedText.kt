@@ -3,7 +3,7 @@ package fr.kairossolum.pangmao.ui.common
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -11,7 +11,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import fr.kairossolum.pangmao.domain.model.TextToken
-import fr.kairossolum.pangmao.ui.theme.PangmaoRed
 
 @Suppress("DEPRECATION")
 @Composable
@@ -19,19 +18,15 @@ fun TokenizedText(
     tokens: List<TextToken>,
     onTokenClick: (TextToken) -> Unit,
     modifier: Modifier = Modifier,
-    darkTheme: Boolean = false,
 ) {
+    val linkedColor = MaterialTheme.colorScheme.primary
+    val plainColor = MaterialTheme.colorScheme.onSurface
     val annotated = buildAnnotatedString {
         tokens.forEachIndexed { index, token ->
             if (token.entryId != null) pushStringAnnotation("token", index.toString())
             withStyle(
                 SpanStyle(
-                    color = when {
-                        token.entryId != null && darkTheme -> Color(0xFFFFB4A9)
-                        token.entryId != null -> PangmaoRed
-                        darkTheme -> Color(0xFFEBDDD9)
-                        else -> Color(0xFF302725)
-                    },
+                    color = if (token.entryId != null) linkedColor else plainColor,
                     textDecoration = if (token.entryId != null) TextDecoration.Underline else TextDecoration.None,
                 )
             ) {
@@ -52,4 +47,3 @@ fun TokenizedText(
         },
     )
 }
-

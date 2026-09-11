@@ -14,9 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.R
 
 @Composable
 fun EntryRow(
@@ -94,7 +96,7 @@ fun QuickEntryCard(entry: DictionaryEntry, onOpen: () -> Unit, modifier: Modifie
             PinyinText(entry.pinyin, fontSize = 18.sp, bold = true)
             Text(entry.definitionsFrench.firstOrNull() ?: entry.definitionsEnglish.firstOrNull().orEmpty())
             Text(
-                "Ouvrir la fiche complète",
+                stringResource(R.string.open_full_entry),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
             )

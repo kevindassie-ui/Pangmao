@@ -27,10 +27,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import fr.kairossolum.pangmao.BuildConfig
+import fr.kairossolum.pangmao.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,10 +43,10 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text("À propos et licences") },
+            title = { Text(stringResource(R.string.about_title)) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Retour")
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             },
         )
@@ -55,9 +58,9 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text("胖猫", fontSize = 52.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-            Text("Pangmao · MVP 0.1.0", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(
-                "Dictionnaire et compagnon d’apprentissage chinois, conçu pour un usage personnel, local et sans abonnement.",
+                stringResource(R.string.about_description),
                 style = MaterialTheme.typography.bodyLarge,
             )
 
@@ -68,8 +71,8 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                 Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Icon(Icons.Outlined.Lock, contentDescription = null)
                     Column {
-                        Text("Vie privée par conception", fontWeight = FontWeight.Bold)
-                        Text("Aucune permission Internet. Recherches, textes, images, OCR, historique et cartes restent sur cet appareil.")
+                        Text(stringResource(R.string.privacy_title), fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.privacy_body))
                     }
                 }
             }
@@ -77,16 +80,16 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
             if (metadata.isNotEmpty()) {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        Text("Contenu hors ligne", fontWeight = FontWeight.Bold)
-                        Metric("Entrées", metadata["entry_count"])
-                        Metric("Exemples", metadata["example_count"])
-                        Metric("Caractères", metadata["character_count"])
+                        Text(stringResource(R.string.offline_content), fontWeight = FontWeight.Bold)
+                        Metric(stringResource(R.string.entries), metadata["entry_count"])
+                        Metric(stringResource(R.string.examples), metadata["example_count"])
+                        Metric(stringResource(R.string.characters), metadata["character_count"])
                         Metric("Unihan", metadata["unihan_version"])
                     }
                 }
             }
 
-            Text("Sources linguistiques", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.sources), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             LicenseItem(
                 "CC-CEDICT",
                 "Données chinois–anglais et pinyin · CC BY-SA 4.0",
@@ -118,9 +121,9 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                 uriHandler::openUri,
             )
 
-            Text("Indépendance", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.independence), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(
-                "Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.",
+                stringResource(R.string.independence_body),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
@@ -150,4 +153,3 @@ private fun LicenseItem(name: String, detail: String, url: String, open: (String
         Text(detail, style = MaterialTheme.typography.bodySmall)
     }
 }
-

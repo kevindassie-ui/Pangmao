@@ -4,15 +4,19 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## MVP highlights
+## Version 0.2 highlights
 
 - 132,000+ Chinese entries with simplified/traditional forms and pinyin.
 - French (CFDICT) and English (CC-CEDICT) definitions.
 - 76,000+ authentic Mandarin–English examples from Tatoeba.
 - Unihan character, radical, stroke and variant information.
 - Live camera OCR and image OCR with an ML model bundled in the APK.
+- Tappable OCR regions for choosing the exact line to translate.
+- Single-character Chinese handwriting input with an on-demand offline model.
+- French, English and Simplified Chinese interfaces; system/light/dark themes.
 - Favorites, history and local flashcards.
-- No account, ads, analytics, server, subscription or Internet permission.
+- No account, ads, analytics, server or subscription. Internet is used only to
+  download the optional handwriting model once; all language features then run locally.
 
 ## Install
 

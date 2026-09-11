@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import fr.kairossolum.pangmao.data.dictionary.DictionaryRepository
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
@@ -39,6 +40,10 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
     val error: StateFlow<String?> = _error.asStateFlow()
     private val _selectedEntry = MutableStateFlow<DictionaryEntry?>(null)
     val selectedEntry: StateFlow<DictionaryEntry?> = _selectedEntry.asStateFlow()
+    private val _frame = MutableStateFlow<OcrFrame?>(null)
+    val frame: StateFlow<OcrFrame?> = _frame.asStateFlow()
+    private val _selectedRegionId = MutableStateFlow<Int?>(null)
+    val selectedRegionId: StateFlow<Int?> = _selectedRegionId.asStateFlow()
 
     val tokens = _recognizedText
         .debounce(80)
@@ -63,8 +68,11 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
         val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
         recognizer.process(image)
             .addOnSuccessListener { result ->
-                val text = result.text.trim()
-                if (text.isNotBlank()) _recognizedText.value = text
+                updateRecognition(
+                    result,
+                    rotatedWidth(imageProxy.width, imageProxy.height, imageProxy.imageInfo.rotationDegrees),
+                    rotatedHeight(imageProxy.width, imageProxy.height, imageProxy.imageInfo.rotationDegrees),
+                )
                 _error.value = null
             }
             .addOnFailureListener { throwable ->
@@ -90,7 +98,7 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
         }
         recognizer.process(image)
             .addOnSuccessListener { result ->
-                _recognizedText.value = result.text.trim()
+                updateRecognition(result, image.width, image.height)
                 if (result.text.isBlank()) _error.value = "Aucun texte n’a été détecté dans l’image."
             }
             .addOnFailureListener { throwable ->
@@ -109,7 +117,15 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
 
     fun clear() {
         _recognizedText.value = ""
+        _frame.value = null
+        _selectedRegionId.value = null
         _error.value = null
+    }
+
+    fun selectRegion(identifier: Int) {
+        val region = _frame.value?.regions?.firstOrNull { it.id == identifier } ?: return
+        _selectedRegionId.value = identifier
+        _recognizedText.value = region.text
     }
 
     fun select(token: TextToken) {
@@ -126,7 +142,44 @@ class OcrViewModel(private val dictionary: DictionaryRepository) : ViewModel() {
         super.onCleared()
     }
 
+    private fun updateRecognition(result: Text, width: Int, height: Int) {
+        val safeWidth = width.coerceAtLeast(1).toFloat()
+        val safeHeight = height.coerceAtLeast(1).toFloat()
+        val regions = result.textBlocks.flatMap { it.lines }.mapIndexedNotNull { index, line ->
+            val box = line.boundingBox ?: return@mapIndexedNotNull null
+            OcrRegion(
+                id = index,
+                text = line.text.trim(),
+                left = (box.left / safeWidth).coerceIn(0f, 1f),
+                top = (box.top / safeHeight).coerceIn(0f, 1f),
+                right = (box.right / safeWidth).coerceIn(0f, 1f),
+                bottom = (box.bottom / safeHeight).coerceIn(0f, 1f),
+            ).takeIf { it.text.isNotBlank() }
+        }
+        _frame.value = OcrFrame(width.coerceAtLeast(1), height.coerceAtLeast(1), regions)
+        val selected = _selectedRegionId.value?.let { id -> regions.firstOrNull { it.id == id } }
+        _recognizedText.value = selected?.text ?: result.text.trim()
+    }
+
     companion object {
         private const val ANALYSIS_INTERVAL_MS = 450L
     }
 }
+
+data class OcrRegion(
+    val id: Int,
+    val text: String,
+    val left: Float,
+    val top: Float,
+    val right: Float,
+    val bottom: Float,
+)
+
+data class OcrFrame(
+    val width: Int,
+    val height: Int,
+    val regions: List<OcrRegion>,
+)
+
+private fun rotatedWidth(width: Int, height: Int, rotation: Int) = if (rotation % 180 == 0) width else height
+private fun rotatedHeight(width: Int, height: Int, rotation: Int) = if (rotation % 180 == 0) height else width

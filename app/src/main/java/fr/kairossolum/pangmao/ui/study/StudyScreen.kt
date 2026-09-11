@@ -34,11 +34,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.data.user.StudyCard
+import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.ReviewRating
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.PinyinText
@@ -58,8 +60,8 @@ fun StudyScreen(
         TopAppBar(
             title = {
                 Column {
-                    Text("Cartes", fontWeight = FontWeight.Bold)
-                    Text("Répétition espacée locale", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.cards_title), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.cards_subtitle), style = MaterialTheme.typography.labelSmall)
                 }
             }
         )
@@ -91,23 +93,22 @@ fun StudyScreen(
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Icon(Icons.Outlined.School, contentDescription = null)
                                 Text(
-                                    if (due.isEmpty()) "À jour pour aujourd’hui" else "${due.size} carte${if (due.size > 1) "s" else ""} à réviser",
+                                    if (due.isEmpty()) stringResource(R.string.cards_up_to_date) else stringResource(R.string.cards_due, due.size),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                 )
                             }
                             Text(
-                                if (due.isEmpty()) "Ajoutez une carte depuis n’importe quelle fiche dictionnaire."
-                                else "Une session courte suffit : affichez la réponse puis évaluez votre rappel.",
+                                stringResource(if (due.isEmpty()) R.string.cards_add_help else R.string.cards_review_help),
                             )
                             Button(onClick = viewModel::startReview, enabled = due.isNotEmpty()) {
-                                Text("Commencer la révision")
+                                Text(stringResource(R.string.cards_start))
                             }
                         }
                     }
                 }
                 if (allCards.isNotEmpty()) {
-                    item { ListTitle("Toutes les cartes · ${allCards.size}") }
+                    item { ListTitle(stringResource(R.string.cards_all, allCards.size)) }
                     items(allCards, key = { it.entry.id }) { card ->
                         StudyCardRow(
                             card = card,
@@ -117,7 +118,7 @@ fun StudyScreen(
                     }
                 }
                 if (favorites.isNotEmpty()) {
-                    item { ListTitle("Favoris") }
+                    item { ListTitle(stringResource(R.string.favorites)) }
                     items(favorites, key = { "favorite-${it.id}" }) { entry ->
                         EntryRow(entry, onClick = { onOpenEntry(entry.id) })
                     }
@@ -138,9 +139,9 @@ private fun ReviewPane(
     if (card == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Text("Session terminée", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                Text("${session.completedCount} carte${if (session.completedCount > 1) "s" else ""} révisée${if (session.completedCount > 1) "s" else ""}")
-                Button(onClick = onClose) { Text("Terminer") }
+                Text(stringResource(R.string.review_done), fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.review_count, session.completedCount))
+                Button(onClick = onClose) { Text(stringResource(R.string.finish)) }
             }
         }
         return
@@ -177,16 +178,16 @@ private fun ReviewPane(
                         fontSize = 19.sp,
                     )
                 } else {
-                    OutlinedButton(onClick = onReveal) { Text("Afficher la réponse") }
+                    OutlinedButton(onClick = onReveal) { Text(stringResource(R.string.show_answer)) }
                 }
             }
         }
         if (session.revealed) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                RatingButton("À revoir", Color(0xFFB3261E), Modifier.weight(1f)) { onRate(ReviewRating.AGAIN) }
-                RatingButton("Difficile", Color(0xFFC56A00), Modifier.weight(1f)) { onRate(ReviewRating.HARD) }
-                RatingButton("Bien", Color(0xFF26733A), Modifier.weight(1f)) { onRate(ReviewRating.GOOD) }
-                RatingButton("Facile", Color(0xFF3267A8), Modifier.weight(1f)) { onRate(ReviewRating.EASY) }
+                RatingButton(stringResource(R.string.rating_again), Color(0xFFB3261E), Modifier.weight(1f)) { onRate(ReviewRating.AGAIN) }
+                RatingButton(stringResource(R.string.rating_hard), Color(0xFFC56A00), Modifier.weight(1f)) { onRate(ReviewRating.HARD) }
+                RatingButton(stringResource(R.string.rating_good), Color(0xFF26733A), Modifier.weight(1f)) { onRate(ReviewRating.GOOD) }
+                RatingButton(stringResource(R.string.rating_easy), Color(0xFF3267A8), Modifier.weight(1f)) { onRate(ReviewRating.EASY) }
             }
         } else {
             Spacer(Modifier.height(48.dp))
@@ -222,13 +223,13 @@ private fun StudyCardRow(card: StudyCard, onOpen: () -> Unit, onRemove: () -> Un
                 Text(card.entry.displayHeadword, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
                 PinyinText(card.entry.pinyin)
                 Text(
-                    "Intervalle ${card.scheduling.intervalDays} j · ${card.scheduling.repetitions} réussite(s)",
+                    stringResource(R.string.card_schedule, card.scheduling.intervalDays, card.scheduling.repetitions),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(onClick = onRemove) {
-                Icon(Icons.Outlined.Delete, contentDescription = "Supprimer la carte")
+                Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.card_delete))
             }
         }
     }

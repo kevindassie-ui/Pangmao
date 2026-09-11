@@ -6,10 +6,11 @@ import fr.kairossolum.pangmao.data.dictionary.DictionaryRepository
 import fr.kairossolum.pangmao.data.dictionary.OfflineDictionaryRepository
 import fr.kairossolum.pangmao.data.user.PangmaoUserDatabase
 import fr.kairossolum.pangmao.data.user.StudyRepository
+import fr.kairossolum.pangmao.data.settings.SettingsRepository
 
 class AppContainer(context: Context) {
     val dictionary: DictionaryRepository = OfflineDictionaryRepository(DictionaryDataSource(context))
     private val userDatabase = PangmaoUserDatabase.create(context)
     val study = StudyRepository(userDatabase.userDao(), dictionary)
+    val settings = SettingsRepository(context)
 }
-
