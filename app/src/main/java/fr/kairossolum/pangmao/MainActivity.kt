@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -68,11 +67,6 @@ class MainActivity : AppCompatActivity() {
             val settings by container.settings.settings.collectAsStateWithLifecycle(
                 initialValue = fr.kairossolum.pangmao.data.settings.AppSettings(),
             )
-            LaunchedEffect(settings.language) {
-                if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != settings.language.languageTag) {
-                    container.settings.applyLanguage(settings.language)
-                }
-            }
             PangmaoTheme(settings.themeMode) {
                 Surface {
                     PangmaoApp(
