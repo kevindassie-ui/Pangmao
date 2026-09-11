@@ -37,8 +37,10 @@ Checkpoint date: 2026-09-11
   Actions secrets, allowing later APKs to update the first installation.
 - Phase 2 run `34659129708` passed dictionary validation, all eleven unit tests,
   Android lint and debug APK assembly on commit `1c92f89`.
+- Final Phase 2 CI run `34659579861` passed the same checks and uploaded the
+  debug APK on release commit `caaf6c1`.
 
-## Published release
+## Previous release
 
 - Tag: `v0.1.0-mvp` at commit `b48d749`.
 - Release run `34636691630` rebuilt the dictionary, ran tests and lint, assembled
@@ -49,8 +51,12 @@ Checkpoint date: 2026-09-11
 
 ## Phase 2 publication
 
-- Target tag: `v0.2.0`.
-- Final CI and signed APK publication are in progress.
+- Tag: `v0.2.0` at commit `caaf6c1`.
+- Release run `34659758215` rebuilt the dictionary, ran all tests and lint,
+  assembled the release APK, and verified its Android signature successfully.
+- APK: `Pangmao-v0.2.0.apk` (118,716,908 bytes).
+- SHA-256: `d64365f5208ad146adb1c39106a90a45b6b5e4d20d6e7791b7c090c6f14c65ee`.
+- Download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.2.0/Pangmao-v0.2.0.apk>
 
 ## Later iteration
 
