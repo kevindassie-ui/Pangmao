@@ -5,6 +5,9 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+val signingStorePath = providers.environmentVariable("PANGMAO_SIGNING_STORE_FILE").orNull
+val signingPassword = providers.environmentVariable("PANGMAO_SIGNING_PASSWORD").orNull
+
 android {
     namespace = "fr.kairossolum.pangmao"
     compileSdk = 35
@@ -22,9 +25,21 @@ android {
         resourceConfigurations += listOf("fr", "en", "zh")
     }
 
+    val pangmaoReleaseSigning = if (signingStorePath != null && signingPassword != null) {
+        signingConfigs.create("pangmaoRelease") {
+            storeFile = file(signingStorePath)
+            storePassword = signingPassword
+            keyAlias = "pangmao"
+            keyPassword = signingPassword
+        }
+    } else {
+        null
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = pangmaoReleaseSigning
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

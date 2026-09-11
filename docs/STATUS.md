@@ -27,22 +27,20 @@ Checkpoint date: 2026-09-11
   `checkDebugAarMetadata`. It was intentionally stopped to make this checkpoint;
   no source compilation failure had been reported.
 
-## Publication blocker
+## Verified on GitHub Actions
 
-The connected GitHub identity is `kevindassie-ui` and GitHub reports owner/admin
-permission on `kevindassie-ui/Pangmao`, but the GitHub connector reports no app
-installation and rejects writes with HTTP 403 `Resource not accessible by
-integration`. The repository is still empty until the GitHub app is authorised
-for this repository.
+- `main` is published at `kevindassie-ui/Pangmao`.
+- Run `34635287544` passed dictionary validation, all eight unit tests, Android
+  lint and debug APK assembly on commit `1a7a681`.
+- A persistent RSA-4096 Android release key is stored only in encrypted GitHub
+  Actions secrets, allowing later APKs to update the first installation.
 
 ## Resume sequence
 
-1. Authorise the ChatGPT/Codex GitHub app for `kevindassie-ui/Pangmao`.
-2. Publish the committed source tree to `main`.
-3. Let `Android CI` rebuild the legal source datasets, run unit tests and lint,
-   then assemble the debug APK.
-4. On a failure, inspect the failing job log, patch locally, commit and rerun.
-5. Download `Pangmao-MVP-APK`, verify its checksum and provide the installable APK.
+1. Commit and validate the stable release-signing workflow.
+2. Tag the green commit as `v0.1.0-mvp`.
+3. Let `Android APK Release` rebuild, test, lint, sign and verify the APK.
+4. Download the release asset, verify its checksum and provide the installable APK.
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.

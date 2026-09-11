@@ -18,8 +18,8 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 Download the APK attached to the latest GitHub prerelease, open it on Android,
 and allow installation from the browser or GitHub app when Android asks. The APK
-is a standard debug-signed personal build, so it is installable without the Play
-Store.
+is signed with Pangmao's persistent personal release key, so later versions can
+be installed as updates without the Play Store.
 
 ## Build
 
