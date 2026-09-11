@@ -1,0 +1,50 @@
+# Pangmao · 胖猫
+
+Pangmao is a private, offline-first Android Chinese dictionary and learning
+companion. It combines a large bilingual dictionary, a tappable text reader,
+on-device Chinese OCR and lightweight spaced repetition in one independent app.
+
+## MVP highlights
+
+- 132,000+ Chinese entries with simplified/traditional forms and pinyin.
+- French (CFDICT) and English (CC-CEDICT) definitions.
+- 76,000+ authentic Mandarin–English examples from Tatoeba.
+- Unihan character, radical, stroke and variant information.
+- Live camera OCR and image OCR with an ML model bundled in the APK.
+- Favorites, history and local flashcards.
+- No account, ads, analytics, server, subscription or Internet permission.
+
+## Install
+
+Download the APK attached to the latest GitHub prerelease, open it on Android,
+and allow installation from the browser or GitHub app when Android asks. The APK
+is a standard debug-signed personal build, so it is installable without the Play
+Store.
+
+## Build
+
+The build downloads pinned, checksum-verified public linguistic sources and
+normal free Maven dependencies:
+
+```bash
+tools/fetch_and_build_dictionary.sh
+./gradlew testDebugUnitTest lintDebug assembleDebug
+```
+
+Every push to `main` runs data validation, unit tests, Android lint and a debug
+APK build. A `v*` tag publishes the tested APK as a GitHub prerelease.
+
+## Architecture
+
+- Kotlin, Jetpack Compose and Material 3.
+- MVVM with `StateFlow` and repositories.
+- Immutable, pre-indexed SQLite dictionary asset.
+- Separate Room database for user-owned favorites, history and SRS state.
+- CameraX plus bundled ML Kit Chinese Text Recognition v2.
+- Minimum Android 8.0 (API 26), target Android 15 (API 35).
+
+See [MVP scope](docs/MVP_SCOPE.md), [source data and licenses](tools/SOURCES.md),
+and [notices](NOTICE.md).
+
+Pangmao is independent and unaffiliated with Pleco Software. It contains no
+proprietary Pleco content.

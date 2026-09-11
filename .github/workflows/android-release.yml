@@ -1,0 +1,36 @@
+name: Android APK Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Validate, test and build
+        run: |
+          tools/fetch_and_build_dictionary.sh
+          python3 tools/verify_dictionary.py
+          ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - name: Name APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk "Pangmao-${GITHUB_REF_NAME}.apk"
+      - name: Publish installable APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          "Pangmao-${GITHUB_REF_NAME}.apk"
+          --title "Pangmao ${GITHUB_REF_NAME}"
+          --notes "Premier APK personnel de Pangmao. Téléchargez le fichier APK ci-dessous puis autorisez l’installation depuis votre navigateur Android."
+          --prerelease
