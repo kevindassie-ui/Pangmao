@@ -1,4 +1,4 @@
-# Pangmao MVP — handoff status
+# Pangmao MVP — release status
 
 Checkpoint date: 2026-09-11
 
@@ -14,33 +14,33 @@ Checkpoint date: 2026-09-11
 - Reproducible dictionary builder and validator.
 - GitHub Actions workflows for build, unit tests, lint and APK artifacts.
 
-## Verified locally
+## Verified data
 
 - Dictionary integrity: 132,342 entries, 76,606 examples, 14,622 character records.
-- Gradle 8.9 successfully evaluated the complete Android project and listed all
-  Android build/test/lint tasks.
-- The first full pipeline attempt failed only because AGP requested Build Tools
-  34.0.0 while this environment had 35.0.0. The project now explicitly selects
-  Build Tools 35.0.0.
-- The second pipeline attempt passed SDK initialization, `preBuild`,
-  `preDebugBuild`, `generateDebugBuildConfig`, and reached
-  `checkDebugAarMetadata`. It was intentionally stopped to make this checkpoint;
-  no source compilation failure had been reported.
 
 ## Verified on GitHub Actions
 
 - `main` is published at `kevindassie-ui/Pangmao`.
 - Run `34635287544` passed dictionary validation, all eight unit tests, Android
   lint and debug APK assembly on commit `1a7a681`.
+- Run `34636124452` passed the same checks after adding the release workflow on
+  commit `b48d749`.
 - A persistent RSA-4096 Android release key is stored only in encrypted GitHub
   Actions secrets, allowing later APKs to update the first installation.
 
-## Resume sequence
+## Published release
 
-1. Commit and validate the stable release-signing workflow.
-2. Tag the green commit as `v0.1.0-mvp`.
-3. Let `Android APK Release` rebuild, test, lint, sign and verify the APK.
-4. Download the release asset, verify its checksum and provide the installable APK.
+- Tag: `v0.1.0-mvp` at commit `b48d749`.
+- Release run `34636691630` rebuilt the dictionary, ran tests and lint, assembled
+  the release APK, and verified its Android signature successfully.
+- APK: `Pangmao-v0.1.0-mvp.apk` (88,575,070 bytes).
+- SHA-256: `07b8b2aeed103072a3a02f0c63c0fbb4091cc9e66cfa07ff85f1eb6511638081`.
+- Download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.1.0-mvp/Pangmao-v0.1.0-mvp.apk>
+
+## Next iteration
+
+Collect device feedback, screenshots and reproducible bug reports. Keep the same
+application ID and GitHub signing secrets so future signed APKs update this install.
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
