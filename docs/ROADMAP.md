@@ -61,7 +61,7 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RELEASE_PLAN.md).
 
-## v0.4.1 — stabiliser les retours appareil · en préparation
+## v0.4.1 — stabiliser les retours appareil · publiée
 
 - Empêcher le chevauchement des hanzi colorés sur plusieurs lignes.
 - Fiabiliser l’initialisation TTS avec les moteurs Android qui répondent avant
@@ -80,6 +80,15 @@ Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RE
   registre, contresens et duplication.
 - Ajouter une vue détaillée par source, registre et catégorie grammaticale quand
   la donnée est assez fiable.
+
+La v0.5.0 reste volontairement centrée sur les données. Les commandes audio et
+l’extension de l’explorateur passent dans un lot v0.5.1 distinct afin que chaque
+version possède des critères d’acceptation cohérents.
+
+Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
+
+## v0.5.1 — écouter et explorer
+
 - Ajouter pause, vitesse, test de voix et suivi de lecture au TTS.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
   et relations caractère–mot–expression.

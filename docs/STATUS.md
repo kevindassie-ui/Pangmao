@@ -133,6 +133,22 @@ Checkpoint date: 2026-09-12
   navigation, word explorer, OCR relocation, pinyin repositioning and TTS
   diagnostic.
 
+## Corrective release 0.4.1
+
+- Tag: `v0.4.1` at commit `295a709`.
+- Implementation CI run `34725277909` and final CI run `34725441325` passed
+  full dictionary validation, unit tests, Android lint and debug APK assembly.
+- Release run `34725716490` repeated validation and tests, built both release
+  variants, verified their Android v2 signatures and published the assets.
+- ARM64 APK: `Pangmao-v0.4.1-arm64.apk` (84,475,982 bytes), SHA-256
+  `e9e5cde8998453dffb5f1783e60ab0e6174583a82db9bfc28de83000e2927306`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.4.1/Pangmao-v0.4.1-arm64.apk>
+- Universal APK: `Pangmao-v0.4.1-universal.apk` (183,251,636 bytes), SHA-256
+  `19933c7588bb8e321264710aed0816f8b8dff368c47b579424858aadc4713e46`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.4.1/Pangmao-v0.4.1-universal.apk>
+- Device acceptance remains to be completed for multiline hanzi, the existing
+  Chinese TTS voice and `肉夹馍` in both translation surfaces.
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced
@@ -144,7 +160,8 @@ update this install.
 The v0.2.1 corrective scope and remaining device acceptance are recorded in
 [NEXT_RELEASE.md](NEXT_RELEASE.md). Longer-term product work is tracked in
 [ROADMAP.md](ROADMAP.md), with accepted trade-offs recorded in
-[PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md).
+[PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md). The next isolated data-quality
+milestones are specified in [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
