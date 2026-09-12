@@ -90,7 +90,12 @@ class DictionarySegmenter(
 
     private fun MutableList<TextToken>.append(token: TextToken) {
         val previous = lastOrNull()
-        if (token.entryId == null && previous?.entryId == null && previous.isChinese == token.isChinese) {
+        if (
+            token.entryId == null &&
+            previous != null &&
+            previous.entryId == null &&
+            previous.isChinese == token.isChinese
+        ) {
             this[lastIndex] = previous.copy(text = previous.text + token.text)
         } else {
             add(token)
