@@ -81,3 +81,30 @@ constitue un usage quotidien autonome. Les radicaux, composants, arborescences,
 réglages de source et outils d'étude resteront des vues secondaires tant que les
 tests d'usage ne justifient pas davantage.
 
+## D-009 — OCR comme action rapide
+
+**Décision:** l’OCR reste accessible en un geste depuis l’accueil, mais ne
+conserve pas un onglet principal permanent. La navigation basse se concentre sur
+Dictionnaire, Lecteur et Cartes.
+
+**Pourquoi:** l’OCR est un mode d’entrée du dictionnaire, au même titre que le
+clavier et l’écriture, plutôt qu’une destination de consultation durable.
+
+## D-010 — analyse mot à mot à la demande
+
+**Décision:** la recherche montre d’abord le sens global. L’interprétation mot à
+mot et les blocs logiques sont réunis dans une section repliable, masquée par
+défaut et mémorisée pendant l’utilisation de l’écran.
+
+## D-011 — registre français contextuel
+
+**Décision:** ne pas transformer automatiquement chaque `你`/`vous` en `tu`.
+Pangmao privilégie une traduction française attestée ou révisée; les corrections
+automatiques de registre ne sont appliquées que lorsque le contexte et la
+conjugaison sont maîtrisés. `您` conserve le vouvoiement.
+
+## D-012 — aucune panne audio silencieuse
+
+**Décision:** si le TTS Android ne possède pas de voix chinoise utilisable,
+Pangmao affiche le diagnostic et l’action corrective. Une icône simplement
+désactivée n’est pas une réponse suffisante.

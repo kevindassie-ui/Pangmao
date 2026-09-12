@@ -107,8 +107,11 @@ Checkpoint date: 2026-09-12
 - Universal APK: `Pangmao-v0.3.1-universal.apk` (182,192,056 bytes), SHA-256
   `bd461e6ab4ea1df4a914fef53c51afcd2c4f376515a0475d6949e4dd885c44b6`.
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.3.1/Pangmao-v0.3.1-universal.apk>
-- Device acceptance remains to be completed for the compact reader, continuous
-  pinyin and the reported translation corrections.
+- Device acceptance confirms OCR, handwriting, general dictionary, FR/EN/both
+  definitions, multiword search and the compact reader are functional.
+- Follow-up observations are recorded for v0.4.0: re-centre the reader when
+  pinyin is re-enabled, make word-by-word analysis optional, continue improving
+  French phrasing, move OCR to the home actions and expose TTS failures.
 
 ## Later iteration
 

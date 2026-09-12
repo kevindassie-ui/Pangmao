@@ -48,6 +48,11 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 ## v0.4.0 — enrichir le dictionnaire français
 
+- Rendre l’analyse mot à mot de la recherche principale repliable et corriger le
+  repositionnement du pinyin dans le lecteur.
+- Déplacer l’OCR de la navigation basse vers les actions rapides de l’accueil.
+- Corriger avec prudence les formulations françaises contextuelles, sans
+  remplacer globalement `vous` par `tu`.
 - Rendre les sources dictionnaire interactives et expliquer précisément leur
   contribution à chaque fiche.
 - Ajouter pause, vitesse et suivi visuel à la lecture contextuelle; évaluer une
@@ -60,6 +65,8 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 - Ajouter catégories grammaticales, registre, collocations, classificateurs et
   exemples mieux alignés lorsqu'une ressource légale le permet.
 - Offrir une vue simple fusionnée et une vue avancée par source.
+
+Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RELEASE_PLAN.md).
 
 ## v0.5.0 — modes d'apprentissage
 
