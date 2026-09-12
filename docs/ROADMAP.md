@@ -21,7 +21,7 @@ Dernière mise à jour: 2026-09-12.
 
 Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
-## v0.3.0 — comprendre un texte
+## v0.3.0 — comprendre un texte · candidate
 
 - Unifier le moteur de la recherche et du lecteur.
 - Afficher une interprétation globale puis des blocs logiques nettement séparés.
@@ -31,9 +31,8 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 - Ajouter le choix persistant `français`, `anglais` ou `les deux`.
 - Ajouter traduction de phrase, pinyin et définitions sous forme de couches
   activables plutôt que d'écrans supplémentaires.
-- Ajouter lecture vocale de la phrase, pause, vitesse et suivi visuel du passage
-  prononcé; privilégier une voix système neuronale et prévoir un modèle local
-  optionnel si la qualité reste insuffisante.
+- Ajouter la lecture vocale du texte complet. La pause, la vitesse et le suivi
+  visuel restent dans l'itération audio dédiée afin de ne pas fragiliser ce lot.
 - Ajouter l'historique des requêtes, en distinguant l'historique déjà existant
   des fiches consultées.
 - Colorer les hanzi selon leur ton, ajouter le petit chat et alléger le titre en
@@ -41,6 +40,10 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 ## v0.4.0 — enrichir le dictionnaire français
 
+- Rendre les sources dictionnaire interactives et expliquer précisément leur
+  contribution à chaque fiche.
+- Ajouter pause, vitesse et suivi visuel à la lecture contextuelle; évaluer une
+  voix locale libre si les voix système restent insuffisantes.
 - Aligner les sens CFDICT et CC-CEDICT sans supprimer leurs contenus distincts.
 - Enrichir le français avec d'autres sources libres évaluées, notamment les
   extractions Wiktionary/Kaikki si leur qualité et leur licence conviennent.

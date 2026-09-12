@@ -50,5 +50,4 @@ jobs:
           "Pangmao-${GITHUB_REF_NAME}-universal.apk"
           "Pangmao-${GITHUB_REF_NAME}-universal.apk.sha256"
           --title "Pangmao ${GITHUB_REF_NAME}"
-          --notes "Version corrective : saisie manuscrite stabilisée, interface chinoise corrigée et APK ARM64 allégé. Sur un téléphone Android récent, installez l’APK arm64 ; utilisez l’APK universel uniquement en cas d’incompatibilité."
-          --prerelease
+          --notes "Compréhension de texte : segmentation contextuelle, traduction locale facultative, lecteur structuré, définitions FR/EN, hanzi colorés par ton, historique des requêtes et reconnaissance manuscrite automatique. Sur un téléphone Android récent, installez l’APK arm64 ; utilisez l’APK universel uniquement en cas d’incompatibilité."

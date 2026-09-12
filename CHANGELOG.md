@@ -8,14 +8,26 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
-### Problèmes confirmés
+## 0.3.0 — 2026-09-12
 
-- Une suite de caractères absente comme entrée exacte, par exemple `大笨蛋`, ne
-  produit ni traduction globale ni résultats décomposés.
-- Le lecteur montre des segments visuellement collés, sans traduction, pinyin
-  ni définition directement visible.
-- Le téléchargement d'un APK depuis ChatGPT peut ne pas aboutir; le même fichier
-  se télécharge depuis l'application GitHub.
+### Ajouté
+
+- Interprétation globale des expressions et phrases, puis détail en blocs
+  logiques avec hanzi, pinyin, définition et accès à la fiche.
+- Traduction automatique facultative sur l'appareil, après téléchargement
+  explicite des modèles gratuits requis.
+- Choix persistant des définitions : français, anglais ou les deux.
+- Couches pinyin, traduction et définitions activables dans le lecteur.
+- Historique distinct des requêtes avec suppression individuelle ou totale.
+- Couleur des hanzi selon le ton et mascotte compacte dans l'accueil `胖猫`.
+
+### Modifié
+
+- Segmentation contextuelle commune à la recherche et au lecteur, notamment
+  pour `大 / 笨蛋` et `一 / 起床`.
+- Reconnaissance manuscrite de nouveau automatique après une courte pause,
+  tout en conservant la sérialisation qui empêche les crashs.
+- Lecture vocale disponible pour le texte complet du lecteur.
 
 ## 0.2.1 — 2026-09-12
 
@@ -55,6 +67,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
 [0.2.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.0
 [0.1.0-mvp]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.1.0-mvp
