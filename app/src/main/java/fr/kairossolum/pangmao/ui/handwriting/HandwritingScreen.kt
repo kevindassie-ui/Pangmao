@@ -118,14 +118,12 @@ private fun WritingContent(
                 Icon(Icons.Outlined.Undo, null)
                 Text("  ${stringResource(R.string.handwriting_undo)}", maxLines = 1)
             }
-            OutlinedButton(onClick = viewModel::clear, enabled = state.strokes.isNotEmpty()) {
-                Icon(Icons.Outlined.Clear, stringResource(R.string.clear))
-            }
-            Button(onClick = viewModel::recognize, enabled = state.strokes.isNotEmpty() && !state.isRecognizing) {
-                if (state.isRecognizing) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                else Text(stringResource(R.string.handwriting_recognize))
+            OutlinedButton(onClick = viewModel::clear, enabled = state.strokes.isNotEmpty(), modifier = Modifier.weight(1f)) {
+                Icon(Icons.Outlined.Clear, null)
+                Text("  ${stringResource(R.string.clear)}", maxLines = 1)
             }
         }
+        if (state.isRecognizing) CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 2.dp)
         if (state.candidates.isNotEmpty()) {
             Text(stringResource(R.string.handwriting_candidates), modifier = Modifier.fillMaxWidth(), fontWeight = FontWeight.Bold)
             LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
