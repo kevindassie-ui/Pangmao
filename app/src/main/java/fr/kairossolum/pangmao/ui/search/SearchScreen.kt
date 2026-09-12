@@ -214,7 +214,9 @@ fun SearchScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 24.dp),
             ) {
-                state.analysis?.let { analysis ->
+                state.analysis
+                    ?.takeIf { it.exactEntry == null || state.results.isEmpty() }
+                    ?.let { analysis ->
                     item(key = "analysis") {
                         SearchAnalysisCard(
                             analysis = analysis,

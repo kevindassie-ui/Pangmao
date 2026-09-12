@@ -1,0 +1,84 @@
+package fr.kairossolum.pangmao.ui.common
+
+import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
+import fr.kairossolum.pangmao.data.translation.TranslationRepository
+import fr.kairossolum.pangmao.data.translation.TranslationTarget
+import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.TextAnalysis
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Test
+
+class TextTranslationStateTest {
+    @Test
+    fun `exact dictionary entry never requires a translation model`() = runTest {
+        val repository = RecordingTranslationRepository()
+        var state = TextTranslationState()
+
+        resolveTextTranslation(
+            analysis = analysis("笨蛋", exactEntry = entry("笨蛋", "imbécile", "idiot")),
+            definitionLanguage = DefinitionLanguage.BOTH,
+            translation = repository,
+            update = { state = it },
+        )
+
+        assertEquals("imbécile", state.french)
+        assertEquals("idiot", state.english)
+        assertEquals(0, repository.readinessChecks)
+        assertEquals(0, repository.translations)
+        assertFalse(state.hasAutomaticTranslation)
+    }
+
+    @Test
+    fun `curated correction bypasses translation models`() = runTest {
+        val repository = RecordingTranslationRepository()
+        var state = TextTranslationState()
+
+        resolveTextTranslation(
+            analysis = analysis("好喜欢"),
+            definitionLanguage = DefinitionLanguage.FRENCH,
+            translation = repository,
+            update = { state = it },
+        )
+
+        assertEquals("aimer beaucoup ; adorer", state.french)
+        assertEquals(0, repository.readinessChecks)
+        assertEquals(0, repository.translations)
+    }
+
+    private fun analysis(source: String, exactEntry: DictionaryEntry? = null) = TextAnalysis(
+        sourceText = source,
+        exactEntry = exactEntry,
+        exactExample = null,
+        tokens = emptyList(),
+    )
+
+    private fun entry(source: String, french: String, english: String) = DictionaryEntry(
+        id = 1,
+        traditional = source,
+        simplified = source,
+        pinyin = "",
+        definitionsEnglish = listOf(english),
+        definitionsFrench = listOf(french),
+        sources = "test",
+        frequency = 1,
+    )
+
+    private class RecordingTranslationRepository : TranslationRepository {
+        var readinessChecks = 0
+        var translations = 0
+
+        override suspend fun isReady(target: TranslationTarget): Boolean {
+            readinessChecks += 1
+            return true
+        }
+
+        override suspend fun download(target: TranslationTarget) = Unit
+
+        override suspend fun translateChinese(text: String, target: TranslationTarget): String {
+            translations += 1
+            return "automatic"
+        }
+    }
+}

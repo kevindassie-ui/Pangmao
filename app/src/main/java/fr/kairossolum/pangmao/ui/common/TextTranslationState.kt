@@ -3,6 +3,7 @@ package fr.kairossolum.pangmao.ui.common
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.translation.TranslationTarget
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
+import fr.kairossolum.pangmao.domain.TranslationQuality
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import kotlinx.coroutines.CancellationException
 
@@ -10,6 +11,7 @@ data class TextTranslationState(
     val french: String? = null,
     val english: String? = null,
     val englishIsAttested: Boolean = false,
+    val hasAutomaticTranslation: Boolean = false,
     val missingTargets: Set<TranslationTarget> = emptySet(),
     val isChecking: Boolean = false,
     val isDownloading: Boolean = false,
@@ -33,13 +35,23 @@ suspend fun resolveTextTranslation(
     update: (TextTranslationState) -> Unit,
 ) {
     val requestedTargets = definitionLanguage.translationTargets()
+    val curated = TranslationQuality.curated(analysis.sourceText)
+    val trustedFrench = (curated?.french ?: analysis.exactEntry?.definitionsFrench?.firstOrNull())
+        ?.takeIf { TranslationTarget.FRENCH in requestedTargets }
     val attestedEnglish = analysis.exactExample?.english
         ?.takeIf { TranslationTarget.ENGLISH in requestedTargets }
+    val trustedEnglish = (curated?.english ?: analysis.exactEntry?.definitionsEnglish?.firstOrNull())
+        ?.takeIf { TranslationTarget.ENGLISH in requestedTargets }
+    val initialEnglish = attestedEnglish ?: trustedEnglish
     val automaticTargets = requestedTargets.filterNot {
-        it == TranslationTarget.ENGLISH && attestedEnglish != null
+        when (it) {
+            TranslationTarget.FRENCH -> trustedFrench != null
+            TranslationTarget.ENGLISH -> initialEnglish != null
+        }
     }
     var state = TextTranslationState(
-        english = attestedEnglish,
+        french = trustedFrench,
+        english = initialEnglish,
         englishIsAttested = attestedEnglish != null,
         isChecking = automaticTargets.isNotEmpty(),
     )
@@ -55,17 +67,24 @@ suspend fun resolveTextTranslation(
     }
     state = state.copy(isChecking = false, isTranslating = automaticTargets.isNotEmpty())
     update(state)
-    var french: String? = null
-    var english = attestedEnglish
+    var french = trustedFrench
+    var english = initialEnglish
     try {
         for (target in automaticTargets) {
             val translated = translation.translateChinese(analysis.sourceText, target)
             when (target) {
-                TranslationTarget.FRENCH -> french = translated
-                TranslationTarget.ENGLISH -> english = translated
+                TranslationTarget.FRENCH -> french = TranslationQuality.polishFrench(analysis.sourceText, translated)
+                TranslationTarget.ENGLISH -> english = TranslationQuality.polishEnglish(analysis.sourceText, translated)
             }
         }
-        update(state.copy(french = french, english = english, isTranslating = false))
+        update(
+            state.copy(
+                french = french,
+                english = english,
+                hasAutomaticTranslation = automaticTargets.isNotEmpty(),
+                isTranslating = false,
+            )
+        )
     } catch (error: CancellationException) {
         throw error
     } catch (error: Throwable) {

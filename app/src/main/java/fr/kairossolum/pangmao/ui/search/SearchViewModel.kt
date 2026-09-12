@@ -122,7 +122,7 @@ class SearchViewModel(
                 .takeIf { it.codePointCount(0, it.length) > 1 && containsHan(it) }
                 ?.let { dictionary.analyze(it) }
             _uiState.value = SearchUiState(results = results, analysis = analysis, isLoading = false)
-            if (analysis != null) {
+            if (analysis != null && analysis.exactEntry == null) {
                 resolveTextTranslation(
                     analysis = analysis,
                     definitionLanguage = language,

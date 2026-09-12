@@ -38,6 +38,14 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 - Colorer les hanzi selon leur ton, ajouter le petit chat et alléger le titre en
   `胖猫`.
 
+## v0.3.1 — lisibilité et qualité · en validation
+
+- Ne jamais demander un modèle de traduction lorsqu’une définition de
+  dictionnaire répond déjà exactement à la recherche.
+- Corriger les traductions automatiques erronées remontées pendant les tests.
+- Placer le pinyin continu et la traduction immédiatement sous le texte.
+- Supprimer l’aperçu mot à mot redondant tout en conservant les cartes détaillées.
+
 ## v0.4.0 — enrichir le dictionnaire français
 
 - Rendre les sources dictionnaire interactives et expliquer précisément leur

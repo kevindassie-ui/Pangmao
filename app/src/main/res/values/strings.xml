@@ -43,7 +43,7 @@
     <string name="reader_dictionary_gloss">Aperçu du dictionnaire</string>
     <string name="reader_english_attested">English · Tatoeba</string>
     <string name="reader_translation_download_body">Téléchargez une fois les modèles nécessaires (environ 30 Mo par langue) pour obtenir une traduction automatique hors ligne.</string>
-    <string name="reader_translation_download">Télécharger la traduction</string>
+    <string name="reader_translation_download">Télécharger une fois</string>
     <string name="reader_translation_downloading">Téléchargement du modèle…</string>
     <string name="reader_translation_working">Analyse et traduction…</string>
     <string name="reader_translation_error">La traduction locale est momentanément indisponible.</string>

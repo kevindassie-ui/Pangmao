@@ -75,11 +75,13 @@ fun coloredHanzi(
 @Composable
 fun PinyinText(
     numbered: String,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = TextUnit.Unspecified,
     bold: Boolean = false,
 ) {
     Text(
         text = coloredPinyin(numbered, bold),
+        modifier = modifier,
         fontSize = fontSize,
         color = LocalContentColor.current,
     )

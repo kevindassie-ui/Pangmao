@@ -54,13 +54,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
-import fr.kairossolum.pangmao.domain.model.TextAnalysis
+import fr.kairossolum.pangmao.domain.numberedPinyinReading
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
-import fr.kairossolum.pangmao.ui.common.primaryDefinition
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -170,6 +169,11 @@ fun ReaderScreen(
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
+                    if (showPinyin) {
+                        item(key = "continuous-pinyin") {
+                            ContinuousPinyin(currentAnalysis.numberedPinyinReading())
+                        }
+                    }
                     item(key = "layers") {
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             item {
@@ -198,9 +202,7 @@ fun ReaderScreen(
                     if (showTranslation) {
                         item(key = "translation") {
                             ReaderTranslationCard(
-                                analysis = currentAnalysis,
                                 translation = translation,
-                                definitionLanguage = definitionLanguage,
                                 onDownload = viewModel::downloadTranslationModels,
                             )
                         }
@@ -248,31 +250,11 @@ fun ReaderScreen(
 
 @Composable
 private fun ReaderTranslationCard(
-    analysis: TextAnalysis,
     translation: TextTranslationState,
-    definitionLanguage: DefinitionLanguage,
     onDownload: () -> Unit,
 ) {
-    val gloss = analysis.exactEntry?.primaryDefinition(definitionLanguage)
-        ?: analysis.tokens.mapNotNull { it.entry?.primaryDefinition(definitionLanguage)?.takeUnless { value -> value == "—" } }
-            .joinToString(" · ")
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(stringResource(R.string.reader_translation), fontWeight = FontWeight.Bold)
-                Text(
-                    stringResource(R.string.reader_translation_local),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-            if (gloss.isNotBlank()) {
-                TranslationLine(stringResource(R.string.reader_dictionary_gloss), gloss)
-            }
             translation.french?.let {
                 TranslationLine(stringResource(R.string.french), it)
             }
@@ -310,7 +292,7 @@ private fun ReaderTranslationCard(
             if (translation.error != null) {
                 Text(stringResource(R.string.reader_translation_error), color = MaterialTheme.colorScheme.error)
             }
-            if (translation.french != null || (translation.english != null && !translation.englishIsAttested)) {
+            if (translation.hasAutomaticTranslation) {
                 Text(
                     stringResource(R.string.reader_translation_notice),
                     style = MaterialTheme.typography.labelSmall,
@@ -318,6 +300,21 @@ private fun ReaderTranslationCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun ContinuousPinyin(numberedPinyin: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
+    ) {
+        PinyinText(
+            numbered = numberedPinyin,
+            fontSize = 17.sp,
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp),
+        )
     }
 }
 

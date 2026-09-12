@@ -8,6 +8,24 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.3.1 — 2026-09-12
+
+### Corrigé
+
+- Les mots déjà couverts par le dictionnaire n’exigent plus le téléchargement
+  d’un modèle de traduction.
+- Les traductions aberrantes signalées pour `傻比` et `好喜欢` sont remplacées
+  par des formulations françaises et anglaises révisées.
+- La phrase d’exemple du lecteur dispose d’une traduction humaine naturelle.
+
+### Modifié
+
+- Le pinyin continu apparaît juste sous le texte du lecteur et reste activable.
+- Le bloc `Comprendre la phrase` et son long aperçu mot à mot sont supprimés;
+  la traduction compacte précède désormais le détail par blocs logiques.
+- Le téléchargement ponctuel des modèles de traduction est présenté comme une
+  opération unique; les modèles installés restent disponibles hors ligne.
+
 ## 0.3.0 — 2026-09-12
 
 ### Ajouté
@@ -68,6 +86,7 @@ numéros suivent le versionnage sémantique.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
 [0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
+[0.3.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.1
 [0.2.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.0
 [0.1.0-mvp]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.1.0-mvp
