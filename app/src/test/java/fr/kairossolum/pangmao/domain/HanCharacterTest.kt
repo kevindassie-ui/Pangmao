@@ -1,7 +1,9 @@
 package fr.kairossolum.pangmao.domain
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HanCharacterTest {
@@ -15,5 +17,10 @@ class HanCharacterTest {
 
     @Test fun rejectsNonHanCandidate() {
         assertNull(firstHanCharacter("ABC 123"))
+    }
+
+    @Test fun detectsHanAnywhereInText() {
+        assertTrue(containsHan("hello 大笨蛋!"))
+        assertFalse(containsHan("hello 123"))
     }
 }

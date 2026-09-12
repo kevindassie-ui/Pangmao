@@ -10,3 +10,7 @@ fun firstHanCharacter(value: String): String? {
     }
     return null
 }
+
+fun containsHan(value: String): Boolean = value.codePoints().anyMatch {
+    Character.UnicodeScript.of(it) == Character.UnicodeScript.HAN
+}

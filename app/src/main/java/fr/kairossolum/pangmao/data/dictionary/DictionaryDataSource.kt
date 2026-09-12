@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import fr.kairossolum.pangmao.domain.Pinyin
+import fr.kairossolum.pangmao.domain.HeadwordMatch
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
@@ -158,6 +159,27 @@ class DictionaryDataSource(private val context: Context) {
         }
     }
 
+    fun exactExample(text: String): ExampleSentence? = database.rawQuery(
+        """
+        SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english
+        FROM examples
+        WHERE chinese = ?
+        ORDER BY id
+        LIMIT 1
+        """.trimIndent(),
+        arrayOf(text),
+    ).use { cursor ->
+        if (!cursor.moveToFirst()) return@use null
+        ExampleSentence(
+            id = cursor.getLong(0),
+            tatoebaChineseId = cursor.getLong(1),
+            chinese = cursor.getString(2),
+            pinyin = cursor.getString(3),
+            tatoebaEnglishId = cursor.getLong(4),
+            english = cursor.getString(5),
+        )
+    }
+
     fun characters(text: String): List<CharacterInfo> {
         val characters = text.codePoints().toArray().map { String(Character.toChars(it)) }.distinct()
         if (characters.isEmpty()) return emptyList()
@@ -187,12 +209,19 @@ class DictionaryDataSource(private val context: Context) {
         return characters.mapNotNull(result::get)
     }
 
-    fun headwords(): Map<String, Long> = database.rawQuery(
-        "SELECT word, preferred_entry_id FROM headwords WHERE length <= 8",
+    fun headwords(): Map<String, HeadwordMatch> = database.rawQuery(
+        """
+        SELECT h.word, h.preferred_entry_id, e.frequency
+        FROM headwords h
+        JOIN entries e ON e.id = h.preferred_entry_id
+        WHERE h.length <= 8
+        """.trimIndent(),
         null,
     ).use { cursor ->
         buildMap {
-            while (cursor.moveToNext()) put(cursor.getString(0), cursor.getLong(1))
+            while (cursor.moveToNext()) {
+                put(cursor.getString(0), HeadwordMatch(cursor.getLong(1), cursor.getInt(2)))
+            }
         }
     }
 

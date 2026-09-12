@@ -16,6 +16,13 @@
     <string name="search_frequent">Mots fréquents</string>
     <string name="search_empty">Aucune entrée pour « %1$s »</string>
     <string name="search_empty_help">Essayez un mot plus court, le pinyin sans espaces, ou sélectionnez les caractères dans le lecteur.</string>
+    <string name="search_analysis">Analyse du texte</string>
+    <string name="search_whole_expression">Expression complète</string>
+    <string name="search_attested_translation">Traduction attestée · anglais</string>
+    <string name="search_word_gloss">Interprétation mot à mot</string>
+    <string name="search_breakdown">Blocs logiques</string>
+    <string name="search_dictionary_results">Résultats du dictionnaire</string>
+    <string name="search_unknown_block">Aucune entrée</string>
     <string name="about_and_licenses">À propos et licences</string>
     <string name="settings">Paramètres</string>
     <string name="input_keyboard">Clavier</string>

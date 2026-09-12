@@ -44,3 +44,14 @@ data class TextToken(
     val isChinese: Boolean = false,
 )
 
+data class AnalyzedToken(
+    val token: TextToken,
+    val entry: DictionaryEntry?,
+)
+
+data class TextAnalysis(
+    val sourceText: String,
+    val exactEntry: DictionaryEntry?,
+    val exactExample: ExampleSentence?,
+    val tokens: List<AnalyzedToken>,
+)
