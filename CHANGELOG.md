@@ -10,14 +10,24 @@ numéros suivent le versionnage sémantique.
 
 ### Problèmes confirmés
 
-- L'écriture manuscrite peut fermer l'application dès le premier trait.
-- Le choix `简体中文` peut laisser l'interface dans la langue du système.
 - Une suite de caractères absente comme entrée exacte, par exemple `大笨蛋`, ne
   produit ni traduction globale ni résultats décomposés.
 - Le lecteur montre des segments visuellement collés, sans traduction, pinyin
   ni définition directement visible.
 - Le téléchargement d'un APK depuis ChatGPT peut ne pas aboutir; le même fichier
   se télécharge depuis l'application GitHub.
+
+## 0.2.1 — 2026-09-12
+
+### Corrigé
+
+- Reconnaissance manuscrite déclenchée explicitement, sérialisée et protégée
+  contre les erreurs et résultats obsolètes afin d'éviter le crash au tracé.
+- Ressources chinoises alignées sur la balise Android `zh-Hans`.
+
+### Ajouté
+
+- APK ARM64 allégé pour les téléphones récents, en complément de l'APK universel.
 
 ## 0.2.0 — 2026-09-11
 
@@ -45,6 +55,6 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.2.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.0
 [0.1.0-mvp]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.1.0-mvp
-
