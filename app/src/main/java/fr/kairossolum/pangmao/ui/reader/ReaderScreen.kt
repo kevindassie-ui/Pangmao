@@ -166,22 +166,27 @@ fun ReaderScreen(
             )
         }
         if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE || speaker.status == SpeakerStatus.ERROR) {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     stringResource(
                         if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE) R.string.tts_voice_missing
                         else R.string.tts_unavailable
                     ),
-                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
-                TextButton(onClick = { speaker.openVoiceInstallation(context) }) {
-                    Text(stringResource(R.string.tts_open_settings))
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    TextButton(onClick = { speaker.retry(context) }) {
+                        Text(stringResource(R.string.tts_retry))
+                    }
+                    TextButton(onClick = { speaker.openVoiceSettings(context) }) {
+                        Text(stringResource(R.string.tts_open_settings))
+                    }
                 }
             }
         }

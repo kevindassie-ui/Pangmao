@@ -61,6 +61,15 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RELEASE_PLAN.md).
 
+## v0.4.1 — stabiliser les retours appareil · en préparation
+
+- Empêcher le chevauchement des hanzi colorés sur plusieurs lignes.
+- Fiabiliser l’initialisation TTS avec les moteurs Android qui répondent avant
+  l’affectation de leur instance, sélectionner d’abord une voix chinoise
+  disponible et relancer la détection au retour des paramètres.
+- Protéger `肉夹馍`/`肉夾饃` avant la traduction automatique, dans le lecteur
+  comme dans l’analyse de texte du dictionnaire.
+
 ## v0.5.0 — profondeur et qualité du corpus
 
 - Importer un corpus chinois–français direct, versionné et attribué; mesurer la

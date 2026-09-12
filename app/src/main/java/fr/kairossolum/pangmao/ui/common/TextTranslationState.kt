@@ -71,8 +71,9 @@ suspend fun resolveTextTranslation(
     var french = trustedFrench
     var english = initialEnglish
     try {
+        val machineSource = TranslationQuality.prepareForMachineTranslation(analysis.sourceText)
         for (target in automaticTargets) {
-            val translated = translation.translateChinese(analysis.sourceText, target)
+            val translated = translation.translateChinese(machineSource, target)
             when (target) {
                 TranslationTarget.FRENCH -> french = TranslationQuality.polishFrench(analysis.sourceText, translated)
                 TranslationTarget.ENGLISH -> english = TranslationQuality.polishEnglish(analysis.sourceText, translated)

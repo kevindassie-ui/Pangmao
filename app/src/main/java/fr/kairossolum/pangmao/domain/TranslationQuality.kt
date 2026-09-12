@@ -28,6 +28,14 @@ object TranslationQuality {
             french = "gros imbécile",
             english = "big idiot",
         ),
+        "肉夹馍" to CuratedTranslation(
+            french = "roujiamo ; petit pain chinois garni de viande",
+            english = "roujiamo; Chinese flatbread filled with chopped meat",
+        ),
+        "肉夾饃" to CuratedTranslation(
+            french = "roujiamo ; petit pain chinois garni de viande",
+            english = "roujiamo; Chinese flatbread filled with chopped meat",
+        ),
         "你是不是一个大笨蛋" to CuratedTranslation(
             french = "Tu es vraiment un gros imbécile ?",
             english = "Are you a complete idiot?",
@@ -52,11 +60,20 @@ object TranslationQuality {
 
     fun curated(source: String): CuratedTranslation? = curated[normalizeSource(source)]
 
+    /** Keeps culturally specific food names intact while the local model translates the sentence. */
+    fun prepareForMachineTranslation(source: String): String = source
+        .replace("肉夹馍", " roujiamo ")
+        .replace("肉夾饃", " roujiamo ")
+        .replace(Regex("[ \\t]+"), " ")
+        .trim()
+
     fun polishFrench(source: String, candidate: String): String {
         curated(source)?.let { return it.french }
         var result = clean(candidate)
-        if (normalizeSource(source).contains("肉夹馍")) {
-            result = result.replace(Regex("(?i)pinces? (?:à|de) (?:la )?viande"), "roujiamos")
+        if (containsRoujiamo(source)) {
+            result = result
+                .replace(Regex("(?i)(?:pinces|sandwichs|pains|hamburgers) (?:à|de) (?:la )?viande"), "roujiamos")
+                .replace(Regex("(?i)(?:pince|sandwich|pain|hamburger) (?:à|de) (?:la )?viande"), "roujiamo")
         }
         return result
     }
@@ -64,10 +81,16 @@ object TranslationQuality {
     fun polishEnglish(source: String, candidate: String): String {
         curated(source)?.let { return it.english }
         var result = clean(candidate)
-        if (normalizeSource(source).contains("肉夹馍")) {
-            result = result.replace(Regex("(?i)meat clamps?"), "roujiamos")
+        if (containsRoujiamo(source)) {
+            result = result
+                .replace(Regex("(?i)meat (?:clamps|clips|wedges|sandwiches|buns|burgers)"), "roujiamos")
+                .replace(Regex("(?i)meat (?:clamp|clip|wedge|sandwich|bun|burger)"), "roujiamo")
         }
         return result
+    }
+
+    private fun containsRoujiamo(value: String): Boolean = normalizeSource(value).let {
+        it.contains("肉夹馍") || it.contains("肉夾饃")
     }
 
     private fun normalizeSource(value: String): String = value

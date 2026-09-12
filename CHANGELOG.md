@@ -8,6 +8,16 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Corrigé
+
+- Les longues lignes de hanzi colorés disposent d’un interligne explicite et
+  ne se chevauchent plus dans l’analyse de texte.
+- Le TTS réutilise en priorité une voix chinoise déjà exposée par Android,
+  gère les moteurs dont l’initialisation répond immédiatement, puis se relance
+  au retour des paramètres; le diagnostic propose aussi une nouvelle tentative.
+- `肉夹馍` et `肉夾饃` ont une interprétation bilingue revue et restent
+  « roujiamo » dans les phrases envoyées au traducteur local.
+
 ## 0.4.0 — 2026-09-12
 
 ### Ajouté

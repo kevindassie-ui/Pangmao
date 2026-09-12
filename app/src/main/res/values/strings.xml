@@ -53,7 +53,8 @@
     <string name="reader_translation_notice">Traduction automatique locale : vérifiez les nuances importantes.</string>
     <string name="tts_voice_missing">Aucune voix chinoise n’est installée.</string>
     <string name="tts_unavailable">La synthèse vocale Android est indisponible.</string>
-    <string name="tts_open_settings">Installer</string>
+    <string name="tts_retry">Réessayer</string>
+    <string name="tts_open_settings">Paramètres TTS</string>
 
     <string name="ocr_title">OCR chinois</string>
     <string name="ocr_subtitle">Caméra et images · traitement local</string>

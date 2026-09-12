@@ -84,6 +84,24 @@ class TextTranslationStateTest {
         assertEquals(0, repository.translations)
     }
 
+    @Test
+    fun `cultural food name is protected before automatic sentence translation`() = runTest {
+        val repository = RecordingTranslationRepository()
+
+        resolveTextTranslation(
+            analysis = analysis("我买了两个肉夹馍"),
+            definitionLanguage = DefinitionLanguage.BOTH,
+            translation = repository,
+            update = {},
+        )
+
+        assertEquals(2, repository.translations)
+        assertEquals(
+            listOf("我买了两个 roujiamo", "我买了两个 roujiamo"),
+            repository.translatedTexts,
+        )
+    }
+
     private fun analysis(source: String, exactEntry: DictionaryEntry? = null) = TextAnalysis(
         sourceText = source,
         exactEntry = exactEntry,
@@ -105,6 +123,7 @@ class TextTranslationStateTest {
     private class RecordingTranslationRepository : TranslationRepository {
         var readinessChecks = 0
         var translations = 0
+        val translatedTexts = mutableListOf<String>()
 
         override suspend fun isReady(target: TranslationTarget): Boolean {
             readinessChecks += 1
@@ -115,6 +134,7 @@ class TextTranslationStateTest {
 
         override suspend fun translateChinese(text: String, target: TranslationTarget): String {
             translations += 1
+            translatedTexts += text
             return "automatic"
         }
     }

@@ -291,6 +291,7 @@ private fun SearchAnalysisCard(
                     }
                 },
                 fontSize = 30.sp,
+                lineHeight = 42.sp,
             )
             translation.french?.let { MeaningBlock(R.string.french, it) }
             translation.english?.let {

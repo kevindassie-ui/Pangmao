@@ -48,6 +48,14 @@ class TranslationQualityTest {
     @Test
     fun `protects roujiamo from literal model output`() {
         assertEquals(
+            "我买了三个 roujiamo",
+            TranslationQuality.prepareForMachineTranslation("我买了三个肉夹馍"),
+        )
+        assertEquals(
+            "我买了三个 roujiamo",
+            TranslationQuality.prepareForMachineTranslation("我买了三个肉夾饃"),
+        )
+        assertEquals(
             "J’ai acheté trois roujiamos.",
             TranslationQuality.polishFrench("我买了三个肉夹馍", "J’ai acheté trois pinces à viande."),
         )
@@ -55,5 +63,15 @@ class TranslationQualityTest {
             "I bought three roujiamos.",
             TranslationQuality.polishEnglish("我买了三个肉夹馍", "I bought three meat clamps."),
         )
+    }
+
+    @Test
+    fun `provides a curated bilingual definition for roujiamo itself`() {
+        val simplified = TranslationQuality.curated("肉夹馍")
+        val traditional = TranslationQuality.curated("肉夾饃")
+
+        assertEquals("roujiamo ; petit pain chinois garni de viande", simplified?.french)
+        assertEquals("roujiamo; Chinese flatbread filled with chopped meat", simplified?.english)
+        assertEquals(simplified, traditional)
     }
 }
