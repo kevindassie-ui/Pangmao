@@ -8,6 +8,8 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.4.1 — 2026-09-12
+
 ### Corrigé
 
 - Les longues lignes de hanzi colorés disposent d’un interligne explicite et
@@ -123,6 +125,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.4.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.1
 [0.4.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.0
 [0.3.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.1
 [0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
