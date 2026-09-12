@@ -8,10 +8,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.Locale
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
+
+enum class DefinitionLanguage { FRENCH, ENGLISH, BOTH }
 
 enum class AppLanguage(val languageTag: String) {
     SYSTEM(""),
@@ -23,15 +26,20 @@ enum class AppLanguage(val languageTag: String) {
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: AppLanguage = AppLanguage.SYSTEM,
+    val definitionLanguage: DefinitionLanguage = DefinitionLanguage.FRENCH,
 )
 
 class SettingsRepository(private val context: Context) {
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { preferences ->
+        val language = preferences[LANGUAGE]?.let { runCatching { AppLanguage.valueOf(it) }.getOrNull() }
+            ?: AppLanguage.SYSTEM
         AppSettings(
             themeMode = preferences[THEME]?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() }
                 ?: ThemeMode.SYSTEM,
-            language = preferences[LANGUAGE]?.let { runCatching { AppLanguage.valueOf(it) }.getOrNull() }
-                ?: AppLanguage.SYSTEM,
+            language = language,
+            definitionLanguage = preferences[DEFINITION_LANGUAGE]
+                ?.let { runCatching { DefinitionLanguage.valueOf(it) }.getOrNull() }
+                ?: defaultDefinitionLanguage(language),
         )
     }
 
@@ -44,6 +52,10 @@ class SettingsRepository(private val context: Context) {
         applyLanguage(value)
     }
 
+    suspend fun setDefinitionLanguage(value: DefinitionLanguage) {
+        context.settingsDataStore.edit { it[DEFINITION_LANGUAGE] = value.name }
+    }
+
     fun applyLanguage(value: AppLanguage) {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(value.languageTag))
     }
@@ -51,5 +63,17 @@ class SettingsRepository(private val context: Context) {
     private companion object {
         val THEME = stringPreferencesKey("theme")
         val LANGUAGE = stringPreferencesKey("language")
+        val DEFINITION_LANGUAGE = stringPreferencesKey("definition_language")
+
+        fun defaultDefinitionLanguage(language: AppLanguage): DefinitionLanguage = when (language) {
+            AppLanguage.FRENCH -> DefinitionLanguage.FRENCH
+            AppLanguage.ENGLISH -> DefinitionLanguage.ENGLISH
+            AppLanguage.CHINESE -> DefinitionLanguage.BOTH
+            AppLanguage.SYSTEM -> when (Locale.getDefault().language) {
+                "en" -> DefinitionLanguage.ENGLISH
+                "zh" -> DefinitionLanguage.BOTH
+                else -> DefinitionLanguage.FRENCH
+            }
+        }
     }
 }

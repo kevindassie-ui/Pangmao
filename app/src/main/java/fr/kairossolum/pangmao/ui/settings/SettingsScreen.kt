@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.data.settings.AppLanguage
+import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,29 +46,42 @@ fun SettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 }
             },
         )
-        SectionTitle(R.string.settings_language)
-        LanguageRow(R.string.settings_language_system, settings.language == AppLanguage.SYSTEM) {
-            viewModel.setLanguage(AppLanguage.SYSTEM)
-        }
-        LanguageRow(R.string.settings_language_french, settings.language == AppLanguage.FRENCH) {
-            viewModel.setLanguage(AppLanguage.FRENCH)
-        }
-        LanguageRow(R.string.settings_language_english, settings.language == AppLanguage.ENGLISH) {
-            viewModel.setLanguage(AppLanguage.ENGLISH)
-        }
-        LanguageRow(R.string.settings_language_chinese, settings.language == AppLanguage.CHINESE) {
-            viewModel.setLanguage(AppLanguage.CHINESE)
-        }
-        HorizontalDivider(Modifier.padding(vertical = 12.dp))
-        SectionTitle(R.string.settings_theme)
-        LanguageRow(R.string.settings_theme_system, settings.themeMode == ThemeMode.SYSTEM) {
-            viewModel.setTheme(ThemeMode.SYSTEM)
-        }
-        LanguageRow(R.string.settings_theme_light, settings.themeMode == ThemeMode.LIGHT) {
-            viewModel.setTheme(ThemeMode.LIGHT)
-        }
-        LanguageRow(R.string.settings_theme_dark, settings.themeMode == ThemeMode.DARK) {
-            viewModel.setTheme(ThemeMode.DARK)
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            SectionTitle(R.string.settings_language)
+            LanguageRow(R.string.settings_language_system, settings.language == AppLanguage.SYSTEM) {
+                viewModel.setLanguage(AppLanguage.SYSTEM)
+            }
+            LanguageRow(R.string.settings_language_french, settings.language == AppLanguage.FRENCH) {
+                viewModel.setLanguage(AppLanguage.FRENCH)
+            }
+            LanguageRow(R.string.settings_language_english, settings.language == AppLanguage.ENGLISH) {
+                viewModel.setLanguage(AppLanguage.ENGLISH)
+            }
+            LanguageRow(R.string.settings_language_chinese, settings.language == AppLanguage.CHINESE) {
+                viewModel.setLanguage(AppLanguage.CHINESE)
+            }
+            HorizontalDivider(Modifier.padding(vertical = 12.dp))
+            SectionTitle(R.string.settings_definitions)
+            LanguageRow(R.string.settings_definitions_french, settings.definitionLanguage == DefinitionLanguage.FRENCH) {
+                viewModel.setDefinitionLanguage(DefinitionLanguage.FRENCH)
+            }
+            LanguageRow(R.string.settings_definitions_english, settings.definitionLanguage == DefinitionLanguage.ENGLISH) {
+                viewModel.setDefinitionLanguage(DefinitionLanguage.ENGLISH)
+            }
+            LanguageRow(R.string.settings_definitions_both, settings.definitionLanguage == DefinitionLanguage.BOTH) {
+                viewModel.setDefinitionLanguage(DefinitionLanguage.BOTH)
+            }
+            HorizontalDivider(Modifier.padding(vertical = 12.dp))
+            SectionTitle(R.string.settings_theme)
+            LanguageRow(R.string.settings_theme_system, settings.themeMode == ThemeMode.SYSTEM) {
+                viewModel.setTheme(ThemeMode.SYSTEM)
+            }
+            LanguageRow(R.string.settings_theme_light, settings.themeMode == ThemeMode.LIGHT) {
+                viewModel.setTheme(ThemeMode.LIGHT)
+            }
+            LanguageRow(R.string.settings_theme_dark, settings.themeMode == ThemeMode.DARK) {
+                viewModel.setTheme(ThemeMode.DARK)
+            }
         }
     }
 }

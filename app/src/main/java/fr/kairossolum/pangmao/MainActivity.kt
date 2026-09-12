@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,6 +39,7 @@ import androidx.navigation.NavType
 import fr.kairossolum.pangmao.ui.about.AboutScreen
 import fr.kairossolum.pangmao.ui.about.AboutViewModel
 import fr.kairossolum.pangmao.ui.common.viewModelFactory
+import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.entry.EntryScreen
 import fr.kairossolum.pangmao.ui.entry.EntryViewModel
 import fr.kairossolum.pangmao.ui.handwriting.HandwritingScreen
@@ -67,13 +69,15 @@ class MainActivity : AppCompatActivity() {
             val settings by container.settings.settings.collectAsStateWithLifecycle(
                 initialValue = fr.kairossolum.pangmao.data.settings.AppSettings(),
             )
-            PangmaoTheme(settings.themeMode) {
-                Surface {
-                    PangmaoApp(
-                        container = container,
-                        sharedText = _sharedText.asStateFlow(),
-                        consumeSharedText = { _sharedText.value = null },
-                    )
+            CompositionLocalProvider(LocalDefinitionLanguage provides settings.definitionLanguage) {
+                PangmaoTheme(settings.themeMode) {
+                    Surface {
+                        PangmaoApp(
+                            container = container,
+                            sharedText = _sharedText.asStateFlow(),
+                            consumeSharedText = { _sharedText.value = null },
+                        )
+                    }
                 }
             }
         }
@@ -142,7 +146,14 @@ private fun PangmaoApp(
             NavHost(navController = navController, startDestination = "dictionary") {
                 composable("dictionary") { entry ->
                     val model: SearchViewModel = viewModel(
-                        factory = viewModelFactory { SearchViewModel(container.dictionary, container.study) }
+                        factory = viewModelFactory {
+                            SearchViewModel(
+                                container.dictionary,
+                                container.study,
+                                container.settings,
+                                container.translation,
+                            )
+                        }
                     )
                     val handwritten by entry.savedStateHandle
                         .getStateFlow("handwritten", "")
@@ -163,7 +174,9 @@ private fun PangmaoApp(
                 }
                 composable("reader") {
                     val model: ReaderViewModel = viewModel(
-                        factory = viewModelFactory { ReaderViewModel(container.dictionary) }
+                        factory = viewModelFactory {
+                            ReaderViewModel(container.dictionary, container.settings, container.translation)
+                        }
                     )
                     LaunchedEffect(incomingText) {
                         incomingText?.takeIf(String::isNotBlank)?.let {

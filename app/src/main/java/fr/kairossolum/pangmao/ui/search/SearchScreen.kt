@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,9 +17,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Draw
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +47,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.PinyinText
+import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
+import fr.kairossolum.pangmao.ui.common.primaryDefinition
+import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
@@ -154,7 +160,12 @@ fun SearchScreen(
             ) {
                 state.analysis?.let { analysis ->
                     item(key = "analysis") {
-                        SearchAnalysisCard(analysis, onOpenEntry)
+                        SearchAnalysisCard(
+                            analysis = analysis,
+                            translation = state.translation,
+                            onDownloadTranslation = viewModel::downloadTranslationModels,
+                            onOpenEntry = onOpenEntry,
+                        )
                     }
                     if (state.results.isNotEmpty()) {
                         item { SectionTitle(stringResource(R.string.search_dictionary_results)) }
@@ -169,10 +180,16 @@ fun SearchScreen(
 }
 
 @Composable
-private fun SearchAnalysisCard(analysis: TextAnalysis, onOpenEntry: (Long) -> Unit) {
+private fun SearchAnalysisCard(
+    analysis: TextAnalysis,
+    translation: TextTranslationState,
+    onDownloadTranslation: () -> Unit,
+    onOpenEntry: (Long) -> Unit,
+) {
+    val definitionLanguage = LocalDefinitionLanguage.current
     val chineseTokens = analysis.tokens.filter { it.token.isChinese }
-    val exactMeaning = analysis.exactEntry?.let(::preferredMeaning)
-    val gloss = chineseTokens.mapNotNull { it.entry?.let(::preferredMeaning) }.joinToString(" · ")
+    val exactMeaning = analysis.exactEntry?.primaryDefinition(definitionLanguage)
+    val gloss = chineseTokens.mapNotNull { it.entry?.primaryDefinition(definitionLanguage) }.joinToString(" · ")
     ElevatedCard(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
@@ -187,12 +204,36 @@ private fun SearchAnalysisCard(analysis: TextAnalysis, onOpenEntry: (Long) -> Un
                 fontWeight = FontWeight.Bold,
             )
             Text(analysis.sourceText, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+            translation.french?.let { MeaningBlock(R.string.french, it) }
+            translation.english?.let {
+                MeaningBlock(
+                    if (translation.englishIsAttested) R.string.reader_english_attested else R.string.english,
+                    it,
+                )
+            }
+            if (translation.isBusy) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
+                    Text(
+                        stringResource(
+                            if (translation.isDownloading) R.string.reader_translation_downloading
+                            else R.string.reader_translation_working
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            if (translation.missingTargets.isNotEmpty() && !translation.isDownloading) {
+                Button(onClick = onDownloadTranslation) {
+                    Icon(Icons.Outlined.Download, contentDescription = null)
+                    Text("  ${stringResource(R.string.reader_translation_download)}")
+                }
+            }
+            if (translation.error != null) {
+                Text(stringResource(R.string.reader_translation_error), color = MaterialTheme.colorScheme.error)
+            }
             when {
                 !exactMeaning.isNullOrBlank() -> MeaningBlock(R.string.search_whole_expression, exactMeaning)
-                analysis.exactExample != null -> MeaningBlock(
-                    R.string.search_attested_translation,
-                    analysis.exactExample.english,
-                )
                 gloss.isNotBlank() -> MeaningBlock(R.string.search_word_gloss, gloss)
             }
             Text(
@@ -200,7 +241,7 @@ private fun SearchAnalysisCard(analysis: TextAnalysis, onOpenEntry: (Long) -> Un
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Bold,
             )
-            chineseTokens.forEach { token -> AnalysisTokenRow(token, onOpenEntry) }
+            chineseTokens.forEach { token -> AnalysisTokenRow(token, definitionLanguage, onOpenEntry) }
         }
     }
 }
@@ -214,7 +255,11 @@ private fun MeaningBlock(@androidx.annotation.StringRes title: Int, meaning: Str
 }
 
 @Composable
-private fun AnalysisTokenRow(token: AnalyzedToken, onOpenEntry: (Long) -> Unit) {
+private fun AnalysisTokenRow(
+    token: AnalyzedToken,
+    definitionLanguage: fr.kairossolum.pangmao.data.settings.DefinitionLanguage,
+    onOpenEntry: (Long) -> Unit,
+) {
     val entry = token.entry
     androidx.compose.material3.Surface(
         onClick = { entry?.let { onOpenEntry(it.id) } },
@@ -232,7 +277,7 @@ private fun AnalysisTokenRow(token: AnalyzedToken, onOpenEntry: (Long) -> Unit) 
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 if (entry != null) {
                     PinyinText(entry.pinyin, fontSize = 14.sp)
-                    Text(preferredMeaning(entry), style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                    Text(entry.primaryDefinition(definitionLanguage), style = MaterialTheme.typography.bodySmall, maxLines = 2)
                 } else {
                     Text(stringResource(R.string.search_unknown_block), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -240,9 +285,6 @@ private fun AnalysisTokenRow(token: AnalyzedToken, onOpenEntry: (Long) -> Unit) 
         }
     }
 }
-
-private fun preferredMeaning(entry: fr.kairossolum.pangmao.domain.model.DictionaryEntry): String =
-    entry.definitionsFrench.firstOrNull() ?: entry.definitionsEnglish.firstOrNull() ?: "—"
 
 @Composable
 private fun SectionTitle(title: String) {

@@ -26,6 +26,7 @@ fun EntryRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val definitionLanguage = LocalDefinitionLanguage.current
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -49,10 +50,13 @@ fun EntryRow(
             }
             PinyinText(entry.pinyin, fontSize = 16.sp)
         }
-        val definition = entry.definitionsFrench.firstOrNull()
-            ?: entry.definitionsEnglish.firstOrNull()
-            ?: "—"
+        val definition = entry.primaryDefinition(definitionLanguage)
         Text(text = definition, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
+        if (definitionLanguage == fr.kairossolum.pangmao.data.settings.DefinitionLanguage.BOTH) {
+            entry.definitionsEnglish.firstOrNull()?.takeIf { it != definition }?.let {
+                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+            }
+        }
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
 }
@@ -82,6 +86,7 @@ fun DefinitionList(title: String, definitions: List<String>, modifier: Modifier 
 
 @Composable
 fun QuickEntryCard(entry: DictionaryEntry, onOpen: () -> Unit, modifier: Modifier = Modifier) {
+    val definitionLanguage = LocalDefinitionLanguage.current
     Surface(modifier = modifier.fillMaxWidth(), tonalElevation = 2.dp) {
         Column(
             modifier = Modifier
@@ -94,7 +99,12 @@ fun QuickEntryCard(entry: DictionaryEntry, onOpen: () -> Unit, modifier: Modifie
                 entry.alternateHeadword?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
             PinyinText(entry.pinyin, fontSize = 18.sp, bold = true)
-            Text(entry.definitionsFrench.firstOrNull() ?: entry.definitionsEnglish.firstOrNull().orEmpty())
+            Text(entry.primaryDefinition(definitionLanguage))
+            if (definitionLanguage == fr.kairossolum.pangmao.data.settings.DefinitionLanguage.BOTH) {
+                entry.definitionsEnglish.firstOrNull()
+                    ?.takeIf { it != entry.primaryDefinition(definitionLanguage) }
+                    ?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
             Text(
                 stringResource(R.string.open_full_entry),
                 color = MaterialTheme.colorScheme.primary,

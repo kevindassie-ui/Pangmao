@@ -45,8 +45,10 @@ import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.ui.common.DefinitionList
+import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
+import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +57,7 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     val isFlashcard by viewModel.isFlashcard.collectAsStateWithLifecycle()
     val speaker = rememberMandarinSpeaker()
+    val definitionLanguage = LocalDefinitionLanguage.current
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -132,8 +135,12 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                         }
                     }
 
-                    DefinitionList(stringResource(R.string.french), entry.definitionsFrench)
-                    DefinitionList(stringResource(R.string.english), entry.definitionsEnglish)
+                    if (definitionLanguage != DefinitionLanguage.ENGLISH) {
+                        DefinitionList(stringResource(R.string.french), entry.definitionsFrench)
+                    }
+                    if (definitionLanguage != DefinitionLanguage.FRENCH) {
+                        DefinitionList(stringResource(R.string.english), entry.definitionsEnglish)
+                    }
 
                     if (state.examples.isNotEmpty()) {
                         HorizontalDivider()

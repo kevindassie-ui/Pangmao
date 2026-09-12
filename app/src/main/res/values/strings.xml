@@ -35,6 +35,17 @@
     <string name="reader_placeholder">Collez, partagez ou ouvrez un fichier texte…</string>
     <string name="reader_segmented">LECTURE SEGMENTÉE</string>
     <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
+    <string name="reader_speak">Lire tout le texte</string>
+    <string name="reader_translation">Comprendre la phrase</string>
+    <string name="reader_translation_local">Local · hors ligne</string>
+    <string name="reader_dictionary_gloss">Aperçu du dictionnaire</string>
+    <string name="reader_english_attested">English · Tatoeba</string>
+    <string name="reader_translation_download_body">Téléchargez une fois les modèles nécessaires (environ 30 Mo par langue) pour obtenir une traduction automatique hors ligne.</string>
+    <string name="reader_translation_download">Télécharger la traduction</string>
+    <string name="reader_translation_downloading">Téléchargement du modèle…</string>
+    <string name="reader_translation_working">Analyse et traduction…</string>
+    <string name="reader_translation_error">La traduction locale est momentanément indisponible.</string>
+    <string name="reader_translation_notice">Traduction automatique locale : vérifiez les nuances importantes.</string>
 
     <string name="ocr_title">OCR chinois</string>
     <string name="ocr_subtitle">Caméra et images · traitement local</string>
@@ -54,6 +65,10 @@
     <string name="settings_language_french">Français</string>
     <string name="settings_language_english">English</string>
     <string name="settings_language_chinese">简体中文</string>
+    <string name="settings_definitions">Langue des définitions</string>
+    <string name="settings_definitions_french">Français uniquement</string>
+    <string name="settings_definitions_english">Anglais uniquement</string>
+    <string name="settings_definitions_both">Français et anglais</string>
     <string name="settings_theme">Apparence</string>
     <string name="settings_theme_system">Thème du système</string>
     <string name="settings_theme_light">Clair · Porcelaine douce</string>
@@ -96,7 +111,7 @@
 
     <string name="about_title">À propos et licences</string>
     <string name="privacy_title">Vie privée par conception</string>
-    <string name="privacy_body">Le dictionnaire, les textes, l’OCR, l’historique et les cartes restent sur cet appareil. Seul le modèle manuscrit est téléchargé une fois à votre demande.</string>
+    <string name="privacy_body">Le dictionnaire, les textes, l’OCR, les traductions, l’historique et les cartes restent sur cet appareil. Les modèles manuscrit et de traduction sont téléchargés uniquement à votre demande.</string>
     <string name="about_version">Pangmao · version %1$s</string><string name="about_description">Dictionnaire et compagnon d’apprentissage chinois, conçu pour un usage personnel, local et sans abonnement.</string>
     <string name="offline_content">Contenu hors ligne</string><string name="entries">Entrées</string><string name="examples">Exemples</string><string name="sources">Sources linguistiques</string><string name="independence">Indépendance</string>
     <string name="independence_body">Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.</string>

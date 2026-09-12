@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.kairossolum.pangmao.data.settings.AppLanguage
 import fr.kairossolum.pangmao.data.settings.AppSettings
+import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SettingsRepository
 import fr.kairossolum.pangmao.data.settings.ThemeMode
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,6 +19,10 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
     )
 
     fun setLanguage(value: AppLanguage) = viewModelScope.launch { repository.setLanguage(value) }
+
+    fun setDefinitionLanguage(value: DefinitionLanguage) = viewModelScope.launch {
+        repository.setDefinitionLanguage(value)
+    }
 
     fun setTheme(value: ThemeMode) = viewModelScope.launch { repository.setThemeMode(value) }
 }
