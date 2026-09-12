@@ -21,9 +21,10 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 ## Install
 
 Download the APK attached to the latest GitHub prerelease, open it on Android,
-and allow installation from the browser or GitHub app when Android asks. The APK
-is signed with Pangmao's persistent personal release key, so later versions can
-be installed as updates without the Play Store.
+and allow installation from the browser or GitHub app when Android asks. Use the
+smaller `arm64` APK on recent Android phones; the `universal` APK is the fallback
+for other devices. Both are signed with Pangmao's persistent personal release
+key, so later versions can be installed as updates without the Play Store.
 
 ## Build
 
@@ -36,7 +37,8 @@ tools/fetch_and_build_dictionary.sh
 ```
 
 Every push to `main` runs data validation, unit tests, Android lint and a debug
-APK build. A `v*` tag publishes the tested APK as a GitHub prerelease.
+APK build. A `v*` tag publishes tested ARM64 and universal APKs as a GitHub
+prerelease.
 
 ## Architecture
 

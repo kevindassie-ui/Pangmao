@@ -17,12 +17,20 @@ android {
         applicationId = "fr.kairossolum.pangmao"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-        resourceConfigurations += listOf("fr", "en", "zh")
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
+        }
     }
 
     val pangmaoReleaseSigning = if (signingStorePath != null && signingPassword != null) {
