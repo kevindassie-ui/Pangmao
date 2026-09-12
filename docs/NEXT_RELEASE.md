@@ -2,6 +2,8 @@
 
 Checkpoint: 2026-09-12, après test réel de v0.2.0.
 
+Statut: publiée le 2026-09-12; validation finale sur téléphone en attente.
+
 La direction graphique est validée et gelée. Cette version corrective doit
 rester courte afin de remettre rapidement une base fiable entre les mains de
 l'utilisateur.
@@ -41,4 +43,3 @@ Acceptation: tous les écrans principaux passent en chinois et le choix persiste
 
 Les nouvelles fonctions de lecture et de dictionnaire commencent en `v0.3.0`:
 voir [ROADMAP.md](ROADMAP.md).
-

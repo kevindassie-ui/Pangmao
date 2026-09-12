@@ -13,7 +13,7 @@ Dernière mise à jour: 2026-09-12.
   est identifié comme tel.
 - Langue de l'interface et langue étudiée sont deux réglages indépendants.
 
-## v0.2.1 — stabiliser
+## v0.2.1 — stabiliser · publiée
 
 - Corriger le crash de l'écriture manuscrite.
 - Corriger l'interface `zh-Hans`.
@@ -106,4 +106,3 @@ dictionnaire d'apprentissage pour sinophones.
   centrée sur l'écriture.
 - [欧路词典](https://www.eudic.net/): historique, notes, listes personnelles,
   prononciation et consultation transversale pour apprenants sinophones.
-

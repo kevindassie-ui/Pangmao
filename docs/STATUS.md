@@ -58,6 +58,22 @@ Checkpoint date: 2026-09-11
 - SHA-256: `d64365f5208ad146adb1c39106a90a45b6b5e4d20d6e7791b7c090c6f14c65ee`.
 - Download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.2.0/Pangmao-v0.2.0.apk>
 
+## Corrective release 0.2.1
+
+- Tag: `v0.2.1` at commit `eda8183`.
+- Implementation CI run `34679865764` and final CI run `34680165813` passed
+  dictionary validation, unit tests, Android lint and debug APK assembly.
+- Release run `34680206681` repeated validation and tests, built both release
+  variants, and verified their Android signatures successfully.
+- ARM64 APK: `Pangmao-v0.2.1-arm64.apk` (66,857,764 bytes), SHA-256
+  `a5aa63a8c49be59419554a26ea4d728e88f99a388366a4cea388fb7caf0c03b9`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.2.1/Pangmao-v0.2.1-arm64.apk>
+- Universal APK: `Pangmao-v0.2.1-universal.apk` (119,370,092 bytes), SHA-256
+  `f282b83e398dc328271a597b322e32d7d8a3a08a14acf5f7c507445bb59fbf4f`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.2.1/Pangmao-v0.2.1-universal.apk>
+- Device acceptance remains to be completed for repeated handwriting and
+  hot/cold switching to `zh-Hans`.
+
 ## Later iteration
 
 Robust audio and interactive dictionary-source controls are intentionally
@@ -65,9 +81,10 @@ deferred. Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
-The tested v0.2.0 follow-up is specified in [NEXT_RELEASE.md](NEXT_RELEASE.md).
-Longer-term product work is tracked in [ROADMAP.md](ROADMAP.md), with accepted
-trade-offs recorded in [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md).
+The v0.2.1 corrective scope and remaining device acceptance are recorded in
+[NEXT_RELEASE.md](NEXT_RELEASE.md). Longer-term product work is tracked in
+[ROADMAP.md](ROADMAP.md), with accepted trade-offs recorded in
+[PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md).
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
