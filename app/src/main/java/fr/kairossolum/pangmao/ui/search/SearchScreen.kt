@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,12 +22,15 @@ import androidx.compose.material.icons.outlined.Draw
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,14 +43,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.ui.common.EntryRow
+import fr.kairossolum.pangmao.ui.common.HanziText
+import fr.kairossolum.pangmao.ui.common.coloredHanzi
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.primaryDefinition
@@ -66,19 +77,31 @@ fun SearchScreen(
     val query by viewModel.query.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsStateWithLifecycle()
+    val queryHistory by viewModel.queryHistory.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
-                Column {
-                    Text("Pangmao · 胖猫", fontWeight = FontWeight.Bold)
-                    Text(
-                        stringResource(R.string.search_subtitle),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_pangmao_v2),
+                        contentDescription = stringResource(R.string.app_mascot),
+                        modifier = Modifier.size(40.dp).clip(RoundedCornerShape(13.dp)),
+                        contentScale = ContentScale.Crop,
                     )
+                    Column {
+                        Text("胖猫", fontWeight = FontWeight.Bold)
+                        Text(
+                            stringResource(R.string.search_subtitle),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             },
             actions = {
@@ -140,8 +163,40 @@ fun SearchScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 24.dp),
             ) {
+                if (queryHistory.isNotEmpty()) {
+                    item {
+                        SectionTitle(
+                            title = stringResource(R.string.search_query_history),
+                            action = stringResource(R.string.clear_all),
+                            onAction = viewModel::clearQueryHistory,
+                        )
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items(queryHistory, key = { "query-${it.query}" }) { item ->
+                                InputChip(
+                                    selected = false,
+                                    onClick = { viewModel.setQuery(item.query) },
+                                    label = { Text(item.query, maxLines = 1) },
+                                    trailingIcon = {
+                                        IconButton(onClick = { viewModel.deleteQuery(item.query) }, modifier = Modifier.size(24.dp)) {
+                                            Icon(
+                                                Icons.Outlined.Close,
+                                                contentDescription = stringResource(R.string.delete_history_item),
+                                                modifier = Modifier.size(16.dp),
+                                            )
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
                 if (history.isNotEmpty()) {
-                    item { SectionTitle(stringResource(R.string.search_recent)) }
+                    item { SectionTitle(stringResource(R.string.search_viewed_history)) }
                     items(history, key = { "history-${it.id}" }) { entry ->
                         EntryRow(entry, onClick = { onOpenEntry(entry.id) })
                     }
@@ -203,7 +258,14 @@ private fun SearchAnalysisCard(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
             )
-            Text(analysis.sourceText, fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                buildAnnotatedString {
+                    analysis.tokens.forEach { token ->
+                        append(coloredHanzi(token.token.text, token.entry?.pinyin.orEmpty(), bold = true))
+                    }
+                },
+                fontSize = 30.sp,
+            )
             translation.french?.let { MeaningBlock(R.string.french, it) }
             translation.english?.let {
                 MeaningBlock(
@@ -273,7 +335,12 @@ private fun AnalysisTokenRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(token.token.text, fontSize = 25.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+            HanziText(
+                token.token.text,
+                entry?.pinyin.orEmpty(),
+                fontSize = 25.sp,
+                bold = true,
+            )
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 if (entry != null) {
                     PinyinText(entry.pinyin, fontSize = 14.sp)
@@ -287,7 +354,11 @@ private fun AnalysisTokenRow(
 }
 
 @Composable
-private fun SectionTitle(title: String) {
+private fun SectionTitle(
+    title: String,
+    action: String? = null,
+    onAction: (() -> Unit)? = null,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -296,6 +367,9 @@ private fun SectionTitle(title: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        if (action != null && onAction != null) {
+            TextButton(onClick = onAction) { Text(action) }
+        }
     }
 }
 
@@ -315,3 +389,4 @@ private fun EmptySearch(query: String) {
         }
     }
 }
+import androidx.compose.foundation.Image

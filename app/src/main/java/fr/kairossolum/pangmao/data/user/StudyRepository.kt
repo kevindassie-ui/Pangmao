@@ -22,6 +22,8 @@ class StudyRepository(
 
     fun history(): Flow<List<DictionaryEntry>> = dao.historyIds().mapLatest(dictionary::entries)
 
+    fun queryHistory(): Flow<List<QueryHistoryEntity>> = dao.queryHistory()
+
     fun isFavorite(entryId: Long): Flow<Boolean> = dao.isFavorite(entryId)
 
     fun isFlashcard(entryId: Long): Flow<Boolean> = dao.isFlashcard(entryId)
@@ -31,6 +33,15 @@ class StudyRepository(
     }
 
     suspend fun recordHistory(entryId: Long) = dao.recordHistory(entryId)
+
+    suspend fun recordQuery(value: String) {
+        val query = value.trim().replace(Regex("\\s+"), " ").take(MAX_QUERY_LENGTH)
+        if (query.isNotBlank()) dao.recordQuery(query)
+    }
+
+    suspend fun deleteQuery(query: String) = dao.deleteQuery(query)
+
+    suspend fun clearQueryHistory() = dao.clearQueryHistory()
 
     suspend fun addFlashcard(entryId: Long) {
         val today = LocalDate.now().toEpochDay()
@@ -67,5 +78,8 @@ class StudyRepository(
         val entries = dictionary.entries(cards.map(FlashcardEntity::entryId)).associateBy(DictionaryEntry::id)
         return cards.mapNotNull { card -> entries[card.entryId]?.let { StudyCard(it, card) } }
     }
-}
 
+    private companion object {
+        const val MAX_QUERY_LENGTH = 200
+    }
+}

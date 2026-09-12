@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Pangmao · 胖猫</string>
+    <string name="app_mascot">Mascotte Pangmao</string>
     <string name="back">Retour</string>
     <string name="clear">Effacer</string>
     <string name="copy">Copier</string>
@@ -12,7 +13,7 @@
 
     <string name="search_subtitle">Dictionnaire chinois hors ligne</string>
     <string name="search_hint">Hanzi, pinyin, français ou anglais</string>
-    <string name="search_recent">Consultés récemment</string>
+    <string name="search_recent">Consultés récemment</string><string name="search_viewed_history">Fiches récemment consultées</string><string name="search_query_history">Recherches récentes</string><string name="clear_all">Tout effacer</string><string name="delete_history_item">Supprimer de l’historique</string>
     <string name="search_frequent">Mots fréquents</string>
     <string name="search_empty">Aucune entrée pour « %1$s »</string>
     <string name="search_empty_help">Essayez un mot plus court, le pinyin sans espaces, ou sélectionnez les caractères dans le lecteur.</string>
@@ -36,6 +37,7 @@
     <string name="reader_segmented">LECTURE SEGMENTÉE</string>
     <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
     <string name="reader_speak">Lire tout le texte</string>
+    <string name="reader_layer_pinyin">Pinyin</string><string name="reader_layer_translation">Traduction</string><string name="reader_layer_definitions">Définitions</string>
     <string name="reader_translation">Comprendre la phrase</string>
     <string name="reader_translation_local">Local · hors ligne</string>
     <string name="reader_dictionary_gloss">Aperçu du dictionnaire</string>

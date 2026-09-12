@@ -45,6 +45,7 @@ import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.ui.common.DefinitionList
+import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
@@ -105,11 +106,11 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(
-                                entry.displayHeadword,
+                            HanziText(
+                                hanzi = entry.displayHeadword,
+                                numberedPinyin = entry.pinyin,
                                 fontSize = 48.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
+                                bold = true,
                             )
                             entry.alternateHeadword?.let {
                                 Text(
@@ -206,7 +207,7 @@ private fun CharacterCard(info: CharacterInfo) {
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            Text(info.character, fontSize = 38.sp, color = MaterialTheme.colorScheme.primary)
+            HanziText(info.character, info.mandarin, fontSize = 38.sp, bold = true)
             Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(
                     listOfNotNull(

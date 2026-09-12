@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,7 +38,7 @@ data class SearchUiState(
 @OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModel(
     private val dictionary: DictionaryRepository,
-    study: StudyRepository,
+    private val study: StudyRepository,
     settings: SettingsRepository,
     private val translation: TranslationRepository,
 ) : ViewModel() {
@@ -46,6 +47,8 @@ class SearchViewModel(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
     val history = study.history().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val queryHistory = study.queryHistory()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     private val translationRefresh = MutableStateFlow(0L)
 
     init {
@@ -57,10 +60,26 @@ class SearchViewModel(
             ) { value, language, _ -> value to language }
                 .collectLatest { (value, language) -> load(value, language) }
         }
+        viewModelScope.launch {
+            query
+                .map(String::trim)
+                .debounce(1_000)
+                .filter(String::isNotBlank)
+                .distinctUntilChanged()
+                .collectLatest(study::recordQuery)
+        }
     }
 
     fun setQuery(value: String) {
         query.value = value
+    }
+
+    fun deleteQuery(value: String) {
+        viewModelScope.launch { study.deleteQuery(value) }
+    }
+
+    fun clearQueryHistory() {
+        viewModelScope.launch { study.clearQueryHistory() }
     }
 
     fun downloadTranslationModels() {

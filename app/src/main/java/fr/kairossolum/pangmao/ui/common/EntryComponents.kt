@@ -39,11 +39,11 @@ fun EntryRow(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(
-                text = entry.displayHeadword,
+            HanziText(
+                hanzi = entry.displayHeadword,
+                numberedPinyin = entry.pinyin,
                 fontSize = 27.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
+                bold = true,
             )
             entry.alternateHeadword?.let {
                 Text(text = it, fontSize = 17.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -95,7 +95,7 @@ fun QuickEntryCard(entry: DictionaryEntry, onOpen: () -> Unit, modifier: Modifie
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Bottom) {
-                Text(entry.displayHeadword, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                HanziText(entry.displayHeadword, entry.pinyin, fontSize = 32.sp, bold = true)
                 entry.alternateHeadword?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
             PinyinText(entry.pinyin, fontSize = 18.sp, bold = true)

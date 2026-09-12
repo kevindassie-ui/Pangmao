@@ -16,6 +16,13 @@ data class HistoryEntity(
     val viewCount: Int = 1,
 )
 
+@Entity(tableName = "query_history")
+data class QueryHistoryEntity(
+    @PrimaryKey val query: String,
+    val lastSearchedAt: Long = System.currentTimeMillis(),
+    val searchCount: Int = 1,
+)
+
 @Entity(tableName = "flashcards")
 data class FlashcardEntity(
     @PrimaryKey val entryId: Long,
@@ -27,4 +34,3 @@ data class FlashcardEntity(
     val lapses: Int = 0,
     val lastReviewedAt: Long? = null,
 )
-

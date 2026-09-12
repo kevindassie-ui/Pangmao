@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -52,6 +56,7 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
+import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
@@ -89,6 +94,9 @@ fun ReaderScreen(
             }
         }
     }
+    var showPinyin by rememberSaveable { mutableStateOf(true) }
+    var showTranslation by rememberSaveable { mutableStateOf(true) }
+    var showDefinitions by rememberSaveable { mutableStateOf(true) }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -162,13 +170,40 @@ fun ReaderScreen(
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    item(key = "translation") {
-                        ReaderTranslationCard(
-                            analysis = currentAnalysis,
-                            translation = translation,
-                            definitionLanguage = definitionLanguage,
-                            onDownload = viewModel::downloadTranslationModels,
-                        )
+                    item(key = "layers") {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            item {
+                                FilterChip(
+                                    selected = showPinyin,
+                                    onClick = { showPinyin = !showPinyin },
+                                    label = { Text(stringResource(R.string.reader_layer_pinyin)) },
+                                )
+                            }
+                            item {
+                                FilterChip(
+                                    selected = showTranslation,
+                                    onClick = { showTranslation = !showTranslation },
+                                    label = { Text(stringResource(R.string.reader_layer_translation)) },
+                                )
+                            }
+                            item {
+                                FilterChip(
+                                    selected = showDefinitions,
+                                    onClick = { showDefinitions = !showDefinitions },
+                                    label = { Text(stringResource(R.string.reader_layer_definitions)) },
+                                )
+                            }
+                        }
+                    }
+                    if (showTranslation) {
+                        item(key = "translation") {
+                            ReaderTranslationCard(
+                                analysis = currentAnalysis,
+                                translation = translation,
+                                definitionLanguage = definitionLanguage,
+                                onDownload = viewModel::downloadTranslationModels,
+                            )
+                        }
                     }
                     item(key = "blocks-title") {
                         Text(
@@ -184,7 +219,13 @@ fun ReaderScreen(
                         chineseTokens,
                         key = { index, token -> "${index}-${token.token.text}-${token.token.entryId}" },
                     ) { _, token ->
-                        ReaderTokenCard(token, definitionLanguage, onClick = { viewModel.select(token) })
+                        ReaderTokenCard(
+                            analyzed = token,
+                            definitionLanguage = definitionLanguage,
+                            showPinyin = showPinyin,
+                            showDefinitions = showDefinitions,
+                            onClick = { viewModel.select(token) },
+                        )
                     }
                 }
             }
@@ -292,6 +333,8 @@ private fun TranslationLine(title: String, text: String) {
 private fun ReaderTokenCard(
     analyzed: AnalyzedToken,
     definitionLanguage: DefinitionLanguage,
+    showPinyin: Boolean,
+    showDefinitions: Boolean,
     onClick: () -> Unit,
 ) {
     val entry = analyzed.entry
@@ -307,24 +350,26 @@ private fun ReaderTokenCard(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            Text(
-                analyzed.token.text,
+            HanziText(
+                hanzi = analyzed.token.text,
+                numberedPinyin = entry?.pinyin.orEmpty(),
                 fontSize = 28.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
+                bold = true,
             )
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 if (entry == null) {
                     Text(stringResource(R.string.search_unknown_block), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
-                    PinyinText(entry.pinyin, fontSize = 15.sp, bold = true)
-                    when (definitionLanguage) {
-                        DefinitionLanguage.FRENCH -> entry.definitionsFrench.firstOrNull()?.let { Text(it) }
-                        DefinitionLanguage.ENGLISH -> entry.definitionsEnglish.firstOrNull()?.let { Text(it) }
-                        DefinitionLanguage.BOTH -> {
-                            entry.definitionsFrench.firstOrNull()?.let { Text("FR · $it") }
-                            entry.definitionsEnglish.firstOrNull()?.let {
-                                Text("EN · $it", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (showPinyin) PinyinText(entry.pinyin, fontSize = 15.sp, bold = true)
+                    if (showDefinitions) {
+                        when (definitionLanguage) {
+                            DefinitionLanguage.FRENCH -> entry.definitionsFrench.firstOrNull()?.let { Text(it) }
+                            DefinitionLanguage.ENGLISH -> entry.definitionsEnglish.firstOrNull()?.let { Text(it) }
+                            DefinitionLanguage.BOTH -> {
+                                entry.definitionsFrench.firstOrNull()?.let { Text("FR · $it") }
+                                entry.definitionsEnglish.firstOrNull()?.let {
+                                    Text("EN · $it", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
                             }
                         }
                     }

@@ -42,6 +42,33 @@ interface UserDao {
         )
     }
 
+    @Query("SELECT * FROM query_history ORDER BY lastSearchedAt DESC LIMIT :limit")
+    fun queryHistory(limit: Int = 20): Flow<List<QueryHistoryEntity>>
+
+    @Query("SELECT * FROM query_history WHERE `query` = :query LIMIT 1")
+    suspend fun queryHistoryItem(query: String): QueryHistoryEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertQueryHistory(item: QueryHistoryEntity)
+
+    @Transaction
+    suspend fun recordQuery(query: String) {
+        val previous = queryHistoryItem(query)
+        upsertQueryHistory(
+            QueryHistoryEntity(
+                query = query,
+                lastSearchedAt = System.currentTimeMillis(),
+                searchCount = (previous?.searchCount ?: 0) + 1,
+            )
+        )
+    }
+
+    @Query("DELETE FROM query_history WHERE `query` = :query")
+    suspend fun deleteQuery(query: String)
+
+    @Query("DELETE FROM query_history")
+    suspend fun clearQueryHistory()
+
     @Query("SELECT * FROM flashcards ORDER BY dueEpochDay, createdAt")
     fun flashcards(): Flow<List<FlashcardEntity>>
 
@@ -60,4 +87,3 @@ interface UserDao {
     @Query("DELETE FROM flashcards WHERE entryId = :entryId")
     suspend fun deleteFlashcard(entryId: Long)
 }
-

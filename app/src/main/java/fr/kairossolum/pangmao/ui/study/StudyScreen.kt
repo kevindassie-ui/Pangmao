@@ -44,6 +44,7 @@ import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.ReviewRating
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.PinyinText
+import fr.kairossolum.pangmao.ui.common.HanziText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,7 +168,7 @@ private fun ReviewPane(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(15.dp),
             ) {
-                Text(card.entry.displayHeadword, fontSize = 52.sp, fontWeight = FontWeight.Bold)
+                HanziText(card.entry.displayHeadword, card.entry.pinyin, fontSize = 52.sp, bold = true)
                 card.entry.alternateHeadword?.let { Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 if (session.revealed) {
                     PinyinText(card.entry.pinyin, fontSize = 22.sp, bold = true)
@@ -220,7 +221,7 @@ private fun StudyCardRow(card: StudyCard, onOpen: () -> Unit, onRemove: () -> Un
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(card.entry.displayHeadword, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+                HanziText(card.entry.displayHeadword, card.entry.pinyin, fontSize = 24.sp, bold = true)
                 PinyinText(card.entry.pinyin)
                 Text(
                     stringResource(R.string.card_schedule, card.scheduling.intervalDays, card.scheduling.repetitions),
