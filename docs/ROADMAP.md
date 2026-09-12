@@ -38,7 +38,7 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 - Colorer les hanzi selon leur ton, ajouter le petit chat et alléger le titre en
   `胖猫`.
 
-## v0.3.1 — lisibilité et qualité · en validation
+## v0.3.1 — lisibilité et qualité · publiée
 
 - Ne jamais demander un modèle de traduction lorsqu’une définition de
   dictionnaire répond déjà exactement à la recherche.

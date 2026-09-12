@@ -94,6 +94,22 @@ Checkpoint date: 2026-09-12
 - Device acceptance remains to be completed for automatic handwriting,
   segmentation, model download and the new reader workflow.
 
+## Reader quality release 0.3.1
+
+- Tag: `v0.3.1` at commit `fe7874f`.
+- CI run `34689603981` passed dictionary validation, unit tests, Android lint
+  and debug APK assembly.
+- Release run `34689854701` repeated validation and tests, built both variants,
+  and verified their Android signatures successfully.
+- ARM64 APK: `Pangmao-v0.3.1-arm64.apk` (83,416,402 bytes), SHA-256
+  `c4880e964c76a4ded198688efebd1811cf39465e0c7c8e430205cd0bfd29956a`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.3.1/Pangmao-v0.3.1-arm64.apk>
+- Universal APK: `Pangmao-v0.3.1-universal.apk` (182,192,056 bytes), SHA-256
+  `bd461e6ab4ea1df4a914fef53c51afcd2c4f376515a0475d6949e4dd885c44b6`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.3.1/Pangmao-v0.3.1-universal.apk>
+- Device acceptance remains to be completed for the compact reader, continuous
+  pinyin and the reported translation corrections.
+
 ## Later iteration
 
 Robust audio and interactive dictionary-source controls are intentionally

@@ -85,8 +85,8 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
-[0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
 [0.3.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.1
+[0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
 [0.2.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.1
 [0.2.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.0
 [0.1.0-mvp]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.1.0-mvp
