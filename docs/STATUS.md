@@ -65,5 +65,7 @@ deferred. Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
+The tested v0.2.0 follow-up is specified in [NEXT_RELEASE.md](NEXT_RELEASE.md).
+
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
