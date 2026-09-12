@@ -36,7 +36,8 @@ suspend fun resolveTextTranslation(
 ) {
     val requestedTargets = definitionLanguage.translationTargets()
     val curated = TranslationQuality.curated(analysis.sourceText)
-    val trustedFrench = (curated?.french ?: analysis.exactEntry?.definitionsFrench?.firstOrNull())
+    val reviewedFrench = analysis.exactExample?.french?.takeIf(String::isNotBlank)
+    val trustedFrench = (curated?.french ?: reviewedFrench ?: analysis.exactEntry?.definitionsFrench?.firstOrNull())
         ?.takeIf { TranslationTarget.FRENCH in requestedTargets }
     val attestedEnglish = analysis.exactExample?.english
         ?.takeIf { TranslationTarget.ENGLISH in requestedTargets }
@@ -52,7 +53,7 @@ suspend fun resolveTextTranslation(
     var state = TextTranslationState(
         french = trustedFrench,
         english = initialEnglish,
-        englishIsAttested = attestedEnglish != null,
+        englishIsAttested = attestedEnglish != null && analysis.exactExample?.englishSource == "Tatoeba",
         isChecking = automaticTargets.isNotEmpty(),
     )
     update(state)

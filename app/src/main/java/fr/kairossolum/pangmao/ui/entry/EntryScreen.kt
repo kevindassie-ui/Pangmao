@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,15 +26,20 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -44,7 +51,10 @@ import fr.kairossolum.pangmao.domain.Pinyin
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
+import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
+import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import fr.kairossolum.pangmao.ui.common.DefinitionList
+import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.PinyinText
@@ -53,7 +63,11 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
+fun EntryScreen(
+    viewModel: EntryViewModel,
+    onBack: () -> Unit,
+    onOpenEntry: (Long) -> Unit,
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     val isFlashcard by viewModel.isFlashcard.collectAsStateWithLifecycle()
@@ -93,6 +107,13 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
             }
             state.entry != null -> {
                 val entry = checkNotNull(state.entry)
+                val isSingleCharacter = entry.simplified.codePointCount(0, entry.simplified.length) == 1
+                val tabLabels = listOf(
+                    stringResource(R.string.entry_tab_definitions),
+                    stringResource(R.string.entry_tab_examples),
+                    stringResource(if (isSingleCharacter) R.string.entry_tab_words else R.string.entry_tab_characters),
+                )
+                var selectedTab by remember(entry.id) { mutableIntStateOf(0) }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -136,35 +157,68 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
                         }
                     }
 
-                    if (definitionLanguage != DefinitionLanguage.ENGLISH) {
-                        DefinitionList(stringResource(R.string.french), entry.definitionsFrench)
-                    }
-                    if (definitionLanguage != DefinitionLanguage.FRENCH) {
-                        DefinitionList(stringResource(R.string.english), entry.definitionsEnglish)
-                    }
-
-                    if (state.examples.isNotEmpty()) {
-                        HorizontalDivider()
-                        Text(stringResource(R.string.authentic_examples), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        state.examples.forEach { ExampleCard(it, onSpeak = { speaker.speak(it.chinese) }) }
-                    }
-
-                    if (state.characters.isNotEmpty()) {
-                        HorizontalDivider()
-                        Text(stringResource(R.string.characters), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        state.characters.forEach { character -> CharacterCard(character) }
-                    }
-
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                    ScrollableTabRow(
+                        selectedTabIndex = selectedTab,
+                        edgePadding = 0.dp,
+                        divider = {},
                     ) {
-                        Text(
-                            stringResource(R.string.entry_sources_note, entry.sources),
-                            modifier = Modifier.padding(14.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        tabLabels.forEachIndexed { index, label ->
+                            Tab(
+                                selected = selectedTab == index,
+                                onClick = { selectedTab = index },
+                                text = { Text(label) },
+                            )
+                        }
+                    }
+
+                    when (selectedTab) {
+                        0 -> {
+                            if (definitionLanguage != DefinitionLanguage.ENGLISH) {
+                                DefinitionList(stringResource(R.string.french), entry.definitionsFrench)
+                            }
+                            if (definitionLanguage != DefinitionLanguage.FRENCH) {
+                                DefinitionList(stringResource(R.string.english), entry.definitionsEnglish)
+                            }
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                            ) {
+                                Text(
+                                    stringResource(R.string.entry_sources_note, entry.sources),
+                                    modifier = Modifier.padding(14.dp),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        1 -> {
+                            if (state.examples.isEmpty()) {
+                                EmptyEntrySection(R.string.entry_no_examples)
+                            } else {
+                                state.examples.forEach { example ->
+                                    ExampleCard(
+                                        example = example,
+                                        definitionLanguage = definitionLanguage,
+                                        onSpeak = { speaker.speak(example.chinese) },
+                                    )
+                                }
+                            }
+                        }
+                        else -> {
+                            if (isSingleCharacter) {
+                                RelatedWordsSection(state, viewModel, onOpenEntry)
+                            } else if (state.characters.isEmpty()) {
+                                EmptyEntrySection(R.string.entry_no_characters)
+                            } else {
+                                state.characters.forEach { character ->
+                                    CharacterCard(
+                                        info = character,
+                                        entryId = state.characterEntryIds[character.character],
+                                        onOpenEntry = onOpenEntry,
+                                    )
+                                }
+                            }
+                        }
                     }
                     Spacer(Modifier.height(24.dp))
                 }
@@ -174,7 +228,11 @@ fun EntryScreen(viewModel: EntryViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-private fun ExampleCard(example: ExampleSentence, onSpeak: () -> Unit) {
+private fun ExampleCard(
+    example: ExampleSentence,
+    definitionLanguage: DefinitionLanguage,
+    onSpeak: () -> Unit,
+) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(14.dp),
@@ -190,14 +248,56 @@ private fun ExampleCard(example: ExampleSentence, onSpeak: () -> Unit) {
             if (example.pinyin.isNotBlank()) {
                 Text(Pinyin.withToneMarks(example.pinyin), color = MaterialTheme.colorScheme.primary)
             }
-            Text(example.english, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            when (definitionLanguage) {
+                DefinitionLanguage.FRENCH -> {
+                    if (example.french.isNotBlank()) {
+                        ExampleTranslation(R.string.french, example.frenchSource, example.french)
+                    } else {
+                        ExampleTranslation(R.string.english, example.englishSource, example.english)
+                    }
+                }
+                DefinitionLanguage.ENGLISH -> {
+                    ExampleTranslation(R.string.english, example.englishSource, example.english)
+                }
+                DefinitionLanguage.BOTH -> {
+                    if (example.french.isNotBlank()) {
+                        ExampleTranslation(R.string.french, example.frenchSource, example.french)
+                    }
+                    ExampleTranslation(R.string.english, example.englishSource, example.english)
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun CharacterCard(info: CharacterInfo) {
+private fun ExampleTranslation(
+    @androidx.annotation.StringRes language: Int,
+    source: String,
+    text: String,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            buildString {
+                append(stringResource(language))
+                if (source.isNotBlank()) append(" · $source")
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun CharacterCard(
+    info: CharacterInfo,
+    entryId: Long?,
+    onOpenEntry: (Long) -> Unit,
+) {
     Surface(
+        onClick = { entryId?.let(onOpenEntry) },
+        enabled = entryId != null,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         tonalElevation = 1.dp,
@@ -227,4 +327,75 @@ private fun CharacterCard(info: CharacterInfo) {
             }
         }
     }
+}
+
+@Composable
+private fun RelatedWordsSection(
+    state: EntryUiState,
+    viewModel: EntryViewModel,
+    onOpenEntry: (Long) -> Unit,
+) {
+    Text(
+        stringResource(R.string.entry_words_help),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(RelatedWordPosition.entries) { position ->
+            val label = when (position) {
+                RelatedWordPosition.CONTAINS -> R.string.entry_words_contains
+                RelatedWordPosition.STARTS_WITH -> R.string.entry_words_starts
+                RelatedWordPosition.ENDS_WITH -> R.string.entry_words_ends
+            }
+            FilterChip(
+                selected = state.relatedWordPosition == position,
+                onClick = { viewModel.setRelatedWordPosition(position) },
+                label = { Text(stringResource(label)) },
+            )
+        }
+    }
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        item {
+            FilterChip(
+                selected = state.frequentWordsOnly,
+                onClick = { viewModel.setFrequentWordsOnly(!state.frequentWordsOnly) },
+                label = { Text(stringResource(R.string.entry_words_frequent_only)) },
+            )
+        }
+        items(RelatedWordSort.entries) { sort ->
+            FilterChip(
+                selected = state.relatedWordSort == sort,
+                onClick = { viewModel.setRelatedWordSort(sort) },
+                label = {
+                    Text(
+                        stringResource(
+                            if (sort == RelatedWordSort.FREQUENCY) R.string.entry_words_sort_frequency
+                            else R.string.entry_words_sort_pinyin
+                        )
+                    )
+                },
+            )
+        }
+    }
+    when {
+        state.isWordsLoading -> Box(
+            modifier = Modifier.fillMaxWidth().padding(24.dp),
+            contentAlignment = Alignment.Center,
+        ) { CircularProgressIndicator() }
+        state.wordsError != null -> Text(state.wordsError, color = MaterialTheme.colorScheme.error)
+        state.relatedWords.isEmpty() -> EmptyEntrySection(R.string.entry_no_words)
+        else -> state.relatedWords.forEach { word ->
+            EntryRow(word, onClick = { onOpenEntry(word.id) })
+        }
+    }
+}
+
+@Composable
+private fun EmptyEntrySection(@androidx.annotation.StringRes message: Int) {
+    Text(
+        stringResource(message),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }

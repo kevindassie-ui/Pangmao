@@ -48,27 +48,34 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 ## v0.4.0 — enrichir le dictionnaire français
 
-- Rendre l’analyse mot à mot de la recherche principale repliable et corriger le
-  repositionnement du pinyin dans le lecteur.
-- Déplacer l’OCR de la navigation basse vers les actions rapides de l’accueil.
-- Corriger avec prudence les formulations françaises contextuelles, sans
-  remplacer globalement `vous` par `tu`.
-- Rendre les sources dictionnaire interactives et expliquer précisément leur
-  contribution à chaque fiche.
-- Ajouter pause, vitesse et suivi visuel à la lecture contextuelle; évaluer une
-  voix locale libre si les voix système restent insuffisantes.
-- Aligner les sens CFDICT et CC-CEDICT sans supprimer leurs contenus distincts.
-- Enrichir le français avec d'autres sources libres évaluées, notamment les
-  extractions Wiktionary/Kaikki si leur qualité et leur licence conviennent.
-- Traduire localement les sens anglais manquants en français, dans une section
-  `Compléments automatiques`, avec source et statut visibles.
-- Ajouter catégories grammaticales, registre, collocations, classificateurs et
-  exemples mieux alignés lorsqu'une ressource légale le permet.
-- Offrir une vue simple fusionnée et une vue avancée par source.
+- Rendre l’analyse mot à mot repliable et corriger le repositionnement du pinyin.
+- Déplacer l’OCR vers les actions rapides de l’accueil.
+- Corriger les traductions contextuelles signalées et protéger les termes
+  culturels tels que `肉夹馍` contre les calques littéraux.
+- Dédupliquer les exemples par phrase chinoise et préparer leur schéma bilingue.
+- Ajouter des compléments éditoriaux bilingues revus pour les lacunes observées.
+- Organiser les fiches en onglets, rendre leurs caractères cliquables et ajouter
+  un explorateur de mots avec filtres combinables.
+- Diagnostiquer l’absence de voix chinoise au lieu de laisser le TTS échouer
+  silencieusement.
 
 Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RELEASE_PLAN.md).
 
-## v0.5.0 — modes d'apprentissage
+## v0.5.0 — profondeur et qualité du corpus
+
+- Importer un corpus chinois–français direct, versionné et attribué; mesurer la
+  couverture commune avec le corpus chinois–anglais.
+- Harmoniser les lacunes français/anglais par lots révisables, sans présenter
+  une sortie automatique comme donnée authentique.
+- Ajouter davantage d’exemples dans les deux langues et des tests de naturel,
+  registre, contresens et duplication.
+- Ajouter une vue détaillée par source, registre et catégorie grammaticale quand
+  la donnée est assez fiable.
+- Ajouter pause, vitesse, test de voix et suivi de lecture au TTS.
+- Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
+  et relations caractère–mot–expression.
+
+## v0.6.0 — modes d'apprentissage
 
 Ajouter un réglage distinct de la langue d'interface:
 
@@ -87,7 +94,7 @@ distinctes. Ces modes ne seront publiés qu'avec des données libres suffisammen
 riches: la base actuelle permet une consultation élémentaire, pas encore un vrai
 dictionnaire d'apprentissage pour sinophones.
 
-## v0.6.0 — apprendre et mémoriser
+## v0.7.0 — apprendre et mémoriser
 
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.

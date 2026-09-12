@@ -67,6 +67,19 @@ class MutableEntry:
     frequency: int = 0
 
 
+@dataclass
+class MutableExample:
+    chinese_id: int
+    chinese: str
+    english_id: int = 0
+    english: str = ""
+    french_id: int = 0
+    french: str = ""
+    chinese_source: str = "Tatoeba"
+    english_source: str = "Tatoeba"
+    french_source: str = ""
+
+
 def entry_key(traditional: str, simplified: str, pinyin: str) -> tuple[str, str, str]:
     return traditional, simplified, re.sub(r"\s+", " ", pinyin.strip()).lower()
 
@@ -113,33 +126,106 @@ def load_pangmao_entries(entries: dict[tuple[str, str, str], MutableEntry]) -> N
             ["fat cat; chubby cat", "Pangmao, name of this independent dictionary application"],
             ["chat dodu; gros chat", "Pangmao, nom de cette application indépendante de dictionnaire"],
         ),
+        (
+            "奶茶婊",
+            "奶茶婊",
+            "nai3 cha2 biao3",
+            ["woman who acts sweet, innocent and helpless to attract male attention (derogatory Internet slang)"],
+            ["femme qui joue l’ingénue douce et fragile pour attirer l’attention masculine (argot Internet péjoratif)"],
+        ),
+        (
+            "肉夾饃",
+            "肉夹馍",
+            "rou4 jia1 mo2",
+            ["roujiamo; Chinese flatbread filled with chopped meat; so-called Chinese burger"],
+            ["roujiamo ; petit pain chinois garni de viande ; parfois appelé « burger chinois »"],
+        ),
+        (
+            "爸比",
+            "爸比",
+            "ba4 bi3",
+            ["daddy (loanword)"],
+            ["papa (emprunt affectueux à l’anglais « daddy »)"],
+        ),
     ]
     for traditional, simplified, pinyin, english, french in custom:
         key = entry_key(traditional, simplified, pinyin)
-        entries[key] = MutableEntry(
-            traditional=traditional,
-            simplified=simplified,
-            pinyin=pinyin,
-            definitions_en=english,
-            definitions_fr=french,
-            sources={"Pangmao"},
-        )
+        entry = entries.get(key)
+        if entry is None:
+            entry = next(
+                (
+                    candidate
+                    for candidate in entries.values()
+                    if candidate.traditional == traditional and candidate.simplified == simplified
+                ),
+                None,
+            )
+        if entry is None:
+            entry = MutableEntry(traditional, simplified, pinyin)
+            entries[key] = entry
+        entry.definitions_en = unique([*english, *entry.definitions_en])
+        entry.definitions_fr = unique([*french, *entry.definitions_fr])
+        entry.sources.add("Pangmao")
 
 
-def load_examples(path: Path) -> list[tuple[int, str, int, str]]:
-    examples: list[tuple[int, str, int, str]] = []
-    seen: set[tuple[str, str]] = set()
+def normalized_sentence(value: str) -> str:
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFC", value).strip())
+
+
+def load_examples(path: Path) -> list[MutableExample]:
+    examples: list[MutableExample] = []
+    seen_chinese: set[str] = set()
     with path.open(encoding="utf-8-sig", newline="") as handle:
         for row in csv.reader(handle, delimiter="\t"):
             if len(row) < 4:
                 continue
             chinese_id, chinese, english_id, english = row[:4]
-            pair = chinese.strip(), english.strip()
-            if not pair[0] or not pair[1] or pair in seen:
+            chinese = normalized_sentence(chinese)
+            english = normalized_sentence(english)
+            key = chinese
+            if not chinese or not english or key in seen_chinese:
                 continue
-            seen.add(pair)
-            examples.append((int(chinese_id), pair[0], int(english_id), pair[1]))
+            seen_chinese.add(key)
+            examples.append(
+                MutableExample(
+                    chinese_id=int(chinese_id),
+                    chinese=chinese,
+                    english_id=int(english_id),
+                    english=english,
+                )
+            )
     return examples
+
+
+def load_pangmao_examples(path: Path, examples: list[MutableExample]) -> None:
+    """Merge small, human-reviewed bilingual examples and prefer them on collisions."""
+    by_chinese = {normalized_sentence(example.chinese): example for example in examples}
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        required = {"chinese", "english", "french"}
+        if not reader.fieldnames or not required.issubset(reader.fieldnames):
+            raise ValueError(f"Curated examples must contain {sorted(required)}: {path}")
+        for row in reader:
+            chinese = normalized_sentence(row["chinese"])
+            english = normalized_sentence(row["english"])
+            french = normalized_sentence(row["french"])
+            if not chinese or not english or not french:
+                raise ValueError(f"Incomplete curated example in {path}: {row}")
+            example = by_chinese.get(chinese)
+            if example is None:
+                example = MutableExample(
+                    chinese_id=0,
+                    chinese=chinese,
+                    chinese_source="Pangmao",
+                )
+                examples.append(example)
+                by_chinese[chinese] = example
+            example.english_id = 0
+            example.english = english
+            example.french_id = 0
+            example.french = french
+            example.english_source = "Pangmao"
+            example.french_source = "Pangmao"
 
 
 def greedy_tokens(text: str, headwords: set[str], maximum_length: int) -> list[str]:
@@ -162,7 +248,7 @@ def greedy_tokens(text: str, headwords: set[str], maximum_length: int) -> list[s
 
 def apply_frequency_and_pinyin(
     entries: dict[tuple[str, str, str], MutableEntry],
-    examples: list[tuple[int, str, int, str]],
+    examples: list[MutableExample],
 ) -> tuple[Counter[str], dict[str, str]]:
     headwords = {
         word
@@ -177,8 +263,8 @@ def apply_frequency_and_pinyin(
         for word in (entry.simplified, entry.traditional):
             if word and word not in preferred_pinyin:
                 preferred_pinyin[word] = entry.pinyin
-    for _, chinese, _, _ in examples:
-        for token in greedy_tokens(chinese, headwords, maximum_length):
+    for example in examples:
+        for token in greedy_tokens(example.chinese, headwords, maximum_length):
             if token in headwords:
                 frequencies[token] += 1
     for entry in entries.values():
@@ -241,7 +327,7 @@ def variants_to_text(value: str | None) -> str:
 def create_database(
     output: Path,
     entries: dict[tuple[str, str, str], MutableEntry],
-    examples: list[tuple[int, str, int, str]],
+    examples: list[MutableExample],
     unihan: dict[str, dict[str, str]],
     preferred_pinyin: dict[str, str],
     metadata: dict[str, str],
@@ -291,8 +377,14 @@ def create_database(
             chinese TEXT NOT NULL,
             pinyin TEXT NOT NULL,
             tatoeba_english_id INTEGER NOT NULL,
-            english TEXT NOT NULL
+            english TEXT NOT NULL,
+            tatoeba_french_id INTEGER NOT NULL,
+            french TEXT NOT NULL,
+            chinese_source TEXT NOT NULL,
+            english_source TEXT NOT NULL,
+            french_source TEXT NOT NULL
         );
+        CREATE UNIQUE INDEX examples_chinese_idx ON examples(chinese);
         CREATE TABLE characters (
             character TEXT PRIMARY KEY,
             codepoint TEXT NOT NULL,
@@ -359,18 +451,23 @@ def create_database(
     headword_set = {word for word in preferred if len(word) <= 8}
     maximum_length = max(map(len, headword_set), default=1)
     example_rows = []
-    for identifier, (chinese_id, chinese, english_id, english) in enumerate(examples, start=1):
+    for identifier, example in enumerate(examples, start=1):
         example_rows.append(
             (
                 identifier,
-                chinese_id,
-                chinese,
-                sentence_pinyin(chinese, headword_set, maximum_length, preferred_pinyin),
-                english_id,
-                english,
+                example.chinese_id,
+                example.chinese,
+                sentence_pinyin(example.chinese, headword_set, maximum_length, preferred_pinyin),
+                example.english_id,
+                example.english,
+                example.french_id,
+                example.french,
+                example.chinese_source,
+                example.english_source,
+                example.french_source,
             )
         )
-    connection.executemany("INSERT INTO examples VALUES (?, ?, ?, ?, ?, ?)", example_rows)
+    connection.executemany("INSERT INTO examples VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", example_rows)
 
     character_rows = []
     for character, values in sorted(unihan.items(), key=lambda item: ord(item[0])):
@@ -395,7 +492,7 @@ def create_database(
         )
     connection.executemany("INSERT INTO characters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", character_rows)
     connection.executemany("INSERT INTO metadata VALUES (?, ?)", sorted(metadata.items()))
-    connection.execute("PRAGMA user_version = 1")
+    connection.execute("PRAGMA user_version = 2")
     connection.commit()
     connection.execute("ANALYZE")
     connection.execute("VACUUM")
@@ -410,6 +507,7 @@ def main() -> None:
     parser.add_argument("--cc-cedict", required=True, type=Path)
     parser.add_argument("--cfdict", required=True, type=Path)
     parser.add_argument("--tatoeba", required=True, type=Path)
+    parser.add_argument("--pangmao-examples", required=True, type=Path)
     parser.add_argument("--unihan-dir", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--cc-revision", default="unknown")
@@ -421,6 +519,7 @@ def main() -> None:
     load_cfdict(args.cfdict, entries)
     load_pangmao_entries(entries)
     examples = load_examples(args.tatoeba)
+    load_pangmao_examples(args.pangmao_examples, examples)
     _, preferred_pinyin = apply_frequency_and_pinyin(entries, examples)
     wanted_characters = {
         character
@@ -431,13 +530,16 @@ def main() -> None:
     }
     unihan = parse_unihan(args.unihan_dir, wanted_characters)
     metadata = {
-        "schema_version": "1",
+        "schema_version": "2",
         "cc_cedict_revision": args.cc_revision,
         "cfdict_downloaded": "2026-09-11",
         "tatoeba_release": args.tatoeba_release,
         "unihan_version": "17.0.0",
         "entry_count": str(len(entries)),
         "example_count": str(len(examples)),
+        "bilingual_example_count": str(sum(bool(example.french) for example in examples)),
+        "definition_missing_english": str(sum(not entry.definitions_en for entry in entries.values())),
+        "definition_missing_french": str(sum(not entry.definitions_fr for entry in entries.values())),
         "character_count": str(len(unihan)),
     }
     create_database(args.output, entries, examples, unihan, preferred_pinyin, metadata)

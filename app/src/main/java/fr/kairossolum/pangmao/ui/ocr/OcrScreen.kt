@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Clear
@@ -66,6 +67,7 @@ import fr.kairossolum.pangmao.R
 @Composable
 fun OcrScreen(
     viewModel: OcrViewModel,
+    onBack: () -> Unit,
     onOpenEntry: (Long) -> Unit,
 ) {
     val context = LocalContext.current
@@ -104,6 +106,11 @@ fun OcrScreen(
                 Column {
                     Text(stringResource(R.string.ocr_title), fontWeight = FontWeight.Bold)
                     Text(stringResource(R.string.ocr_subtitle), style = MaterialTheme.typography.labelSmall)
+                }
+            },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
             },
             actions = {

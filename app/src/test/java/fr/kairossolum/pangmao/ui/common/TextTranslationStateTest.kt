@@ -4,6 +4,7 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
 import fr.kairossolum.pangmao.data.translation.TranslationTarget
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -43,6 +44,42 @@ class TextTranslationStateTest {
         )
 
         assertEquals("aimer beaucoup ; adorer", state.french)
+        assertEquals(0, repository.readinessChecks)
+        assertEquals(0, repository.translations)
+    }
+
+    @Test
+    fun `reviewed bilingual example bypasses both translation models`() = runTest {
+        val repository = RecordingTranslationRepository()
+        var state = TextTranslationState()
+        val example = ExampleSentence(
+            id = 1,
+            chinese = "猫在睡觉。",
+            pinyin = "mao1 zai4 shui4 jiao4",
+            english = "The cat is sleeping.",
+            french = "Le chat dort.",
+            tatoebaChineseId = 0,
+            tatoebaEnglishId = 0,
+            tatoebaFrenchId = 0,
+            chineseSource = "Pangmao",
+            englishSource = "Pangmao",
+            frenchSource = "Pangmao",
+        )
+
+        resolveTextTranslation(
+            analysis = TextAnalysis(
+                sourceText = example.chinese,
+                exactEntry = null,
+                exactExample = example,
+                tokens = emptyList(),
+            ),
+            definitionLanguage = DefinitionLanguage.BOTH,
+            translation = repository,
+            update = { state = it },
+        )
+
+        assertEquals(example.french, state.french)
+        assertEquals(example.english, state.english)
         assertEquals(0, repository.readinessChecks)
         assertEquals(0, repository.translations)
     }

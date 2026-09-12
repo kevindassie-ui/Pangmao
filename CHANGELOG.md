@@ -8,6 +8,34 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.4.0 — 2026-09-12
+
+### Ajouté
+
+- Fiches organisées en onglets Définitions, Exemples et Caractères/Mots.
+- Navigation vers la fiche de chaque caractère composant un mot.
+- Explorateur filtrable des mots contenant, commençant ou finissant par un
+  caractère, avec tri par fréquence ou pinyin.
+- Petit corpus éditorial français–anglais revu pour les lacunes et erreurs
+  documentées, notamment `奶茶婊`, `肉夹馍`, `爸比` et `你很像你哥哥`.
+
+### Corrigé
+
+- Les exemples identiques ne sont plus répétés sous des traductions différentes.
+- `肉夹馍` est protégé contre les traductions littérales « pince à viande » et
+  « meat clamp »; les phrases signalées disposent de traductions naturelles.
+- Réactiver le pinyin continu replace le lecteur en haut pour le rendre visible.
+- Une voix chinoise manquante ou indisponible est maintenant signalée avec une
+  action d’installation, au lieu d’un échec silencieux du TTS.
+
+### Modifié
+
+- L’analyse mot à mot de l’accueil devient facultative et masquée par défaut.
+- L’OCR rejoint les actions rapides de l’accueil; la navigation basse est réduite
+  à Dictionnaire, Lecteur et Cartes.
+- Le stockage des exemples accepte désormais une traduction française et une
+  provenance propres à chaque langue.
+
 ## 0.3.1 — 2026-09-12
 
 ### Corrigé
@@ -85,6 +113,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.4.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.0
 [0.3.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.1
 [0.3.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.0
 [0.2.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.2.1

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.ContentPaste
@@ -35,8 +36,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,6 +64,7 @@ import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
+import fr.kairossolum.pangmao.ui.common.SpeakerStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,6 +100,15 @@ fun ReaderScreen(
     var showPinyin by rememberSaveable { mutableStateOf(true) }
     var showTranslation by rememberSaveable { mutableStateOf(true) }
     var showDefinitions by rememberSaveable { mutableStateOf(true) }
+    var revealPinyinAtTop by rememberSaveable { mutableStateOf(false) }
+    val readingListState = rememberLazyListState()
+
+    LaunchedEffect(revealPinyinAtTop) {
+        if (revealPinyinAtTop) {
+            readingListState.animateScrollToItem(0)
+            revealPinyinAtTop = false
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -152,6 +165,26 @@ fun ReaderScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+        if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE || speaker.status == SpeakerStatus.ERROR) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    stringResource(
+                        if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE) R.string.tts_voice_missing
+                        else R.string.tts_unavailable
+                    ),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                TextButton(onClick = { speaker.openVoiceInstallation(context) }) {
+                    Text(stringResource(R.string.tts_open_settings))
+                }
+            }
+        }
         HorizontalDivider(Modifier.padding(top = 10.dp))
         when {
             isAnalyzing -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -165,6 +198,7 @@ fun ReaderScreen(
             else -> {
                 val currentAnalysis = checkNotNull(analysis)
                 LazyColumn(
+                    state = readingListState,
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -179,7 +213,10 @@ fun ReaderScreen(
                             item {
                                 FilterChip(
                                     selected = showPinyin,
-                                    onClick = { showPinyin = !showPinyin },
+                                    onClick = {
+                                        showPinyin = !showPinyin
+                                        if (showPinyin) revealPinyinAtTop = true
+                                    },
                                     label = { Text(stringResource(R.string.reader_layer_pinyin)) },
                                 )
                             }

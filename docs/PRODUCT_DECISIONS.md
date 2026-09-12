@@ -108,3 +108,23 @@ conjugaison sont maîtrisés. `您` conserve le vouvoiement.
 **Décision:** si le TTS Android ne possède pas de voix chinoise utilisable,
 Pangmao affiche le diagnostic et l’action corrective. Une icône simplement
 désactivée n’est pas une réponse suffisante.
+
+## D-013 — un exemple, une phrase chinoise
+
+**Décision:** l’identité d’un exemple est sa phrase chinoise normalisée, pas la
+paire chinois–traduction. Plusieurs traductions concurrentes ne créent donc plus
+plusieurs cartes identiques. Les ajouts éditoriaux revus peuvent compléter ou
+remplacer une langue cible tout en conservant leur source.
+
+## D-014 — aucune authenticité automatique
+
+**Décision:** une traduction produite par un modèle local peut aider à comprendre
+un texte, mais ne peut pas être présentée comme une définition harmonisée ou un
+exemple authentique. Les enrichissements du dictionnaire exigent une source
+libre attribuée ou une révision éditoriale explicite.
+
+## D-015 — exploration dans la fiche
+
+**Décision:** Définitions, Exemples et Caractères/Mots sont des onglets internes
+à la fiche, pas de nouvelles destinations principales. Les filtres de position,
+fréquence et tri sont combinables, mais restent repliés dans ce contexte.

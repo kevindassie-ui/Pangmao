@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.icons.outlined.TextSnippet
@@ -104,7 +103,6 @@ private data class MainDestination(val route: String, @StringRes val label: Int,
 private val mainDestinations = listOf(
     MainDestination("dictionary", R.string.nav_dictionary, Icons.Outlined.MenuBook),
     MainDestination("reader", R.string.nav_reader, Icons.Outlined.TextSnippet),
-    MainDestination("ocr", R.string.nav_ocr, Icons.Outlined.CameraAlt),
     MainDestination("study", R.string.nav_cards, Icons.Outlined.School),
 )
 
@@ -170,6 +168,7 @@ private fun PangmaoApp(
                         onOpenAbout = { navController.navigate("about") },
                         onOpenSettings = { navController.navigate("settings") },
                         onOpenHandwriting = { navController.navigate("handwriting") },
+                        onOpenOcr = { navController.navigate("ocr") },
                     )
                 }
                 composable("reader") {
@@ -190,7 +189,11 @@ private fun PangmaoApp(
                     val model: OcrViewModel = viewModel(
                         factory = viewModelFactory { OcrViewModel(container.dictionary) }
                     )
-                    OcrScreen(model, onOpenEntry = { navController.navigate("entry/$it") })
+                    OcrScreen(
+                        viewModel = model,
+                        onBack = navController::navigateUp,
+                        onOpenEntry = { navController.navigate("entry/$it") },
+                    )
                 }
                 composable("study") {
                     val model: StudyViewModel = viewModel(
@@ -209,7 +212,11 @@ private fun PangmaoApp(
                             EntryViewModel(identifier, container.dictionary, container.study)
                         },
                     )
-                    EntryScreen(model, onBack = navController::navigateUp)
+                    EntryScreen(
+                        viewModel = model,
+                        onBack = navController::navigateUp,
+                        onOpenEntry = { navController.navigate("entry/$it") },
+                    )
                 }
                 composable("about") {
                     val model: AboutViewModel = viewModel(

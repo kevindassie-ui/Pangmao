@@ -5,6 +5,8 @@ import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
+import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
+import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import fr.kairossolum.pangmao.domain.model.TextToken
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +20,13 @@ interface DictionaryRepository {
     suspend fun lookupExact(word: String): DictionaryEntry?
     suspend fun examples(headword: String, limit: Int = 6): List<ExampleSentence>
     suspend fun characters(text: String): List<CharacterInfo>
+    suspend fun relatedWords(
+        character: String,
+        position: RelatedWordPosition = RelatedWordPosition.CONTAINS,
+        frequentOnly: Boolean = true,
+        sort: RelatedWordSort = RelatedWordSort.FREQUENCY,
+        limit: Int = 80,
+    ): List<DictionaryEntry>
     suspend fun tokenize(text: String): List<TextToken>
     suspend fun analyze(text: String): TextAnalysis
     suspend fun metadata(): Map<String, String>
@@ -36,6 +45,13 @@ class OfflineDictionaryRepository(
     override suspend fun lookupExact(word: String): DictionaryEntry? = io { source.lookupExact(word) }
     override suspend fun examples(headword: String, limit: Int): List<ExampleSentence> = io { source.examples(headword, limit) }
     override suspend fun characters(text: String): List<CharacterInfo> = io { source.characters(text) }
+    override suspend fun relatedWords(
+        character: String,
+        position: RelatedWordPosition,
+        frequentOnly: Boolean,
+        sort: RelatedWordSort,
+        limit: Int,
+    ): List<DictionaryEntry> = io { source.relatedWords(character, position, frequentOnly, sort, limit) }
     override suspend fun metadata(): Map<String, String> = io { source.metadata() }
 
     override suspend fun tokenize(text: String): List<TextToken> = io {

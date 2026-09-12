@@ -33,4 +33,27 @@ class TranslationQualityTest {
             TranslationQuality.polishFrench("天气很好", "  Une   traduction\tutile  "),
         )
     }
+
+    @Test
+    fun `uses natural translations for reported reader sentences`() {
+        val resemblance = TranslationQuality.curated("你很像你哥哥。")
+        val food = TranslationQuality.curated("我上次去市中心买了三个肉夹馍")
+
+        assertEquals("Tu ressembles beaucoup à ton frère aîné.", resemblance?.french)
+        assertEquals("You look a lot like your older brother.", resemblance?.english)
+        assertEquals("La dernière fois, je suis allé en centre-ville acheter trois roujiamos.", food?.french)
+        assertEquals("Last time, I went downtown and bought three roujiamos.", food?.english)
+    }
+
+    @Test
+    fun `protects roujiamo from literal model output`() {
+        assertEquals(
+            "J’ai acheté trois roujiamos.",
+            TranslationQuality.polishFrench("我买了三个肉夹馍", "J’ai acheté trois pinces à viande."),
+        )
+        assertEquals(
+            "I bought three roujiamos.",
+            TranslationQuality.polishEnglish("我买了三个肉夹馍", "I bought three meat clamps."),
+        )
+    }
 }

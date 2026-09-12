@@ -18,9 +18,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Draw
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Close
@@ -39,7 +42,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -74,6 +79,7 @@ fun SearchScreen(
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenHandwriting: () -> Unit,
+    onOpenOcr: () -> Unit,
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -139,13 +145,29 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            FilledTonalButton(onClick = { focusRequester.requestFocus() }, modifier = Modifier.weight(1f)) {
+            FilledTonalButton(
+                onClick = { focusRequester.requestFocus() },
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
                 Icon(Icons.Outlined.Search, contentDescription = null)
-                Text("  ${stringResource(R.string.input_keyboard)}")
+                Text(" ${stringResource(R.string.input_keyboard)}", maxLines = 1)
             }
-            FilledTonalButton(onClick = onOpenHandwriting, modifier = Modifier.weight(1f)) {
+            FilledTonalButton(
+                onClick = onOpenHandwriting,
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
                 Icon(Icons.Outlined.Draw, contentDescription = null)
-                Text("  ${stringResource(R.string.input_handwriting)}")
+                Text(" ${stringResource(R.string.input_handwriting)}", maxLines = 1)
+            }
+            FilledTonalButton(
+                onClick = onOpenOcr,
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+            ) {
+                Icon(Icons.Outlined.CameraAlt, contentDescription = null)
+                Text(" ${stringResource(R.string.input_ocr)}", maxLines = 1)
             }
         }
 
@@ -248,6 +270,7 @@ private fun SearchAnalysisCard(
     val chineseTokens = analysis.tokens.filter { it.token.isChinese }
     val exactMeaning = analysis.exactEntry?.primaryDefinition(definitionLanguage)
     val gloss = chineseTokens.mapNotNull { it.entry?.primaryDefinition(definitionLanguage) }.joinToString(" · ")
+    var showBreakdown by remember(analysis.sourceText) { mutableStateOf(false) }
     ElevatedCard(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
@@ -297,16 +320,30 @@ private fun SearchAnalysisCard(
             if (translation.error != null) {
                 Text(stringResource(R.string.reader_translation_error), color = MaterialTheme.colorScheme.error)
             }
-            when {
-                !exactMeaning.isNullOrBlank() -> MeaningBlock(R.string.search_whole_expression, exactMeaning)
-                gloss.isNotBlank() -> MeaningBlock(R.string.search_word_gloss, gloss)
+            if (!exactMeaning.isNullOrBlank()) {
+                MeaningBlock(R.string.search_whole_expression, exactMeaning)
             }
-            Text(
-                stringResource(R.string.search_breakdown),
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            chineseTokens.forEach { token -> AnalysisTokenRow(token, definitionLanguage, onOpenEntry) }
+            TextButton(onClick = { showBreakdown = !showBreakdown }) {
+                Icon(
+                    if (showBreakdown) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                    contentDescription = null,
+                )
+                Text(
+                    stringResource(
+                        if (showBreakdown) R.string.search_hide_breakdown
+                        else R.string.search_show_breakdown
+                    )
+                )
+            }
+            if (showBreakdown) {
+                if (gloss.isNotBlank()) MeaningBlock(R.string.search_word_gloss, gloss)
+                Text(
+                    stringResource(R.string.search_breakdown),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                chineseTokens.forEach { token -> AnalysisTokenRow(token, definitionLanguage, onOpenEntry) }
+            }
         }
     }
 }

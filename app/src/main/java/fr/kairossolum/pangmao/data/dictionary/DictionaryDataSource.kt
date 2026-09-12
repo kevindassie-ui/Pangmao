@@ -9,11 +9,13 @@ import fr.kairossolum.pangmao.domain.HeadwordMatch
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
+import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
+import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import java.io.File
 
 class DictionaryDataSource(private val context: Context) {
     private val database: SQLiteDatabase by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        val directory = File(context.filesDir, "dictionary/v1").apply { mkdirs() }
+        val directory = File(context.filesDir, "dictionary/v2").apply { mkdirs() }
         val target = File(directory, "pangmao.db")
         if (!target.exists() || target.length() < 1024L) {
             val temporary = File(directory, "pangmao.db.copying")
@@ -134,7 +136,8 @@ class DictionaryDataSource(private val context: Context) {
         val escaped = "%${escapeLike(headword)}%"
         return database.rawQuery(
             """
-            SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english
+            SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english,
+                tatoeba_french_id, french, chinese_source, english_source, french_source
             FROM examples
             WHERE chinese LIKE ? ESCAPE '\'
             ORDER BY length(chinese), id
@@ -152,6 +155,11 @@ class DictionaryDataSource(private val context: Context) {
                             pinyin = cursor.getString(3),
                             tatoebaEnglishId = cursor.getLong(4),
                             english = cursor.getString(5),
+                            tatoebaFrenchId = cursor.getLong(6),
+                            french = cursor.getString(7),
+                            chineseSource = cursor.getString(8),
+                            englishSource = cursor.getString(9),
+                            frenchSource = cursor.getString(10),
                         )
                     )
                 }
@@ -161,7 +169,8 @@ class DictionaryDataSource(private val context: Context) {
 
     fun exactExample(text: String): ExampleSentence? = database.rawQuery(
         """
-        SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english
+        SELECT id, tatoeba_chinese_id, chinese, pinyin, tatoeba_english_id, english,
+            tatoeba_french_id, french, chinese_source, english_source, french_source
         FROM examples
         WHERE chinese = ?
         ORDER BY id
@@ -177,6 +186,42 @@ class DictionaryDataSource(private val context: Context) {
             pinyin = cursor.getString(3),
             tatoebaEnglishId = cursor.getLong(4),
             english = cursor.getString(5),
+            tatoebaFrenchId = cursor.getLong(6),
+            french = cursor.getString(7),
+            chineseSource = cursor.getString(8),
+            englishSource = cursor.getString(9),
+            frenchSource = cursor.getString(10),
+        )
+    }
+
+    fun relatedWords(
+        character: String,
+        position: RelatedWordPosition,
+        frequentOnly: Boolean,
+        sort: RelatedWordSort,
+        limit: Int,
+    ): List<DictionaryEntry> {
+        val escaped = escapeLike(character)
+        val pattern = when (position) {
+            RelatedWordPosition.CONTAINS -> "%$escaped%"
+            RelatedWordPosition.STARTS_WITH -> "$escaped%"
+            RelatedWordPosition.ENDS_WITH -> "%$escaped"
+        }
+        val frequencyClause = if (frequentOnly) "AND frequency > 0" else ""
+        val orderClause = when (sort) {
+            RelatedWordSort.FREQUENCY -> "frequency DESC, length(simplified), pinyin_plain, id"
+            RelatedWordSort.PINYIN -> "pinyin_plain, frequency DESC, length(simplified), id"
+        }
+        return queryEntries(
+            """
+            SELECT * FROM entries
+            WHERE length(simplified) > 1
+                AND (simplified LIKE ? ESCAPE '\' OR traditional LIKE ? ESCAPE '\')
+                $frequencyClause
+            ORDER BY $orderClause
+            LIMIT ?
+            """.trimIndent(),
+            arrayOf(pattern, pattern, limit.toString()),
         )
     }
 

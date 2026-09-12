@@ -22,9 +22,25 @@ data class ExampleSentence(
     val chinese: String,
     val pinyin: String,
     val english: String,
+    val french: String,
     val tatoebaChineseId: Long,
     val tatoebaEnglishId: Long,
+    val tatoebaFrenchId: Long,
+    val chineseSource: String,
+    val englishSource: String,
+    val frenchSource: String,
 )
+
+enum class RelatedWordPosition {
+    CONTAINS,
+    STARTS_WITH,
+    ENDS_WITH,
+}
+
+enum class RelatedWordSort {
+    FREQUENCY,
+    PINYIN,
+}
 
 data class CharacterInfo(
     val character: String,
