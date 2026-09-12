@@ -47,8 +47,9 @@ APK build. A `v*` tag publishes the tested APK as a GitHub prerelease.
 - CameraX plus bundled ML Kit Chinese Text Recognition v2.
 - Minimum Android 8.0 (API 26), target Android 15 (API 35).
 
-See [MVP scope](docs/MVP_SCOPE.md), [source data and licenses](tools/SOURCES.md),
-and [notices](NOTICE.md).
+See the [changelog](CHANGELOG.md), [product roadmap](docs/ROADMAP.md),
+[product decisions](docs/PRODUCT_DECISIONS.md), [MVP scope](docs/MVP_SCOPE.md),
+[source data and licenses](tools/SOURCES.md), and [notices](NOTICE.md).
 
 Pangmao is independent and unaffiliated with Pleco Software. It contains no
 proprietary Pleco content.
