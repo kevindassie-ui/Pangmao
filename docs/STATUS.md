@@ -28,7 +28,10 @@ Checkpoint date: 2026-09-12
 
 ## Verified data
 
-- Dictionary integrity: 132,342 entries, 76,606 examples, 14,622 character records.
+- Dictionary integrity: 132,342 entries, 64,912 unique Chinese examples and
+  14,622 character records.
+- Twelve reviewed Pangmao examples currently provide aligned French and English;
+  broader bilingual coverage is tracked for v0.5.0.
 
 ## Verified on GitHub Actions
 
@@ -113,9 +116,27 @@ Checkpoint date: 2026-09-12
   pinyin is re-enabled, make word-by-word analysis optional, continue improving
   French phrasing, move OCR to the home actions and expose TTS failures.
 
+## Dictionary depth release 0.4.0
+
+- Tag: `v0.4.0` at commit `9eaafa9`.
+- Implementation CI run `34702542913` and final CI run `34702712090` passed
+  full dictionary validation, unit tests, Android lint and debug APK assembly.
+- Release run `34703031162` repeated validation and tests, built both release
+  variants, verified their Android v2 signatures and published the assets.
+- ARM64 APK: `Pangmao-v0.4.0-arm64.apk` (84,475,458 bytes), SHA-256
+  `440e93a9caa1d5e1bfdd4c992463f663c94021a2c12086e5c972342507f7c3da`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.4.0/Pangmao-v0.4.0-arm64.apk>
+- Universal APK: `Pangmao-v0.4.0-universal.apk` (183,251,112 bytes), SHA-256
+  `713d736b26eddfbf14e5f1f0c5cbd2fe869efc9448a94499e925ab029e1ed160`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.4.0/Pangmao-v0.4.0-universal.apk>
+- Device acceptance remains to be completed for the new tabs, character
+  navigation, word explorer, OCR relocation, pinyin repositioning and TTS
+  diagnostic.
+
 ## Later iteration
 
-Robust audio and interactive dictionary-source controls are intentionally
+Exhaustive bilingual corpus alignment, richer authentic examples, advanced
+audio controls and interactive dictionary-source details are intentionally
 deferred. Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.

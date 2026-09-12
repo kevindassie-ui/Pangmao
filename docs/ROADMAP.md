@@ -46,7 +46,7 @@ Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 - Placer le pinyin continu et la traduction immédiatement sous le texte.
 - Supprimer l’aperçu mot à mot redondant tout en conservant les cartes détaillées.
 
-## v0.4.0 — enrichir le dictionnaire français
+## v0.4.0 — enrichir le dictionnaire français · publiée
 
 - Rendre l’analyse mot à mot repliable et corriger le repositionnement du pinyin.
 - Déplacer l’OCR vers les actions rapides de l’accueil.
