@@ -58,11 +58,12 @@
     <string name="handwriting_download_body">Un téléchargement unique d’environ 20 Mo est nécessaire. Il restera ensuite disponible hors ligne.</string>
     <string name="handwriting_download">Télécharger le modèle</string>
     <string name="handwriting_downloading">Téléchargement…</string>
-    <string name="handwriting_ready">Écrivez dans la grille, trait par trait.</string>
+    <string name="handwriting_ready">Écrivez dans la grille, puis touchez Reconnaître.</string>
     <string name="handwriting_candidates">Résultats proposés</string>
     <string name="handwriting_undo">Annuler le dernier trait</string>
     <string name="handwriting_recognize">Reconnaître</string>
     <string name="handwriting_no_result">Aucun caractère reconnu. Essayez de tracer les traits dans leur ordre naturel.</string>
+    <string name="handwriting_recognition_error">La reconnaissance a échoué. Le dessin est conservé : réessayez ou effacez-le.</string>
 
     <string name="entry_title">Fiche dictionnaire</string>
     <string name="traditional">Traditionnel : %1$s</string>

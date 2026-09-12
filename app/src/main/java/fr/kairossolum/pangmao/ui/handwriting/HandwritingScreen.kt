@@ -40,7 +40,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -113,7 +112,7 @@ private fun WritingContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(stringResource(R.string.handwriting_ready), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        WritingCanvas(state.strokes, viewModel::setWritingArea, viewModel::addStroke)
+        WritingCanvas(state.strokes, viewModel::addStroke)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = viewModel::undo, enabled = state.strokes.isNotEmpty(), modifier = Modifier.weight(1f)) {
                 Icon(Icons.Outlined.Undo, null)
@@ -142,8 +141,14 @@ private fun WritingContent(
                     }
                 }
             }
-        } else if (state.strokes.isNotEmpty() && !state.isRecognizing) {
+        } else if (state.recognitionAttempted && !state.isRecognizing) {
             Text(stringResource(R.string.handwriting_no_result), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        state.error?.let {
+            Text(
+                stringResource(R.string.handwriting_recognition_error),
+                color = MaterialTheme.colorScheme.error,
+            )
         }
     }
 }
@@ -151,7 +156,6 @@ private fun WritingContent(
 @Composable
 private fun WritingCanvas(
     strokes: List<DrawnStroke>,
-    onSizeChanged: (Float, Float) -> Unit,
     onStroke: (List<InkPoint>) -> Unit,
 ) {
     var activeStroke by remember { mutableStateOf<List<InkPoint>>(emptyList()) }
@@ -162,7 +166,6 @@ private fun WritingCanvas(
             .fillMaxWidth()
             .aspectRatio(1f)
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f), MaterialTheme.shapes.large)
-            .onSizeChanged { onSizeChanged(it.width.toFloat(), it.height.toFloat()) }
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset -> activeStroke = listOf(InkPoint(offset.x, offset.y, System.currentTimeMillis())) },

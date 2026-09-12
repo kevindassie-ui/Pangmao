@@ -1,7 +1,6 @@
 package fr.kairossolum.pangmao.ui.handwriting
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.mlkit.common.MlKitException
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.common.model.RemoteModelManager
@@ -10,15 +9,10 @@ import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognitionModel
 import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognitionModelIdentifier
 import com.google.mlkit.vision.digitalink.recognition.DigitalInkRecognizerOptions
 import com.google.mlkit.vision.digitalink.recognition.Ink
-import com.google.mlkit.vision.digitalink.recognition.RecognitionContext
-import com.google.mlkit.vision.digitalink.recognition.WritingArea
 import fr.kairossolum.pangmao.domain.firstHanCharacter
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 data class InkPoint(val x: Float, val y: Float, val time: Long)
 data class DrawnStroke(val points: List<InkPoint>)
@@ -30,6 +24,7 @@ data class HandwritingUiState(
     val strokes: List<DrawnStroke> = emptyList(),
     val candidates: List<String> = emptyList(),
     val isRecognizing: Boolean = false,
+    val recognitionAttempted: Boolean = false,
     val error: String? = null,
 )
 
@@ -46,9 +41,7 @@ class HandwritingViewModel : ViewModel() {
     )
     private val _uiState = MutableStateFlow(HandwritingUiState())
     val uiState: StateFlow<HandwritingUiState> = _uiState.asStateFlow()
-    private var writingWidth = 1f
-    private var writingHeight = 1f
-    private var recognitionJob: Job? = null
+    private var recognitionRequest = 0L
 
     init {
         modelManager.isModelDownloaded(model)
@@ -74,66 +67,100 @@ class HandwritingViewModel : ViewModel() {
             }
     }
 
-    fun setWritingArea(width: Float, height: Float) {
-        writingWidth = width.coerceAtLeast(1f)
-        writingHeight = height.coerceAtLeast(1f)
-    }
-
     fun addStroke(points: List<InkPoint>) {
         if (points.isEmpty() || _uiState.value.modelState != InkModelState.READY) return
         _uiState.value = _uiState.value.copy(
             strokes = _uiState.value.strokes + DrawnStroke(points),
+            candidates = emptyList(),
+            recognitionAttempted = false,
             error = null,
         )
-        recognitionJob?.cancel()
-        recognitionJob = viewModelScope.launch {
-            delay(AUTO_RECOGNIZE_DELAY_MS)
-            recognize()
-        }
     }
 
     fun undo() {
+        recognitionRequest += 1
         val strokes = _uiState.value.strokes.dropLast(1)
-        _uiState.value = _uiState.value.copy(strokes = strokes, candidates = emptyList(), error = null)
-        if (strokes.isNotEmpty()) recognize()
+        _uiState.value = _uiState.value.copy(
+            strokes = strokes,
+            candidates = emptyList(),
+            isRecognizing = false,
+            recognitionAttempted = false,
+            error = null,
+        )
     }
 
     fun clear() {
-        recognitionJob?.cancel()
-        _uiState.value = _uiState.value.copy(strokes = emptyList(), candidates = emptyList(), error = null)
+        recognitionRequest += 1
+        _uiState.value = _uiState.value.copy(
+            strokes = emptyList(),
+            candidates = emptyList(),
+            isRecognizing = false,
+            recognitionAttempted = false,
+            error = null,
+        )
     }
 
     fun recognize() {
         val strokes = _uiState.value.strokes
-        if (strokes.isEmpty() || _uiState.value.modelState != InkModelState.READY) return
-        val ink = Ink.builder().apply {
-            strokes.forEach { drawn ->
-                addStroke(Ink.Stroke.builder().apply {
-                    drawn.points.forEach { addPoint(Ink.Point.create(it.x, it.y, it.time)) }
-                }.build())
-            }
-        }.build()
-        val context = RecognitionContext.builder()
-            .setWritingArea(WritingArea(writingWidth, writingHeight))
-            .build()
-        _uiState.value = _uiState.value.copy(isRecognizing = true, error = null)
-        recognizer.recognize(ink, context)
+        if (
+            strokes.isEmpty() ||
+            _uiState.value.modelState != InkModelState.READY ||
+            _uiState.value.isRecognizing
+        ) return
+        val request = ++recognitionRequest
+        val ink = runCatching {
+            Ink.builder().apply {
+                strokes.forEach { drawn ->
+                    addStroke(Ink.Stroke.builder().apply {
+                        drawn.points.forEach { addPoint(Ink.Point.create(it.x, it.y, it.time)) }
+                    }.build())
+                }
+            }.build()
+        }.getOrElse { error ->
+            showRecognitionError(request, error)
+            return
+        }
+        _uiState.value = _uiState.value.copy(
+            isRecognizing = true,
+            recognitionAttempted = false,
+            error = null,
+        )
+        val task = runCatching { recognizer.recognize(ink) }.getOrElse { error ->
+            showRecognitionError(request, error)
+            return
+        }
+        task
             .addOnSuccessListener { result ->
+                if (request != recognitionRequest) return@addOnSuccessListener
                 val candidates = result.candidates.mapNotNull { firstHanCharacter(it.text) }.distinct().take(8)
-                _uiState.value = _uiState.value.copy(candidates = candidates, isRecognizing = false)
+                _uiState.value = _uiState.value.copy(
+                    candidates = candidates,
+                    isRecognizing = false,
+                    recognitionAttempted = true,
+                )
             }
             .addOnFailureListener { error ->
-                _uiState.value = _uiState.value.copy(isRecognizing = false, error = error.message)
+                showRecognitionError(request, error)
             }
     }
 
+    private fun showRecognitionError(request: Long, error: Throwable) {
+        if (request != recognitionRequest) return
+        _uiState.value = _uiState.value.copy(
+            isRecognizing = false,
+            candidates = emptyList(),
+            recognitionAttempted = false,
+            error = error.message ?: error.javaClass.simpleName,
+        )
+    }
+
     override fun onCleared() {
+        recognitionRequest += 1
         recognizer.close()
         super.onCleared()
     }
 
     private companion object {
         const val LANGUAGE_TAG = "zh-Hani-CN"
-        const val AUTO_RECOGNIZE_DELAY_MS = 280L
     }
 }
