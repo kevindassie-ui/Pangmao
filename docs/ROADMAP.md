@@ -21,7 +21,7 @@ Dernière mise à jour: 2026-09-12.
 
 Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
-## v0.3.0 — comprendre un texte · candidate
+## v0.3.0 — comprendre un texte · publiée
 
 - Unifier le moteur de la recherche et du lecteur.
 - Afficher une interprétation globale puis des blocs logiques nettement séparés.

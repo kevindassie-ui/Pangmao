@@ -1,22 +1,26 @@
-# Pangmao Phase 2 — release status
+# Pangmao — release status
 
-Checkpoint date: 2026-09-11
+Checkpoint date: 2026-09-12
 
 ## Implemented
 
 - Offline Chinese dictionary search in Hanzi, pinyin, French and English.
-- Simplified/traditional forms, tone-marked and tone-coloured pinyin.
+- Simplified/traditional forms, tone-coloured hanzi and tone-marked pinyin.
 - Entry details, authentic examples, character metadata and Android TTS.
-- Tappable reader with longest-match dictionary segmentation.
+- Context-aware search and reader segmentation with global and block-by-block
+  interpretation, pinyin and definitions.
+- Optional on-device sentence translation after explicit model download.
 - Camera and gallery OCR using the bundled ML Kit Chinese model, with tappable
   text-region selection.
-- Pleco-like handwriting canvas with offline recognition after the optional,
-  one-time Chinese handwriting model download.
-- Local history, favourites and SRS flashcards.
+- Pleco-like handwriting canvas with safe automatic offline recognition after
+  the optional, one-time Chinese handwriting model download.
+- Separate local histories for searches and viewed entries, favourites and SRS
+  flashcards.
 - Rounded Material 3 / Compose interface with Porcelaine light and Sceau de nuit
   dark palettes.
 - App language selection (system, French, English or Simplified Chinese) and
   theme selection (system, light or dark), stored locally.
+- Persistent choice of French, English or both definition languages.
 - Consistent reader actions, including a compact clear control inside the text
   field.
 - Reproducible dictionary builder and validator.
@@ -71,8 +75,24 @@ Checkpoint date: 2026-09-11
 - Universal APK: `Pangmao-v0.2.1-universal.apk` (119,370,092 bytes), SHA-256
   `f282b83e398dc328271a597b322e32d7d8a3a08a14acf5f7c507445bb59fbf4f`.
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.2.1/Pangmao-v0.2.1-universal.apk>
-- Device acceptance remains to be completed for repeated handwriting and
-  hot/cold switching to `zh-Hans`.
+- Device acceptance completed: the handwriting crash is resolved and the
+  `zh-Hans` interface switches correctly.
+
+## Text understanding release 0.3.0
+
+- Tag: `v0.3.0` at commit `3a39d88`.
+- CI run `34687560717` passed dictionary validation, unit tests, Android lint
+  and debug APK assembly.
+- Release run `34687861761` repeated validation and tests, built both release
+  variants, and verified their Android signatures successfully.
+- ARM64 APK: `Pangmao-v0.3.0-arm64.apk` (83,416,414 bytes), SHA-256
+  `8ea26d99791256e63c7d9023a97c760cfa5642918381f926a498b673125a28a6`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.3.0/Pangmao-v0.3.0-arm64.apk>
+- Universal APK: `Pangmao-v0.3.0-universal.apk` (182,192,068 bytes), SHA-256
+  `088b4e92af8b556b8dcfd500daea8a0efb7575977f7ddb510ccac643e371e069`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.3.0/Pangmao-v0.3.0-universal.apk>
+- Device acceptance remains to be completed for automatic handwriting,
+  segmentation, model download and the new reader workflow.
 
 ## Later iteration
 
