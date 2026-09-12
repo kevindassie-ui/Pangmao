@@ -390,4 +390,3 @@ private fun EmptySearch(query: String) {
         }
     }
 }
-import androidx.compose.foundation.Image
