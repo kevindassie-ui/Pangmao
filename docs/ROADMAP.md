@@ -100,7 +100,7 @@ Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_
 - Déclarer les moteurs TTS dans la visibilité Android et essayer les moteurs
   installés en repli lorsque le moteur par défaut échoue.
 
-## v0.5.2 — écouter et explorer
+## Audio et explorateur — reportés après v0.6
 
 - Ajouter pause, vitesse, test de voix et suivi de lecture au TTS.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
@@ -124,6 +124,21 @@ mode anglais nécessitera formes, variantes UK/US, collocations et prononciation
 distinctes. Ces modes ne seront publiés qu'avec des données libres suffisamment
 riches: la base actuelle permet une consultation élémentaire, pas encore un vrai
 dictionnaire d'apprentissage pour sinophones.
+
+Plan d'exécution et portes de données: [V0.6_RELEASE_PLAN.md](V0.6_RELEASE_PLAN.md).
+
+## Après v0.6 — connectivité, parole et diffusion
+
+- Conserver un mode hors ligne complet et ajouter un mode en ligne explicitement
+  activé pour la traduction, le TTS ou le STT améliorés.
+- Ajouter le STT comme quatrième saisie de l'accueil et partager ses briques
+  techniques avec la future application de transcription longue.
+- Développer l'analyse grammaticale contextuelle, le suivi des mots connus, la
+  difficulté des textes et le parcours capture → définition → carte.
+- Préparer commercialisation, conformité, bêta élargie et portage iOS seulement
+  après stabilisation des profils d'apprentissage.
+
+Stratégie détaillée: [POST_V0.6_STRATEGY.md](POST_V0.6_STRATEGY.md).
 
 ## v0.7.0 — apprendre et mémoriser
 

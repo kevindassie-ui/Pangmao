@@ -1,6 +1,6 @@
 # Décisions produit
 
-Dernière mise à jour: 2026-09-12.
+Dernière mise à jour: 2026-09-13.
 
 ## D-001 — séparer interface et apprentissage
 
@@ -129,3 +129,34 @@ libre attribuée ou une révision éditoriale explicite.
 **Décision:** Définitions, Exemples et Caractères/Mots sont des onglets internes
 à la fiche, pas de nouvelles destinations principales. Les filtres de position,
 fréquence et tri sont combinables, mais restent repliés dans ce contexte.
+
+## D-016 — hors ligne par défaut, en ligne par consentement
+
+**Décision:** le dictionnaire, le Reader, l'OCR, l'écriture, les cartes et les
+fonctions essentielles restent utilisables hors ligne. Un mode « En ligne
+amélioré » pourra être activé explicitement pour une meilleure traduction de
+phrase, une voix distante plus naturelle ou d'autres traitements coûteux.
+
+Chaque appel distant indiquera sa nature et les données envoyées. Une panne, un
+quota épuisé ou la désactivation du mode ramènera automatiquement au service
+local disponible. Les résultats automatiques en ligne ne deviendront jamais des
+données « authentiques » sans source ou révision éditoriale.
+
+## D-017 — parole comme quatrième mode d'entrée
+
+**Décision:** le STT rejoint Clavier, Écriture et OCR dans les actions rapides de
+l'accueil. Il capture une courte prise de parole, affiche clairement l'écoute en
+cours, puis laisse relire et corriger la transcription avant la recherche ou le
+passage au Reader.
+
+Le moteur local sera privilégié lorsqu'il offre une qualité suffisante; un STT
+en ligne plus précis pourra suivre D-016. Le microphone n'est jamais activé
+implicitement et l'audio brut n'est pas conservé par défaut.
+
+## D-018 — briques audio partageables, produits indépendants
+
+**Décision:** Pangmao et la future application de transcription de réunions
+pourront partager les contrats de moteur STT, le découpage audio, les modèles de
+langue et leurs tests. Ils conserveront toutefois des flux distincts: une saisie
+vocale courte n'a ni les contraintes de durée, ni la reprise après interruption,
+ni le stockage persistant d'une réunion.

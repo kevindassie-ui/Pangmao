@@ -208,9 +208,9 @@ Checkpoint date: 2026-09-13
 - Universal APK: `Pangmao-v0.5.1-universal.apk` (183,258,788 bytes), SHA-256
   `90c4ccf9b6dbf4b790c52daa81fd0913522cb48b4a87a42c0ca64edfc0bf856c`.
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.1/Pangmao-v0.5.1-universal.apk>
-- Device acceptance remains to be completed for TTS on the reported ColorOS
-  device, the independently visible logical blocks and the reviewed `才`
-  sentence translation.
+- Device acceptance confirms that TTS now works on the reported ColorOS device
+  and that logical blocks remain visible independently of the optional linear
+  word gloss. Acceptance of the reviewed `才` sentence remains to be recorded.
 
 ## Later iteration
 
@@ -219,6 +219,11 @@ audio controls and interactive dictionary-source details are intentionally
 deferred. Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
+
+The initial v0.6 plan now isolates learning-profile persistence as the next
+bounded checkpoint. Offline/online services, short-form STT, reusable meeting
+transcription components, commercialization and iOS are recorded for work after
+v0.6 rather than mixed into that release.
 
 The v0.2.1 corrective scope and remaining device acceptance are recorded in
 [NEXT_RELEASE.md](NEXT_RELEASE.md). Longer-term product work is tracked in
