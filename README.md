@@ -4,19 +4,25 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## Version 0.3 highlights
+## Version 0.5.1 highlights
 
-- 132,000+ Chinese entries with simplified/traditional forms and pinyin.
-- French (CFDICT) and English (CC-CEDICT) definitions.
-- 76,000+ authentic Mandarin–English examples from Tatoeba.
+- 132,342 Chinese entries with simplified/traditional forms and pinyin.
+- French (CFDICT) and English (CC-CEDICT) definitions with compact source
+  provenance and a deterministic bilingual-quality audit.
+- 64,912 unique Chinese example sentences, including a first reviewed set with
+  aligned French and English translations.
 - Unihan character, radical, stroke and variant information.
 - Live camera OCR and image OCR with an ML model bundled in the APK.
 - Tappable OCR regions for choosing the exact line to translate.
 - Automatic single-character handwriting recognition with an on-demand offline model.
 - Context-aware analysis of expressions and sentences into logical word blocks.
+- Optional linear word-by-word interpretation, independently of the logical blocks.
 - Structured reader with pinyin, definitions and optional on-device translations.
+- Tappable characters and words, dictionary tabs and a related-word explorer with
+  position, frequency and pinyin sorting filters.
 - Persistent choice of French, English or both definition languages.
 - Tone-coloured hanzi and separate histories for searches and viewed entries.
+- Android Chinese text-to-speech with installed-engine discovery and fallback.
 - French, English and Simplified Chinese interfaces; system/light/dark themes.
 - Favorites, history and local flashcards.
 - No account, ads, analytics, server or subscription. Internet is used only to
@@ -24,7 +30,8 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 ## Install
 
-Download the APK attached to the latest GitHub release, open it on Android,
+Download [Pangmao v0.5.1](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1),
+open the APK on Android,
 and allow installation from the browser or GitHub app when Android asks. Use the
 smaller `arm64` APK on recent Android phones; the `universal` APK is the fallback
 for other devices. Both are signed with Pangmao's persistent personal release
