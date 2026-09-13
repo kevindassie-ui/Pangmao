@@ -70,7 +70,7 @@ Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RE
 - Protéger `肉夹馍`/`肉夾饃` avant la traduction automatique, dans le lecteur
   comme dans l’analyse de texte du dictionnaire.
 
-## v0.5.0 — profondeur et qualité du corpus · candidate
+## v0.5.0 — profondeur et qualité du corpus · publiée
 
 - Importer un corpus chinois–français direct, versionné et attribué; mesurer la
   couverture commune avec le corpus chinois–anglais.

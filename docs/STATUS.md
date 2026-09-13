@@ -178,6 +178,21 @@ Checkpoint date: 2026-09-13
   near-duplication. The bilingual example count is now 38 of 64,912. CI run
   `34755490616` passed on commit `83246fc`.
 
+## Corpus quality release 0.5.0
+
+- Tag: `v0.5.0` at commit `234576f`.
+- Final CI run `34755749553` passed dictionary reconstruction and validation,
+  all 16 Python tests, Android unit tests, lint and debug APK assembly.
+- Release run `34756006883` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.5.0-arm64.apk` (84,483,074 bytes), SHA-256
+  `9ef08ae5cc9cd6916d0a70b2cc6067206c66ae6cec05c53fe9bfdb41b7480a29`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.0/Pangmao-v0.5.0-arm64.apk>
+- Universal APK: `Pangmao-v0.5.0-universal.apk` (183,258,728 bytes), SHA-256
+  `cf8706f17c358f2c1035a230544ed695104fed316e468859087b528abb082873`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.0/Pangmao-v0.5.0-universal.apk>
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced
