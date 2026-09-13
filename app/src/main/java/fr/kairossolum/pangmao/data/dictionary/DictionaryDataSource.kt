@@ -15,7 +15,7 @@ import java.io.File
 
 class DictionaryDataSource(private val context: Context) {
     private val database: SQLiteDatabase by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        val directory = File(context.filesDir, "dictionary/v3").apply { mkdirs() }
+        val directory = File(context.filesDir, "dictionary/v4").apply { mkdirs() }
         val target = File(directory, "pangmao.db")
         if (!target.exists() || target.length() < 1024L) {
             val temporary = File(directory, "pangmao.db.copying")

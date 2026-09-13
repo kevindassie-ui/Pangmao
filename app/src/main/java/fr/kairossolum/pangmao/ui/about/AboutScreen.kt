@@ -84,6 +84,8 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                         Metric(stringResource(R.string.entries), metadata["entry_count"])
                         Metric(stringResource(R.string.examples), metadata["example_count"])
                         Metric(stringResource(R.string.characters), metadata["character_count"])
+                        Metric("Français → 中文", metadata["learning_entry_count_fr"])
+                        Metric("English → 中文", metadata["learning_entry_count_en"])
                         Metric("Unihan", metadata["unihan_version"])
                     }
                 }
@@ -112,6 +114,18 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                 "Unicode Unihan 17.0",
                 "Lectures et propriétés des caractères · Unicode License v3",
                 "https://www.unicode.org/license.txt",
+                uriHandler::openUri,
+            )
+            LicenseItem(
+                "FreeDict / WikDict · français–chinois",
+                "Vedettes, IPA, grammaire et sens chinois · CC BY-SA 3.0",
+                "https://download.freedict.org/dictionaries/fra-zho/",
+                uriHandler::openUri,
+            )
+            LicenseItem(
+                "FreeDict / WikDict · anglais–chinois",
+                "Vedettes, prononciations, grammaire et sens chinois · CC BY-SA 3.0",
+                "https://download.freedict.org/dictionaries/eng-zho/",
                 uriHandler::openUri,
             )
             LicenseItem(

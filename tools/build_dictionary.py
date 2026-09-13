@@ -13,10 +13,11 @@ import json
 import re
 import sqlite3
 import unicodedata
+import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Sequence
 
 
 CEDICT_LINE = re.compile(r"^(\S+)\s+(\S+)\s+\[([^]]+)]\s+/(.*)/\s*$")
@@ -27,6 +28,24 @@ HAN_RANGES = (
     (0x20000, 0x323AF),
 )
 DEFAULT_DEFINITION_SOURCES = {"en": "CC-CEDICT", "fr": "CFDICT"}
+TEI_NAMESPACE = "http://www.tei-c.org/ns/1.0"
+XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace"
+TEI_NAMESPACES = {"tei": TEI_NAMESPACE}
+LEARNING_SOURCE_DETAILS = {
+    "FreeDict-fra-zho": (
+        "fr",
+        "FreeDict français-chinois",
+        "https://download.freedict.org/dictionaries/fra-zho/",
+        "CC BY-SA 3.0",
+    ),
+    "FreeDict-eng-zho": (
+        "en",
+        "FreeDict anglais-chinois",
+        "https://download.freedict.org/dictionaries/eng-zho/",
+        "CC BY-SA 3.0",
+    ),
+}
+MAX_LEARNING_PRONUNCIATIONS = 4
 
 
 def is_han(character: str) -> bool:
@@ -90,6 +109,146 @@ class MutableExample:
     chinese_source: str = "Tatoeba"
     english_source: str = "Tatoeba"
     french_source: str = ""
+
+
+@dataclass(frozen=True)
+class LearningSense:
+    definitions: tuple[str, ...]
+    chinese_equivalents: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class LearningEntry:
+    language: str
+    forms: tuple[str, ...]
+    pronunciations: tuple[str, ...]
+    parts_of_speech: tuple[str, ...]
+    genders: tuple[str, ...]
+    senses: tuple[LearningSense, ...]
+    source_code: str
+    source_entry_index: int
+
+
+def normalized_text(value: str) -> str:
+    return re.sub(r"\s+", " ", unicodedata.normalize("NFC", value).strip())
+
+
+def element_text(element: ET.Element) -> str:
+    return normalized_text("".join(element.itertext()))
+
+
+def search_plain(value: str) -> str:
+    value = value.casefold().replace("’", "'")
+    value = "".join(
+        character
+        for character in unicodedata.normalize("NFKD", value)
+        if unicodedata.category(character) != "Mn"
+    )
+    return re.sub(r"[^\w'-]+", " ", value, flags=re.UNICODE).strip()
+
+
+def contains_han(value: str) -> bool:
+    return any(is_han(character) for character in value)
+
+
+def tei_values(entry: ET.Element, path: str) -> list[str]:
+    return unique(element_text(element) for element in entry.findall(path, TEI_NAMESPACES))
+
+
+def clean_pronunciation(value: str) -> tuple[str, bool]:
+    """Remove WikDict's residual angle-bracket labels from a pronunciation."""
+    cleaned = normalized_text(re.sub(r"<[^<>]+>", " ", value))
+    return cleaned, cleaned != normalized_text(value)
+
+
+def load_learning_dictionary(
+    path: Path,
+    expected_language: str,
+    source_code: str,
+) -> tuple[list[LearningEntry], Counter[str]]:
+    """Load a filtered FreeDict TEI snapshot without merging lexical entries."""
+    if source_code not in LEARNING_SOURCE_DETAILS:
+        raise ValueError(f"Unsupported learning source: {source_code}")
+    if expected_language not in {"fr", "en"}:
+        raise ValueError(f"Unsupported learning language: {expected_language}")
+
+    root = ET.parse(path).getroot()
+    body = root.find("./tei:text/tei:body", TEI_NAMESPACES)
+    if body is None:
+        raise ValueError(f"No TEI body in {path}")
+    language = body.get(f"{{{XML_NAMESPACE}}}lang", "")
+    if language != expected_language:
+        raise ValueError(
+            f"Expected source language {expected_language!r}, found {language!r} in {path}"
+        )
+
+    result: list[LearningEntry] = []
+    metrics: Counter[str] = Counter()
+    for source_index, element in enumerate(body.findall("./tei:entry", TEI_NAMESPACES), start=1):
+        metrics["source_entries"] += 1
+        forms = tuple(tei_values(element, "./tei:form/tei:orth"))
+        if not forms:
+            metrics["rejected_without_headword"] += 1
+            continue
+
+        raw_pronunciations = tei_values(element, "./tei:form/tei:pron")
+        cleaned_pronunciations: list[str] = []
+        for raw in raw_pronunciations:
+            pronunciation, changed = clean_pronunciation(raw)
+            metrics["pronunciations_cleaned"] += changed
+            if pronunciation:
+                cleaned_pronunciations.append(pronunciation)
+        all_pronunciations = unique(cleaned_pronunciations)
+        if len(all_pronunciations) > MAX_LEARNING_PRONUNCIATIONS:
+            metrics["entries_with_truncated_pronunciations"] += 1
+            metrics["pronunciations_discarded"] += (
+                len(all_pronunciations) - MAX_LEARNING_PRONUNCIATIONS
+            )
+        pronunciations = tuple(all_pronunciations[:MAX_LEARNING_PRONUNCIATIONS])
+
+        senses: list[LearningSense] = []
+        for sense in element.findall("./tei:sense", TEI_NAMESPACES):
+            definitions = tuple(tei_values(sense, ".//tei:def"))
+            raw_equivalents: list[str] = []
+            for citation in sense.findall(".//tei:cit[@type='trans']", TEI_NAMESPACES):
+                if citation.get(f"{{{XML_NAMESPACE}}}lang") != "zh":
+                    continue
+                raw_equivalents.extend(tei_values(citation, "./tei:quote"))
+            equivalents = tuple(value for value in unique(raw_equivalents) if contains_han(value))
+            metrics["non_han_equivalents_rejected"] += sum(
+                bool(value) and not contains_han(value) for value in unique(raw_equivalents)
+            )
+            if not equivalents:
+                metrics["senses_rejected_without_chinese"] += 1
+                continue
+            senses.append(
+                LearningSense(
+                    definitions=definitions,
+                    chinese_equivalents=equivalents,
+                )
+            )
+
+        if not senses:
+            metrics["rejected_without_valid_sense"] += 1
+            continue
+        result.append(
+            LearningEntry(
+                language=expected_language,
+                forms=forms,
+                pronunciations=pronunciations,
+                parts_of_speech=tuple(tei_values(element, "./tei:gramGrp/tei:pos")),
+                genders=tuple(tei_values(element, "./tei:gramGrp/tei:gen")),
+                senses=tuple(senses),
+                source_code=source_code,
+                source_entry_index=source_index,
+            )
+        )
+        metrics["imported_entries"] += 1
+        metrics["imported_senses"] += len(senses)
+        metrics["imported_equivalents"] += sum(
+            len(sense.chinese_equivalents) for sense in senses
+        )
+    return result, metrics
 
 
 def entry_key(traditional: str, simplified: str, pinyin: str) -> tuple[str, str, str]:
@@ -494,6 +653,7 @@ def create_database(
     unihan: dict[str, dict[str, str]],
     preferred_pinyin: dict[str, str],
     metadata: dict[str, str],
+    learning_entries: Sequence[LearningEntry] = (),
 ) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.exists():
@@ -505,6 +665,7 @@ def create_database(
         PRAGMA journal_mode = OFF;
         PRAGMA synchronous = OFF;
         PRAGMA temp_store = MEMORY;
+        PRAGMA foreign_keys = ON;
         CREATE TABLE entries (
             id INTEGER PRIMARY KEY,
             traditional TEXT NOT NULL,
@@ -583,6 +744,71 @@ def create_database(
             simplified_variants TEXT NOT NULL DEFAULT '',
             traditional_variants TEXT NOT NULL DEFAULT ''
         ) WITHOUT ROWID;
+        CREATE TABLE learning_sources (
+            code TEXT PRIMARY KEY,
+            language TEXT NOT NULL CHECK(language IN ('fr', 'en')),
+            display_name TEXT NOT NULL,
+            url TEXT NOT NULL,
+            revision TEXT NOT NULL,
+            license TEXT NOT NULL
+        ) WITHOUT ROWID;
+        CREATE TABLE learning_entries (
+            id INTEGER PRIMARY KEY,
+            language TEXT NOT NULL CHECK(language IN ('fr', 'en')),
+            primary_form TEXT NOT NULL,
+            primary_form_search TEXT NOT NULL,
+            parts_of_speech TEXT NOT NULL DEFAULT '',
+            genders TEXT NOT NULL DEFAULT '',
+            source_code TEXT NOT NULL,
+            source_entry_index INTEGER NOT NULL,
+            FOREIGN KEY(source_code) REFERENCES learning_sources(code),
+            UNIQUE(source_code, source_entry_index)
+        );
+        CREATE INDEX learning_entries_language_form_idx
+            ON learning_entries(language, primary_form_search, id);
+        CREATE TABLE learning_forms (
+            entry_id INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            form TEXT NOT NULL,
+            form_search TEXT NOT NULL,
+            PRIMARY KEY(entry_id, position),
+            FOREIGN KEY(entry_id) REFERENCES learning_entries(id)
+        ) WITHOUT ROWID;
+        CREATE INDEX learning_forms_search_idx ON learning_forms(form_search, entry_id);
+        CREATE TABLE learning_pronunciations (
+            entry_id INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            pronunciation TEXT NOT NULL,
+            PRIMARY KEY(entry_id, position),
+            FOREIGN KEY(entry_id) REFERENCES learning_entries(id)
+        ) WITHOUT ROWID;
+        CREATE TABLE learning_senses (
+            id INTEGER PRIMARY KEY,
+            entry_id INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            definitions TEXT NOT NULL DEFAULT '',
+            source_code TEXT NOT NULL,
+            FOREIGN KEY(entry_id) REFERENCES learning_entries(id),
+            FOREIGN KEY(source_code) REFERENCES learning_sources(code),
+            UNIQUE(entry_id, position)
+        );
+        CREATE INDEX learning_senses_entry_idx ON learning_senses(entry_id, position);
+        CREATE TABLE learning_equivalents (
+            sense_id INTEGER NOT NULL,
+            position INTEGER NOT NULL,
+            chinese TEXT NOT NULL,
+            PRIMARY KEY(sense_id, position),
+            FOREIGN KEY(sense_id) REFERENCES learning_senses(id)
+        ) WITHOUT ROWID;
+        CREATE INDEX learning_equivalents_chinese_idx
+            ON learning_equivalents(chinese, sense_id);
+        CREATE VIRTUAL TABLE learning_entries_fts USING fts4(
+            forms,
+            forms_search,
+            chinese_equivalents,
+            definitions,
+            tokenize=unicode61 "remove_diacritics=2"
+        );
         CREATE TABLE metadata (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
@@ -753,8 +979,118 @@ def create_database(
             )
         )
     connection.executemany("INSERT INTO characters VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", character_rows)
+
+    source_codes = sorted({entry.source_code for entry in learning_entries})
+    source_rows = []
+    for source_code in source_codes:
+        language, display_name, url, license_name = LEARNING_SOURCE_DETAILS[source_code]
+        source_rows.append(
+            (
+                source_code,
+                language,
+                display_name,
+                url,
+                metadata[f"{source_code}_revision"],
+                license_name,
+            )
+        )
+    connection.executemany(
+        "INSERT INTO learning_sources VALUES (?, ?, ?, ?, ?, ?)",
+        source_rows,
+    )
+
+    ordered_learning_entries = sorted(
+        learning_entries,
+        key=lambda item: (
+            item.language,
+            search_plain(item.forms[0]),
+            item.forms[0].casefold(),
+            item.parts_of_speech,
+            item.source_entry_index,
+        ),
+    )
+    learning_entry_rows = []
+    form_rows = []
+    pronunciation_rows = []
+    sense_rows = []
+    equivalent_rows = []
+    fts_rows = []
+    sense_identifier = 1
+    for entry_identifier, entry in enumerate(ordered_learning_entries, start=1):
+        learning_entry_rows.append(
+            (
+                entry_identifier,
+                entry.language,
+                entry.forms[0],
+                search_plain(entry.forms[0]),
+                "\n".join(entry.parts_of_speech),
+                "\n".join(entry.genders),
+                entry.source_code,
+                entry.source_entry_index,
+            )
+        )
+        for position, form in enumerate(entry.forms):
+            form_rows.append((entry_identifier, position, form, search_plain(form)))
+        for position, pronunciation in enumerate(entry.pronunciations):
+            pronunciation_rows.append((entry_identifier, position, pronunciation))
+        entry_equivalents: list[str] = []
+        entry_definitions: list[str] = []
+        for sense_position, sense in enumerate(entry.senses):
+            sense_rows.append(
+                (
+                    sense_identifier,
+                    entry_identifier,
+                    sense_position,
+                    "\n".join(sense.definitions),
+                    entry.source_code,
+                )
+            )
+            entry_definitions.extend(sense.definitions)
+            for equivalent_position, equivalent in enumerate(sense.chinese_equivalents):
+                equivalent_rows.append(
+                    (sense_identifier, equivalent_position, equivalent)
+                )
+                entry_equivalents.append(equivalent)
+            sense_identifier += 1
+        fts_rows.append(
+            (
+                entry_identifier,
+                "\n".join(entry.forms),
+                "\n".join(search_plain(form) for form in entry.forms),
+                "\n".join(unique(entry_equivalents)),
+                "\n".join(unique(entry_definitions)),
+            )
+        )
+    connection.executemany(
+        "INSERT INTO learning_entries VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        learning_entry_rows,
+    )
+    connection.executemany(
+        "INSERT INTO learning_forms VALUES (?, ?, ?, ?)",
+        form_rows,
+    )
+    connection.executemany(
+        "INSERT INTO learning_pronunciations VALUES (?, ?, ?)",
+        pronunciation_rows,
+    )
+    connection.executemany(
+        "INSERT INTO learning_senses VALUES (?, ?, ?, ?, ?)",
+        sense_rows,
+    )
+    connection.executemany(
+        "INSERT INTO learning_equivalents VALUES (?, ?, ?)",
+        equivalent_rows,
+    )
+    connection.executemany(
+        """
+        INSERT INTO learning_entries_fts(
+            docid, forms, forms_search, chinese_equivalents, definitions
+        ) VALUES (?, ?, ?, ?, ?)
+        """,
+        fts_rows,
+    )
     connection.executemany("INSERT INTO metadata VALUES (?, ?)", sorted(metadata.items()))
-    connection.execute("PRAGMA user_version = 3")
+    connection.execute("PRAGMA user_version = 4")
     connection.commit()
     connection.execute("ANALYZE")
     connection.execute("VACUUM")
@@ -773,9 +1109,12 @@ def main() -> None:
     parser.add_argument("--pangmao-examples", required=True, type=Path)
     parser.add_argument("--reviewed-definitions", required=True, type=Path)
     parser.add_argument("--unihan-dir", required=True, type=Path)
+    parser.add_argument("--freedict-french", required=True, type=Path)
+    parser.add_argument("--freedict-english", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--cc-revision", default="unknown")
     parser.add_argument("--tatoeba-release", default="unknown")
+    parser.add_argument("--freedict-release", default="unknown")
     args = parser.parse_args()
 
     entries: dict[tuple[str, str, str], MutableEntry] = {}
@@ -786,6 +1125,17 @@ def main() -> None:
     examples = load_examples(args.tatoeba)
     load_reviewed_tatoeba_french(args.tatoeba_french, examples)
     load_pangmao_examples(args.pangmao_examples, examples)
+    french_learning_entries, french_learning_metrics = load_learning_dictionary(
+        args.freedict_french,
+        "fr",
+        "FreeDict-fra-zho",
+    )
+    english_learning_entries, english_learning_metrics = load_learning_dictionary(
+        args.freedict_english,
+        "en",
+        "FreeDict-eng-zho",
+    )
+    learning_entries = [*french_learning_entries, *english_learning_entries]
     _, preferred_pinyin = apply_frequency_and_pinyin(entries, examples)
     wanted_characters = {
         character
@@ -796,7 +1146,7 @@ def main() -> None:
     }
     unihan = parse_unihan(args.unihan_dir, wanted_characters)
     metadata = {
-        "schema_version": "3",
+        "schema_version": "4",
         "cc_cedict_revision": args.cc_revision,
         "cfdict_downloaded": "2026-09-11",
         "tatoeba_release": args.tatoeba_release,
@@ -832,8 +1182,29 @@ def main() -> None:
             )
         ),
         "character_count": str(len(unihan)),
+        "FreeDict-fra-zho_revision": args.freedict_release,
+        "FreeDict-eng-zho_revision": args.freedict_release,
+        "learning_entry_count": str(len(learning_entries)),
+        "learning_entry_count_fr": str(len(french_learning_entries)),
+        "learning_entry_count_en": str(len(english_learning_entries)),
+        **{
+            f"learning_filter_fr_{key}": str(value)
+            for key, value in sorted(french_learning_metrics.items())
+        },
+        **{
+            f"learning_filter_en_{key}": str(value)
+            for key, value in sorted(english_learning_metrics.items())
+        },
     }
-    create_database(args.output, entries, examples, unihan, preferred_pinyin, metadata)
+    create_database(
+        args.output,
+        entries,
+        examples,
+        unihan,
+        preferred_pinyin,
+        metadata,
+        learning_entries,
+    )
     size_mb = args.output.stat().st_size / (1024 * 1024)
     print(json.dumps({**metadata, "size_mb": round(size_mb, 2)}, ensure_ascii=False, indent=2))
 

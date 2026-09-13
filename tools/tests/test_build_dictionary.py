@@ -67,7 +67,7 @@ class BuildDictionaryProvenanceTest(unittest.TestCase):
         add_definitions(entry, "fr", ["jeu; jouer"], "Wiktionnaire", reviewed=True)
         output = self.root / "pangmao.db"
         metadata = {
-            "schema_version": "3",
+            "schema_version": "4",
             "cc_cedict_revision": "fixture",
             "cfdict_downloaded": "fixture",
             "pangmao_supplement_version": "fixture",
@@ -85,7 +85,7 @@ class BuildDictionaryProvenanceTest(unittest.TestCase):
         )
 
         connection = sqlite3.connect(output)
-        self.assertEqual(3, connection.execute("PRAGMA user_version").fetchone()[0])
+        self.assertEqual(4, connection.execute("PRAGMA user_version").fetchone()[0])
         self.assertEqual(
             1,
             connection.execute("SELECT count(*) FROM definition_attributions").fetchone()[0],

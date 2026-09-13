@@ -10,6 +10,8 @@ The generated `pangmao.db` is an aggregation of independently licensed sources.
 | Tatoeba | Authentic Mandarin–English pairs and reviewed direct French relations | English export 2026-05-20; French subset 2026-09-12 | © Tatoeba contributors, [CC BY 2.0 FR](https://creativecommons.org/licenses/by/2.0/fr/), source: [Tatoeba](https://tatoeba.org/) |
 | Unicode Unihan | Character readings, radicals, stroke counts, variants and definitions | Unicode 17.0.0 | © 1991–2026 Unicode, Inc., [Unicode License v3](https://www.unicode.org/license.txt) |
 | Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.5.0 | Original project content; source files in `tools/data/` |
+| FreeDict / WikDict `fra-zho` | French headwords, IPA, grammar and Chinese equivalents for the v0.6 French profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/fra-zho/2025.11.23/) |
+| FreeDict / WikDict `eng-zho` | English headwords, pronunciation, grammar and Chinese equivalents for the v0.6 English profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/eng-zho/2025.11.23/) |
 
 ## Source candidate under editorial review
 
@@ -21,11 +23,12 @@ reviewed and attributed subset; the full post-processed download is deprecated
 by Kaikki and contains extraction noise. See
 [`docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md`](../docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md).
 
-FreeDict/WikDict `fra-zho` and `eng-zho` 2025.11.23 are separate candidates for
-the post-v0.5 learning profiles. They are not part of the generated database.
-They provide direct target-language headwords, IPA, grammatical metadata and
-Chinese equivalents under CC BY-SA 3.0. The deterministic evaluator, measured
-coverage, required cleanup and staged-import decision are documented in
+FreeDict/WikDict `fra-zho` and `eng-zho` 2025.11.23 passed the source gate and
+are imported into isolated schema-v4 tables. The builder rejects empty and
+non-Han equivalents, preserves homonyms and parts of speech, strips residual
+pronunciation tags and retains at most four ordered variants. It does not merge
+these rows into the established Chinese dictionary. The deterministic evaluator,
+measured coverage and staged-import decision are documented in
 [`docs/V0.6_LEARNING_SOURCE_EVALUATION.md`](../docs/V0.6_LEARNING_SOURCE_EVALUATION.md).
 
 The CC-CEDICT and Tatoeba input files used for this build were obtained from
@@ -36,12 +39,17 @@ downloaded from their official download endpoints.
 The database builder preserves attribution metadata inside the database and the
 application exposes the same notices from its About screen.
 
-Dictionary schema 3 records `CC-CEDICT` as the default source for English and
+Dictionary schema 4 records `CC-CEDICT` as the default source for English and
 `CFDICT` as the default source for French. Only reviewed or secondary-source
 attributions are stored as compact exceptions, referenced by definition index;
 this preserves per-definition provenance without duplicating the definition
 text. Reviewed rows use the strict format in
 [`tools/data/reviewed_definitions.tsv`](data/reviewed_definitions.tsv).
+
+The same schema stores French/English learning entries in normalized tables for
+forms, pronunciations, senses and Chinese equivalents. Each sense points back to
+its pinned FreeDict source and license; distinct source entries are never merged
+merely because their spelling matches.
 
 The example builder normalizes Unicode and whitespace, then keeps one record
 per Chinese sentence. When several Tatoeba translations share the same Chinese

@@ -228,6 +228,19 @@ Checkpoint date: 2026-09-13
   schema-v4 pilot import; public APK publication remains gated on real
   profile-driven entries and device acceptance.
 
+## Learning dictionary schema — v0.6 lot D1
+
+- Schema v4 adds isolated, normalized tables for French/English lexical entries,
+  forms, pronunciations, senses, Chinese equivalents and per-sense sources.
+- The pinned filtered build imports 10,923 French and 26,549 English entries;
+  166 source entries without a usable Chinese sense and 144 non-Han values are
+  rejected deterministically.
+- The existing 132,342 Chinese entries and stable identifiers are unchanged.
+- The generated database grows from about 69 MiB to 92.34 MiB. Publication is
+  still gated on profile-driven Android search, entry rendering and device QA.
+- Detailed measurements and invariants are recorded in
+  [V0.6_SCHEMA_V4_REPORT.md](V0.6_SCHEMA_V4_REPORT.md).
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced
