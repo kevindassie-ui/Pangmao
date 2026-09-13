@@ -11,6 +11,16 @@ The generated `pangmao.db` is an aggregation of independently licensed sources.
 | Unicode Unihan | Character readings, radicals, stroke counts, variants and definitions | Unicode 17.0.0 | © 1991–2026 Unicode, Inc., [Unicode License v3](https://www.unicode.org/license.txt) |
 | Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.4.0 | Original project content; source file: `tools/data/pangmao_examples.tsv` |
 
+## Source candidate under editorial review
+
+Kaikki's French-Wiktionary Chinese extract is not part of the generated
+database. Snapshot `847718c8d03743b5f29b9c16263a67efa6c468bdf3b2ad666d5896f85cb9139e`
+(2026-09-12 publication, based on the 2026-09-01 frwiktionary dump) was assessed
+with `tools/evaluate_french_candidate.py`. The decision is to use only a small,
+reviewed and attributed subset; the full post-processed download is deprecated
+by Kaikki and contains extraction noise. See
+[`docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md`](../docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md).
+
 The CC-CEDICT and Tatoeba input files used for this build were obtained from
 public, versioned GitHub mirrors so the build can be pinned and audited. The
 original projects remain the attributed data authors. CFDICT and Unihan were
