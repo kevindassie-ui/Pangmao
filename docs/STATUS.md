@@ -212,6 +212,22 @@ Checkpoint date: 2026-09-13
   and that logical blocks remain visible independently of the optional linear
   word gloss. Acceptance of the reviewed `才` sentence remains to be recorded.
 
+## Learning profiles — v0.6 foundation
+
+- Commit `19e667e` adds a persistent learning-language axis independent from
+  the app locale and definition preference. Existing installations migrate to
+  `CHINESE`; CI run `34770974051` passed migration tests, lint and assembly.
+- Commits `e78fada` and `15a3f2c` add the translated home selector and honest
+  bilingual-preview labels. CI run `34771566996` passed all checks.
+- Commit `da94620` adds a non-mutating evaluation of direct FreeDict/WikDict
+  sources. The measured snapshots contain 10,947 French-to-Chinese and 26,660
+  English-to-Chinese entries; they qualify for a filtered pilot, not a raw
+  import. CI run `34772064048` passed 18 data tests, Android tests, lint and
+  debug APK assembly.
+- No v0.6 release tag has been created. The next independent checkpoint is the
+  schema-v4 pilot import; public APK publication remains gated on real
+  profile-driven entries and device acceptance.
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced
