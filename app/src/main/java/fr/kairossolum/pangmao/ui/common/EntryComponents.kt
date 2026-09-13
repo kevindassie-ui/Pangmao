@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.LearningDictionaryEntry
 import fr.kairossolum.pangmao.R
 
 @Composable
@@ -57,6 +58,56 @@ fun EntryRow(
                 Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
             }
         }
+    }
+    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+}
+
+@Composable
+fun LearningEntryRow(
+    entry: LearningDictionaryEntry,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                text = entry.displayHeadword,
+                modifier = Modifier.weight(1f, fill = false),
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            val grammar = (entry.partsOfSpeech + entry.genders).joinToString(" · ")
+            if (grammar.isNotBlank()) {
+                Text(
+                    text = grammar,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+        if (entry.pronunciations.isNotEmpty()) {
+            Text(
+                text = entry.pronunciations.take(2).joinToString(" · "),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+            )
+        }
+        Text(
+            text = entry.chineseMeanings.take(5).joinToString(" · "),
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 2,
+        )
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
 }

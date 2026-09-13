@@ -9,6 +9,7 @@ import fr.kairossolum.pangmao.data.translation.TranslationRepository
 import fr.kairossolum.pangmao.data.user.StudyRepository
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.LearningDictionaryEntry
 import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 
 data class SearchUiState(
     val results: List<DictionaryEntry> = emptyList(),
+    val learningResults: List<LearningDictionaryEntry> = emptyList(),
     val analysis: TextAnalysis? = null,
     val translation: TextTranslationState = TextTranslationState(),
     val isLoading: Boolean = true,
@@ -60,10 +62,14 @@ class SearchViewModel(
         viewModelScope.launch {
             combine(
                 query.debounce { value -> if (value.isBlank()) 0L else 180L },
-                settings.settings.map { it.definitionLanguage }.distinctUntilChanged(),
+                settings.settings
+                    .map { it.definitionLanguage to it.learningLanguage }
+                    .distinctUntilChanged(),
                 translationRefresh,
-            ) { value, language, _ -> value to language }
-                .collectLatest { (value, language) -> load(value, language) }
+            ) { value, selected, _ -> Triple(value, selected.first, selected.second) }
+                .collectLatest { (value, definitionLanguage, learningLanguage) ->
+                    load(value, definitionLanguage, learningLanguage)
+                }
         }
         viewModelScope.launch {
             query
@@ -120,7 +126,11 @@ class SearchViewModel(
         }
     }
 
-    private suspend fun load(value: String, language: DefinitionLanguage) {
+    private suspend fun load(
+        value: String,
+        definitionLanguage: DefinitionLanguage,
+        learningLanguage: LearningLanguage,
+    ) {
         _uiState.value = _uiState.value.copy(
             isLoading = true,
             translation = TextTranslationState(),
@@ -128,15 +138,35 @@ class SearchViewModel(
         )
         try {
             val normalized = value.trim()
-            val results = if (normalized.isBlank()) dictionary.popular() else dictionary.search(normalized)
+            val results = if (learningLanguage == LearningLanguage.CHINESE) {
+                if (normalized.isBlank()) dictionary.popular() else dictionary.search(normalized)
+            } else {
+                emptyList()
+            }
+            val learningResults = if (
+                learningLanguage != LearningLanguage.CHINESE && normalized.isNotBlank()
+            ) {
+                dictionary.searchLearning(learningLanguage, normalized)
+            } else {
+                emptyList()
+            }
             val analysis = normalized
-                .takeIf { it.codePointCount(0, it.length) > 1 && containsHan(it) }
+                .takeIf {
+                    learningLanguage == LearningLanguage.CHINESE &&
+                        it.codePointCount(0, it.length) > 1 &&
+                        containsHan(it)
+                }
                 ?.let { dictionary.analyze(it) }
-            _uiState.value = SearchUiState(results = results, analysis = analysis, isLoading = false)
+            _uiState.value = SearchUiState(
+                results = results,
+                learningResults = learningResults,
+                analysis = analysis,
+                isLoading = false,
+            )
             if (analysis != null && analysis.exactEntry == null) {
                 resolveTextTranslation(
                     analysis = analysis,
-                    definitionLanguage = language,
+                    definitionLanguage = definitionLanguage,
                     translation = translation,
                     update = { state -> _uiState.value = _uiState.value.copy(translation = state) },
                 )

@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import fr.kairossolum.pangmao.domain.model.presentation
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.ui.about.AboutScreen
 import fr.kairossolum.pangmao.ui.about.AboutViewModel
 import fr.kairossolum.pangmao.ui.common.viewModelFactory
@@ -43,6 +44,8 @@ import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.LocalLearningProfile
 import fr.kairossolum.pangmao.ui.entry.EntryScreen
 import fr.kairossolum.pangmao.ui.entry.EntryViewModel
+import fr.kairossolum.pangmao.ui.entry.LearningEntryScreen
+import fr.kairossolum.pangmao.ui.entry.LearningEntryViewModel
 import fr.kairossolum.pangmao.ui.handwriting.HandwritingScreen
 import fr.kairossolum.pangmao.ui.handwriting.HandwritingViewModel
 import fr.kairossolum.pangmao.ui.ocr.OcrScreen
@@ -170,6 +173,9 @@ private fun PangmaoApp(
                     SearchScreen(
                         viewModel = model,
                         onOpenEntry = { navController.navigate("entry/$it") },
+                        onOpenLearningEntry = { language, identifier ->
+                            navController.navigate("learning-entry/${language.name}/$identifier")
+                        },
                         onOpenAbout = { navController.navigate("about") },
                         onOpenSettings = { navController.navigate("settings") },
                         onOpenHandwriting = { navController.navigate("handwriting") },
@@ -221,6 +227,29 @@ private fun PangmaoApp(
                         viewModel = model,
                         onBack = navController::navigateUp,
                         onOpenEntry = { navController.navigate("entry/$it") },
+                    )
+                }
+                composable(
+                    route = "learning-entry/{language}/{entryId}",
+                    arguments = listOf(
+                        navArgument("language") { type = NavType.StringType },
+                        navArgument("entryId") { type = NavType.LongType },
+                    ),
+                ) { entry ->
+                    val identifier = entry.arguments?.getLong("entryId") ?: return@composable
+                    val language = entry.arguments?.getString("language")
+                        ?.let { runCatching { LearningLanguage.valueOf(it) }.getOrNull() }
+                        ?: return@composable
+                    val model: LearningEntryViewModel = viewModel(
+                        key = "learning-entry-${language.name}-$identifier",
+                        factory = viewModelFactory {
+                            LearningEntryViewModel(identifier, language, container.dictionary)
+                        },
+                    )
+                    LearningEntryScreen(
+                        viewModel = model,
+                        onBack = navController::navigateUp,
+                        onOpenChineseEntry = { navController.navigate("entry/$it") },
                     )
                 }
                 composable("about") {

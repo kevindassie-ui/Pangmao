@@ -12,11 +12,11 @@
     <string name="nav_cards">Cartes</string>
 
     <string name="search_subtitle">Dictionnaire chinois hors ligne</string>
-    <string name="search_subtitle_french_profile">Profil français · aperçu bilingue</string>
-    <string name="search_subtitle_english_profile">Profil anglais · aperçu bilingue</string>
+    <string name="search_subtitle_french_profile">Dictionnaire français–chinois hors ligne</string>
+    <string name="search_subtitle_english_profile">Dictionnaire anglais–chinois hors ligne</string>
     <string name="search_hint">Hanzi, pinyin, français ou anglais</string>
-    <string name="search_hint_french_profile">Chinois, français ou pinyin</string>
-    <string name="search_hint_english_profile">Chinois, anglais ou pinyin</string>
+    <string name="search_hint_french_profile">Mot français ou sens chinois</string>
+    <string name="search_hint_english_profile">Mot anglais ou sens chinois</string>
     <string name="search_recent">Consultés récemment</string><string name="search_viewed_history">Fiches récemment consultées</string><string name="search_query_history">Recherches récentes</string><string name="clear_all">Tout effacer</string><string name="delete_history_item">Supprimer de l’historique</string>
     <string name="search_frequent">Mots fréquents</string>
     <string name="search_empty">Aucune entrée pour « %1$s »</string>
@@ -40,6 +40,9 @@
     <string name="learning_profile_chinese">Chinois</string>
     <string name="learning_profile_french">Français</string>
     <string name="learning_profile_english">Anglais</string>
+    <string name="learning_search_ready">Dictionnaire prêt hors ligne</string>
+    <string name="learning_search_help_french">Recherchez un mot français, avec ou sans accents, ou un sens en chinois.</string>
+    <string name="learning_search_help_english">Recherchez un mot anglais ou un sens en chinois.</string>
 
     <string name="reader_title">Lecteur</string>
     <string name="reader_subtitle">Touchez un mot pour le définir</string>
@@ -104,6 +107,13 @@
     <string name="handwriting_recognition_error">La reconnaissance a échoué. Le dessin est conservé : réessayez ou effacez-le.</string>
 
     <string name="entry_title">Fiche dictionnaire</string>
+    <string name="learning_entry_title">Fiche lexicale</string>
+    <string name="learning_alternative_forms">Autres formes</string>
+    <string name="learning_pronunciations">Prononciation</string>
+    <string name="learning_grammar">Grammaire</string>
+    <string name="learning_chinese_meanings">Sens chinois</string>
+    <string name="learning_definition">Précision</string>
+    <string name="learning_source_note">Données FreeDict/WikDict 2025.11.23 · CC BY-SA 3.0. Touchez un sens chinois disponible pour ouvrir sa fiche.</string>
     <string name="traditional">Traditionnel : %1$s</string>
     <string name="pronounce">Prononcer</string>
     <string name="french">Français</string>

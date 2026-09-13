@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.ui.common.EntryRow
+import fr.kairossolum.pangmao.ui.common.LearningEntryRow
 import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.coloredHanzi
 import fr.kairossolum.pangmao.ui.common.PinyinText
@@ -78,6 +79,7 @@ import fr.kairossolum.pangmao.domain.model.TextAnalysis
 fun SearchScreen(
     viewModel: SearchViewModel,
     onOpenEntry: (Long) -> Unit,
+    onOpenLearningEntry: (LearningLanguage, Long) -> Unit,
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenHandwriting: () -> Unit,
@@ -160,21 +162,23 @@ fun SearchScreen(
                 Icon(Icons.Outlined.Search, contentDescription = null)
                 Text(" ${stringResource(R.string.input_keyboard)}", maxLines = 1)
             }
-            FilledTonalButton(
-                onClick = onOpenHandwriting,
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 8.dp),
-            ) {
-                Icon(Icons.Outlined.Draw, contentDescription = null)
-                Text(" ${stringResource(R.string.input_handwriting)}", maxLines = 1)
-            }
-            FilledTonalButton(
-                onClick = onOpenOcr,
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 8.dp),
-            ) {
-                Icon(Icons.Outlined.CameraAlt, contentDescription = null)
-                Text(" ${stringResource(R.string.input_ocr)}", maxLines = 1)
+            if (learningLanguage == LearningLanguage.CHINESE) {
+                FilledTonalButton(
+                    onClick = onOpenHandwriting,
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                ) {
+                    Icon(Icons.Outlined.Draw, contentDescription = null)
+                    Text(" ${stringResource(R.string.input_handwriting)}", maxLines = 1)
+                }
+                FilledTonalButton(
+                    onClick = onOpenOcr,
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
+                ) {
+                    Icon(Icons.Outlined.CameraAlt, contentDescription = null)
+                    Text(" ${stringResource(R.string.input_ocr)}", maxLines = 1)
+                }
             }
         }
 
@@ -225,20 +229,25 @@ fun SearchScreen(
                         }
                     }
                 }
-                if (history.isNotEmpty()) {
-                    item { SectionTitle(stringResource(R.string.search_viewed_history)) }
-                    items(history, key = { "history-${it.id}" }) { entry ->
+                if (learningLanguage == LearningLanguage.CHINESE) {
+                    if (history.isNotEmpty()) {
+                        item { SectionTitle(stringResource(R.string.search_viewed_history)) }
+                        items(history, key = { "history-${it.id}" }) { entry ->
+                            EntryRow(entry, onClick = { onOpenEntry(entry.id) })
+                        }
+                        item { SectionTitle(stringResource(R.string.search_frequent)) }
+                    } else {
+                        item { SectionTitle(stringResource(R.string.search_frequent)) }
+                    }
+                    items(state.results, key = { "popular-${it.id}" }) { entry ->
                         EntryRow(entry, onClick = { onOpenEntry(entry.id) })
                     }
-                    item { SectionTitle(stringResource(R.string.search_frequent)) }
                 } else {
-                    item { SectionTitle(stringResource(R.string.search_frequent)) }
-                }
-                items(state.results, key = { "popular-${it.id}" }) { entry ->
-                    EntryRow(entry, onClick = { onOpenEntry(entry.id) })
+                    item { LearningProfilePrompt(learningLanguage) }
                 }
             }
-            state.results.isEmpty() && state.analysis == null -> EmptySearch(query)
+            state.results.isEmpty() && state.learningResults.isEmpty() && state.analysis == null ->
+                EmptySearch(query, learningLanguage)
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 24.dp),
@@ -260,6 +269,15 @@ fun SearchScreen(
                 }
                 items(state.results, key = { it.id }) { entry ->
                     EntryRow(entry, onClick = { onOpenEntry(entry.id) })
+                }
+                items(
+                    state.learningResults,
+                    key = { "learning-${it.language.name}-${it.id}" },
+                ) { entry ->
+                    LearningEntryRow(
+                        entry = entry,
+                        onClick = { onOpenLearningEntry(entry.language, entry.id) },
+                    )
                 }
             }
         }
@@ -292,6 +310,28 @@ private fun LearningProfileSelector(
     }
 }
 
+@Composable
+private fun LearningProfilePrompt(language: LearningLanguage) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                stringResource(R.string.learning_search_ready),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                stringResource(language.learningHelpResource()),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
 @StringRes
 private fun LearningLanguage.labelResource(): Int = when (this) {
     LearningLanguage.CHINESE -> R.string.learning_profile_chinese
@@ -311,6 +351,13 @@ private fun LearningLanguage.searchHintResource(): Int = when (this) {
     LearningLanguage.CHINESE -> R.string.search_hint
     LearningLanguage.FRENCH -> R.string.search_hint_french_profile
     LearningLanguage.ENGLISH -> R.string.search_hint_english_profile
+}
+
+@StringRes
+private fun LearningLanguage.learningHelpResource(): Int = when (this) {
+    LearningLanguage.CHINESE -> R.string.search_empty_help
+    LearningLanguage.FRENCH -> R.string.learning_search_help_french
+    LearningLanguage.ENGLISH -> R.string.learning_search_help_english
 }
 
 @Composable
@@ -467,7 +514,7 @@ private fun SectionTitle(
 }
 
 @Composable
-private fun EmptySearch(query: String) {
+private fun EmptySearch(query: String, language: LearningLanguage) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.padding(32.dp),
@@ -476,7 +523,7 @@ private fun EmptySearch(query: String) {
         ) {
             Text(stringResource(R.string.search_empty, query), fontWeight = FontWeight.SemiBold)
             Text(
-                stringResource(R.string.search_empty_help),
+                stringResource(language.learningHelpResource()),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
