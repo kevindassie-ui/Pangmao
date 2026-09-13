@@ -35,10 +35,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import fr.kairossolum.pangmao.domain.model.presentation
 import fr.kairossolum.pangmao.ui.about.AboutScreen
 import fr.kairossolum.pangmao.ui.about.AboutViewModel
 import fr.kairossolum.pangmao.ui.common.viewModelFactory
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
+import fr.kairossolum.pangmao.ui.common.LocalLearningProfile
 import fr.kairossolum.pangmao.ui.entry.EntryScreen
 import fr.kairossolum.pangmao.ui.entry.EntryViewModel
 import fr.kairossolum.pangmao.ui.handwriting.HandwritingScreen
@@ -68,7 +70,10 @@ class MainActivity : AppCompatActivity() {
             val settings by container.settings.settings.collectAsStateWithLifecycle(
                 initialValue = fr.kairossolum.pangmao.data.settings.AppSettings(),
             )
-            CompositionLocalProvider(LocalDefinitionLanguage provides settings.definitionLanguage) {
+            CompositionLocalProvider(
+                LocalDefinitionLanguage provides settings.definitionLanguage,
+                LocalLearningProfile provides settings.learningLanguage.presentation,
+            ) {
                 PangmaoTheme(settings.themeMode) {
                     Surface {
                         PangmaoApp(

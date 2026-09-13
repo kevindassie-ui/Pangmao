@@ -7,6 +7,7 @@ import fr.kairossolum.pangmao.data.settings.AppSettings
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SettingsRepository
 import fr.kairossolum.pangmao.data.settings.ThemeMode
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -22,6 +23,10 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
 
     fun setDefinitionLanguage(value: DefinitionLanguage) = viewModelScope.launch {
         repository.setDefinitionLanguage(value)
+    }
+
+    fun setLearningLanguage(value: LearningLanguage) = viewModelScope.launch {
+        repository.setLearningLanguage(value)
     }
 
     fun setTheme(value: ThemeMode) = viewModelScope.launch { repository.setThemeMode(value) }
