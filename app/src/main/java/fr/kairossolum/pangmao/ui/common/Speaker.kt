@@ -35,12 +35,14 @@ class MandarinSpeaker internal constructor() {
     fun speak(text: String): Boolean {
         val current = engine ?: return false
         if (!ready || text.isBlank()) return false
-        return current.speak(
+        val queued = current.speak(
             text,
             TextToSpeech.QUEUE_FLUSH,
             null,
             "pangmao-${text.hashCode()}",
         ) == TextToSpeech.SUCCESS
+        if (!queued) status = SpeakerStatus.ERROR
+        return queued
     }
 
     fun retry(context: Context) = restart(context)
@@ -61,23 +63,72 @@ class MandarinSpeaker internal constructor() {
         closeEngine()
         status = SpeakerStatus.INITIALIZING
         val generation = initializationGeneration
+        val applicationContext = context.applicationContext
+        val candidates = buildList<String?> {
+            add(null)
+            addAll(discoverTtsEngines(applicationContext))
+        }
+        tryEngine(applicationContext, generation, candidates, candidateIndex = 0, hadWorkingEngine = false)
+    }
+
+    private fun tryEngine(
+        context: Context,
+        generation: Int,
+        candidates: List<String?>,
+        candidateIndex: Int,
+        hadWorkingEngine: Boolean,
+    ) {
+        if (generation != initializationGeneration) return
+        if (candidateIndex >= candidates.size) {
+            engine = null
+            status = if (hadWorkingEngine) SpeakerStatus.MISSING_CHINESE_VOICE else SpeakerStatus.ERROR
+            return
+        }
+
         var createdEngine: TextToSpeech? = null
         var earlyStatus: Int? = null
-        createdEngine = TextToSpeech(context.applicationContext) { statusCode ->
-            if (generation != initializationGeneration) return@TextToSpeech
-            if (createdEngine == null) {
+        val listener = TextToSpeech.OnInitListener { statusCode ->
+            if (generation != initializationGeneration) {
+                createdEngine?.shutdown()
+            } else if (createdEngine == null) {
                 earlyStatus = statusCode
             } else {
                 engine = createdEngine
-                initialize(statusCode)
+                handleInitialization(
+                    context = context,
+                    generation = generation,
+                    candidates = candidates,
+                    candidateIndex = candidateIndex,
+                    hadWorkingEngine = hadWorkingEngine,
+                    createdEngine = checkNotNull(createdEngine),
+                    statusCode = statusCode,
+                )
             }
+        }
+        createdEngine = try {
+            candidates[candidateIndex]?.let { packageName ->
+                TextToSpeech(context, listener, packageName)
+            } ?: TextToSpeech(context, listener)
+        } catch (_: Throwable) {
+            tryEngine(context, generation, candidates, candidateIndex + 1, hadWorkingEngine)
+            return
         }
         if (generation != initializationGeneration) {
             createdEngine?.shutdown()
             return
         }
         engine = createdEngine
-        earlyStatus?.let(::initialize)
+        earlyStatus?.let { statusCode ->
+            handleInitialization(
+                context = context,
+                generation = generation,
+                candidates = candidates,
+                candidateIndex = candidateIndex,
+                hadWorkingEngine = hadWorkingEngine,
+                createdEngine = checkNotNull(createdEngine),
+                statusCode = statusCode,
+            )
+        }
     }
 
     internal fun close() {
@@ -92,40 +143,59 @@ class MandarinSpeaker internal constructor() {
         engine = null
     }
 
-    internal fun initialize(statusCode: Int) {
-        val current = engine
-        if (statusCode != TextToSpeech.SUCCESS || current == null) {
-            status = SpeakerStatus.ERROR
+    private fun handleInitialization(
+        context: Context,
+        generation: Int,
+        candidates: List<String?>,
+        candidateIndex: Int,
+        hadWorkingEngine: Boolean,
+        createdEngine: TextToSpeech,
+        statusCode: Int,
+    ) {
+        if (generation != initializationGeneration || engine !== createdEngine) {
+            createdEngine.shutdown()
             return
         }
-        val compatible = runCatching { current.voices.orEmpty() }
-            .getOrDefault(emptySet())
-            .filter { voice ->
-                voice.locale.language.equals(Locale.CHINESE.language, ignoreCase = true) &&
-                    voice.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true
-            }
-            .sortedWith(chineseVoicePreference)
-        val selectedVoice = compatible.firstOrNull { voice ->
-            runCatching { current.setVoice(voice) == TextToSpeech.SUCCESS }.getOrDefault(false)
-        }
-        if (selectedVoice != null) {
+        val initialized = statusCode == TextToSpeech.SUCCESS
+        if (initialized && configureMandarin(createdEngine)) {
             status = SpeakerStatus.READY
             return
         }
+        createdEngine.stop()
+        createdEngine.shutdown()
+        engine = null
+        tryEngine(
+            context = context,
+            generation = generation,
+            candidates = candidates,
+            candidateIndex = candidateIndex + 1,
+            hadWorkingEngine = hadWorkingEngine || initialized,
+        )
+    }
 
-        val languageAvailable = listOf(Locale.SIMPLIFIED_CHINESE, Locale.CHINA, Locale.CHINESE)
-            .any { locale ->
-                runCatching { current.setLanguage(locale) >= TextToSpeech.LANG_AVAILABLE }
-                    .getOrDefault(false)
-            }
-        status = when {
-            languageAvailable -> SpeakerStatus.READY
-            compatible.isNotEmpty() -> SpeakerStatus.ERROR
-            else -> SpeakerStatus.MISSING_CHINESE_VOICE
+    private fun configureMandarin(current: TextToSpeech): Boolean {
+        val compatible = runCatching { current.voices.orEmpty() }
+            .getOrDefault(emptySet())
+            .filter { voice -> isMandarinLocale(voice.locale) && voice.isInstalled }
+            .sortedWith(chineseVoicePreference)
+        val languageAvailable = mandarinLocales.any { locale ->
+            runCatching { isTtsLanguageResultUsable(current.setLanguage(locale)) }
+                .getOrDefault(false)
         }
+        val selectedVoice = compatible.firstOrNull { voice ->
+            runCatching { current.setVoice(voice) == TextToSpeech.SUCCESS }.getOrDefault(false)
+        }
+        return languageAvailable || selectedVoice != null
     }
 
     private companion object {
+        val mandarinLocales = listOf(
+            Locale.SIMPLIFIED_CHINESE,
+            Locale.forLanguageTag("cmn-CN"),
+            Locale.CHINESE,
+            Locale.TRADITIONAL_CHINESE,
+        )
+
         val chineseVoicePreference: Comparator<Voice> =
             compareBy<Voice> { it.isNetworkConnectionRequired }
                 .thenByDescending { it.locale.country.equals(Locale.CHINA.country, ignoreCase = true) }
@@ -133,6 +203,22 @@ class MandarinSpeaker internal constructor() {
                 .thenBy { it.latency }
     }
 }
+
+private val Voice.isInstalled: Boolean
+    get() = features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true
+
+internal fun isMandarinLocale(locale: Locale): Boolean =
+    locale.language.equals("zh", ignoreCase = true) ||
+        locale.language.equals("cmn", ignoreCase = true)
+
+internal fun isTtsLanguageResultUsable(result: Int): Boolean = result >= TextToSpeech.LANG_AVAILABLE
+
+@Suppress("DEPRECATION")
+private fun discoverTtsEngines(context: Context): List<String> =
+    context.packageManager
+        .queryIntentServices(Intent(TextToSpeech.Engine.INTENT_ACTION_TTS_SERVICE), 0)
+        .mapNotNull { it.serviceInfo?.packageName }
+        .distinct()
 
 @Composable
 fun rememberMandarinSpeaker(): MandarinSpeaker {
