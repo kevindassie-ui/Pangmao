@@ -298,6 +298,57 @@ def load_examples(path: Path) -> list[MutableExample]:
     return examples
 
 
+def load_reviewed_tatoeba_french(path: Path, examples: list[MutableExample]) -> None:
+    """Attach a small relation-level reviewed French subset by stable Tatoeba id."""
+    by_chinese_id = {
+        example.chinese_id: example for example in examples if example.chinese_id > 0
+    }
+    seen: set[int] = set()
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        required = {
+            "chinese_id",
+            "chinese",
+            "french_id",
+            "french",
+            "positive_reviews",
+        }
+        if not reader.fieldnames or not required.issubset(reader.fieldnames):
+            raise ValueError(f"Reviewed Tatoeba French rows must contain {sorted(required)}: {path}")
+        for line_number, row in enumerate(reader, start=2):
+            chinese_id = int(row["chinese_id"])
+            french_id = int(row["french_id"])
+            positive_reviews = int(row["positive_reviews"])
+            chinese = normalized_sentence(row["chinese"])
+            french = normalized_sentence(row["french"])
+            if chinese_id <= 0 or french_id <= 0 or not chinese or not french:
+                raise ValueError(f"Invalid reviewed Tatoeba row at {path}:{line_number}")
+            if positive_reviews < 2:
+                raise ValueError(
+                    f"Production Tatoeba row lacks two positive reviews at {path}:{line_number}"
+                )
+            if chinese_id in seen:
+                raise ValueError(f"Duplicate reviewed Chinese id at {path}:{line_number}: {chinese_id}")
+            seen.add(chinese_id)
+            example = by_chinese_id.get(chinese_id)
+            if example is None:
+                raise ValueError(
+                    f"Reviewed Tatoeba row does not exist in the pinned English corpus at "
+                    f"{path}:{line_number}: {chinese_id}"
+                )
+            if example.chinese != chinese:
+                raise ValueError(
+                    f"Reviewed Tatoeba Chinese text mismatch at {path}:{line_number}: {chinese_id}"
+                )
+            if example.french:
+                raise ValueError(
+                    f"Reviewed Tatoeba row would overwrite French text at {path}:{line_number}"
+                )
+            example.french_id = french_id
+            example.french = french
+            example.french_source = "Tatoeba"
+
+
 def load_pangmao_examples(path: Path, examples: list[MutableExample]) -> None:
     """Merge small, human-reviewed bilingual examples and prefer them on collisions."""
     by_chinese = {normalized_sentence(example.chinese): example for example in examples}
@@ -718,6 +769,7 @@ def main() -> None:
     parser.add_argument("--cc-cedict", required=True, type=Path)
     parser.add_argument("--cfdict", required=True, type=Path)
     parser.add_argument("--tatoeba", required=True, type=Path)
+    parser.add_argument("--tatoeba-french", required=True, type=Path)
     parser.add_argument("--pangmao-examples", required=True, type=Path)
     parser.add_argument("--reviewed-definitions", required=True, type=Path)
     parser.add_argument("--unihan-dir", required=True, type=Path)
@@ -732,6 +784,7 @@ def main() -> None:
     load_pangmao_entries(entries)
     load_reviewed_definitions(args.reviewed_definitions, entries)
     examples = load_examples(args.tatoeba)
+    load_reviewed_tatoeba_french(args.tatoeba_french, examples)
     load_pangmao_examples(args.pangmao_examples, examples)
     _, preferred_pinyin = apply_frequency_and_pinyin(entries, examples)
     wanted_characters = {
@@ -747,6 +800,7 @@ def main() -> None:
         "cc_cedict_revision": args.cc_revision,
         "cfdict_downloaded": "2026-09-11",
         "tatoeba_release": args.tatoeba_release,
+        "tatoeba_french_release": "2026-09-12; relation-reviewed subset",
         "unihan_version": "17.0.0",
         "pangmao_supplement_version": "0.5.0",
         "frwiktionary_revision": "dump 2026-09-01; Kaikki extract 2026-09-08",

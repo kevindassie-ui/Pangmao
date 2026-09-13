@@ -7,9 +7,9 @@ The generated `pangmao.db` is an aggregation of independently licensed sources.
 |---|---|---|---|
 | CC-CEDICT | Chinese–English headwords, pinyin and definitions | Mirror revision `3e29e175d6186f76a6978d8716d0976a2016923f` | © CC-CEDICT contributors, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), source: [MDBG CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) |
 | CFDICT | Chinese–French definitions | Downloaded 2026-09-11 | © CFDICT / Chine Informations contributors, [CC BY-SA](https://creativecommons.org/licenses/by-sa/3.0/), source: [CFDICT](https://chine.in/mandarin/dictionnaire/CFDICT/) |
-| Tatoeba | Authentic Mandarin–English sentence pairs | Export 2026-05-20 | © Tatoeba contributors, [CC BY 2.0 FR](https://creativecommons.org/licenses/by/2.0/fr/), source: [Tatoeba](https://tatoeba.org/) |
+| Tatoeba | Authentic Mandarin–English pairs and reviewed direct French relations | English export 2026-05-20; French subset 2026-09-12 | © Tatoeba contributors, [CC BY 2.0 FR](https://creativecommons.org/licenses/by/2.0/fr/), source: [Tatoeba](https://tatoeba.org/) |
 | Unicode Unihan | Character readings, radicals, stroke counts, variants and definitions | Unicode 17.0.0 | © 1991–2026 Unicode, Inc., [Unicode License v3](https://www.unicode.org/license.txt) |
-| Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.4.0 | Original project content; source file: `tools/data/pangmao_examples.tsv` |
+| Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.5.0 | Original project content; source files in `tools/data/` |
 
 ## Source candidate under editorial review
 
@@ -47,8 +47,11 @@ The official 2026-09-12 Tatoeba Mandarin and French sentence, direct-link and
 sentence-review exports were evaluated without changing the database. Although
 14,600 pinned Mandarin sentences have a direct French link, sentence reviews do
 not validate translation fidelity or register. The 826 identity-checked,
-positively reviewed candidates therefore remain a review queue rather than a
-production source. Method, hashes and decision:
+positively reviewed candidates therefore formed a review queue rather than an
+automatic import. Eighteen relations with at least two positive reviews passed
+an additional relation-level editorial review and are now pinned in
+`tools/data/tatoeba_french_examples.tsv`; all remaining candidates stay outside
+the production database. Method, hashes and decision:
 [`docs/TATOEBA_FRENCH_EXAMPLES_EVALUATION.md`](../docs/TATOEBA_FRENCH_EXAMPLES_EVALUATION.md).
 
 ## Reproduire l’audit de qualité

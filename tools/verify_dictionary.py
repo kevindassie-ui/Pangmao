@@ -37,7 +37,13 @@ if not china or "China" not in china[0] or "Chine" not in china[1]:
     fail("Expected bilingual 中国 entry not found")
 
 metadata = dict(connection.execute("SELECT key, value FROM metadata"))
-required = {"schema_version", "cc_cedict_revision", "tatoeba_release", "unihan_version"}
+required = {
+    "schema_version",
+    "cc_cedict_revision",
+    "tatoeba_release",
+    "tatoeba_french_release",
+    "unihan_version",
+}
 if not required.issubset(metadata):
     fail(f"Missing metadata: {required - metadata.keys()}")
 
@@ -106,6 +112,29 @@ duplicate_examples = connection.execute(
 ).fetchone()[0]
 if duplicate_examples:
     fail(f"Duplicate Chinese examples remain: {duplicate_examples}")
+
+bilingual_example_count = connection.execute(
+    "SELECT count(*) FROM examples WHERE french <> ''"
+).fetchone()[0]
+if bilingual_example_count != int(metadata.get("bilingual_example_count", "-1")):
+    fail("Bilingual example count does not match metadata")
+if bilingual_example_count < 38:
+    fail(f"Reviewed bilingual example corpus unexpectedly small: {bilingual_example_count}")
+
+tatoeba_french_count = connection.execute(
+    "SELECT count(*) FROM examples WHERE french_source = 'Tatoeba' AND tatoeba_french_id > 0"
+).fetchone()[0]
+if tatoeba_french_count < 18:
+    fail(f"Reviewed Tatoeba French subset unexpectedly small: {tatoeba_french_count}")
+
+tatoeba_french_example = connection.execute(
+    """
+    SELECT french, tatoeba_french_id, french_source
+    FROM examples WHERE tatoeba_chinese_id = 333158
+    """
+).fetchone()
+if tatoeba_french_example != ("Bonsoir !", 333159, "Tatoeba"):
+    fail("Expected relation-reviewed Tatoeba French example not found")
 
 example_columns = {row[1] for row in connection.execute("PRAGMA table_info(examples)")}
 if not {"english", "french", "english_source", "french_source"}.issubset(example_columns):

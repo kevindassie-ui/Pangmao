@@ -71,16 +71,17 @@ directement l'objectif de langage authentique et fidèle. La confiance dans ce
 diagnostic est élevée, car les identifiants, liens, avis et changements de texte
 ont tous été vérifiés sur les exports complets.
 
-## Décision et prochain lot
+## Décision et suite
 
 1. Ne pas intégrer automatiquement les 826 candidats.
 2. Utiliser cette liste comme file de revue reproductible.
-3. Commencer par les 23 candidats ayant au moins deux avis positifs, puis les
-   classer selon l'utilité lexicale dans Pangmao.
-4. Vérifier manuellement fidélité, registre, ponctuation et naturel français;
-   conserver les identifiants Tatoeba dans la base.
-5. Importer les lignes acceptées par petits lots, chacun accompagné d'un test
-   de non-régression et d'une mesure avant/après.
+3. Les 23 candidats ayant au moins deux avis positifs ont constitué le premier
+   lot de revue: 18 ont été acceptés et cinq rejetés. Voir
+   [V0.5_D1_EXAMPLES_REPORT.md](V0.5_D1_EXAMPLES_REPORT.md).
+4. Continuer à vérifier manuellement fidélité, registre, ponctuation et naturel
+   français, en conservant les identifiants Tatoeba dans la base.
+5. Limiter chaque apport suivant à un lot accompagné d'un test de
+   non-régression et d'une mesure avant/après.
 
 ## Reproduire l'évaluation
 

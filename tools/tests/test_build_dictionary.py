@@ -16,6 +16,7 @@ from build_dictionary import (  # noqa: E402
     create_database,
     entry_key,
     load_pangmao_examples,
+    load_reviewed_tatoeba_french,
     load_reviewed_definitions,
 )
 
@@ -123,6 +124,35 @@ class BuildDictionaryProvenanceTest(unittest.TestCase):
         self.assertEqual("Tatoeba", examples[0].english_source)
         self.assertEqual("Parles-tu chinois ?", examples[0].french)
         self.assertEqual("Pangmao", examples[0].french_source)
+
+    def test_reviewed_tatoeba_french_requires_ids_text_and_two_reviews(self) -> None:
+        supplement = self.root / "tatoeba_french.tsv"
+        supplement.write_text(
+            "chinese_id\tchinese\tfrench_id\tfrench\tpositive_reviews\n"
+            "10\t你好。\t30\tBonjour !\t2\n",
+            encoding="utf-8",
+        )
+        examples = [
+            MutableExample(
+                chinese_id=10,
+                chinese="你好。",
+                english_id=20,
+                english="Hello!",
+            )
+        ]
+
+        load_reviewed_tatoeba_french(supplement, examples)
+
+        self.assertEqual(30, examples[0].french_id)
+        self.assertEqual("Bonjour !", examples[0].french)
+        self.assertEqual("Tatoeba", examples[0].french_source)
+
+        supplement.write_text(
+            supplement.read_text(encoding="utf-8").replace("\t2\n", "\t1\n"),
+            encoding="utf-8",
+        )
+        with self.assertRaisesRegex(ValueError, "lacks two positive reviews"):
+            load_reviewed_tatoeba_french(supplement, [MutableExample(10, "你好。")])
 
 
 if __name__ == "__main__":

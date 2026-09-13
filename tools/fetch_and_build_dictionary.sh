@@ -33,6 +33,7 @@ python3 tools/build_dictionary.py \
   --cc-cedict "$cc_dir/data/all.js" \
   --cfdict "$work_dir/cfdict.u8" \
   --tatoeba "$tatoeba_dir/data/Sentence pairs in Mandarin Chinese-English - 2026-05-20.tsv" \
+  --tatoeba-french tools/data/tatoeba_french_examples.tsv \
   --pangmao-examples tools/data/pangmao_examples.tsv \
   --reviewed-definitions tools/data/reviewed_definitions.tsv \
   --unihan-dir "$unihan_dir/files" \

@@ -30,7 +30,7 @@ Checkpoint date: 2026-09-13
 
 - Dictionary integrity: 132,342 entries, 64,912 unique Chinese examples and
   14,622 character records.
-- Twenty reviewed examples currently provide aligned French and English;
+- Thirty-eight reviewed examples currently provide aligned French and English;
   broader bilingual coverage is tracked for v0.5.0.
 
 ## Verified on GitHub Actions
@@ -173,6 +173,9 @@ Checkpoint date: 2026-09-13
 - D0 inspected the complete official Tatoeba link graph. Of 14,600 direct
   Mandarin–French alignments, 826 pass the identity and sentence-review gate,
   but they still require relation-level editorial review before import.
+- D1 accepted 18 of the 23 strongest candidates after relation-level review.
+  The other five remain excluded for register, intensity, fidelity or
+  near-duplication. The bilingual example count is now 38 of 64,912.
 
 ## Later iteration
 
