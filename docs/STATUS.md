@@ -238,6 +238,9 @@ Checkpoint date: 2026-09-13
 - The existing 132,342 Chinese entries and stable identifiers are unchanged.
 - The generated database grows from about 69 MiB to 92.34 MiB. Publication is
   still gated on profile-driven Android search, entry rendering and device QA.
+- Commit `ccd7549` passed the full GitHub Actions run `34781393394`, including
+  pinned-source reconstruction, 21 Python tests, Android tests, lint and debug
+  APK assembly.
 - Detailed measurements and invariants are recorded in
   [V0.6_SCHEMA_V4_REPORT.md](V0.6_SCHEMA_V4_REPORT.md).
 
