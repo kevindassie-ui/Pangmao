@@ -175,7 +175,8 @@ Checkpoint date: 2026-09-13
   but they still require relation-level editorial review before import.
 - D1 accepted 18 of the 23 strongest candidates after relation-level review.
   The other five remain excluded for register, intensity, fidelity or
-  near-duplication. The bilingual example count is now 38 of 64,912.
+  near-duplication. The bilingual example count is now 38 of 64,912. CI run
+  `34755490616` passed on commit `83246fc`.
 
 ## Later iteration
 
