@@ -243,6 +243,10 @@ Checkpoint date: 2026-09-13
   APK assembly.
 - Detailed measurements and invariants are recorded in
   [V0.6_SCHEMA_V4_REPORT.md](V0.6_SCHEMA_V4_REPORT.md).
+- Commit `0f77fba` adds the Android learning-entry models and exact/prefix/FTS
+  repository queries without changing visible behavior. Accented and Hanzi
+  reverse queries are covered; CI run `34781815388` passed all data and Android
+  checks.
 
 ## Later iteration
 
