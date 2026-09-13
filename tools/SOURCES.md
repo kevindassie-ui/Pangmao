@@ -21,6 +21,13 @@ reviewed and attributed subset; the full post-processed download is deprecated
 by Kaikki and contains extraction noise. See
 [`docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md`](../docs/KAIKKI_FRENCH_SOURCE_EVALUATION.md).
 
+FreeDict/WikDict `fra-zho` and `eng-zho` 2025.11.23 are separate candidates for
+the post-v0.5 learning profiles. They are not part of the generated database.
+They provide direct target-language headwords, IPA, grammatical metadata and
+Chinese equivalents under CC BY-SA 3.0. The deterministic evaluator, measured
+coverage, required cleanup and staged-import decision are documented in
+[`docs/V0.6_LEARNING_SOURCE_EVALUATION.md`](../docs/V0.6_LEARNING_SOURCE_EVALUATION.md).
+
 The CC-CEDICT and Tatoeba input files used for this build were obtained from
 public, versioned GitHub mirrors so the build can be pinned and audited. The
 original projects remain the attributed data authors. CFDICT and Unihan were
