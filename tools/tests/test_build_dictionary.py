@@ -11,9 +11,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from build_dictionary import (  # noqa: E402
     MutableEntry,
+    MutableExample,
     add_definitions,
     create_database,
     entry_key,
+    load_pangmao_examples,
     load_reviewed_definitions,
 )
 
@@ -98,6 +100,29 @@ class BuildDictionaryProvenanceTest(unittest.TestCase):
         ).fetchone()
         self.assertEqual(("fr", 0, "Wiktionnaire", 1, "jeu; jouer"), row)
         connection.close()
+
+    def test_reviewed_translation_can_keep_the_pinned_tatoeba_english(self) -> None:
+        supplement = self.root / "examples.tsv"
+        supplement.write_text(
+            "chinese\tenglish\tfrench\tenglish_source\tfrench_source\n"
+            "你会说中文吗?\tDo you speak Chinese?\tParles-tu chinois ?\tTatoeba\tPangmao\n",
+            encoding="utf-8",
+        )
+        examples = [
+            MutableExample(
+                chinese_id=10,
+                chinese="你会说中文吗?",
+                english_id=20,
+                english="Do you speak Chinese?",
+            )
+        ]
+
+        load_pangmao_examples(supplement, examples)
+
+        self.assertEqual(20, examples[0].english_id)
+        self.assertEqual("Tatoeba", examples[0].english_source)
+        self.assertEqual("Parles-tu chinois ?", examples[0].french)
+        self.assertEqual("Pangmao", examples[0].french_source)
 
 
 if __name__ == "__main__":

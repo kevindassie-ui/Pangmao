@@ -75,6 +75,20 @@ if definition_attribution_count != int(metadata.get("definition_attribution_coun
     fail("Definition attribution count does not match metadata")
 if int(metadata.get("definition_record_count", "0")) < 250_000:
     fail("Conceptual definition provenance is unexpectedly sparse")
+if definition_attribution_count < 80:
+    fail(f"Reviewed definition supplement unexpectedly small: {definition_attribution_count}")
+
+for language, definition_index, definitions in connection.execute(
+    """
+    SELECT a.language, a.definition_index,
+           CASE a.language WHEN 'en' THEN e.definitions_en ELSE e.definitions_fr END
+    FROM definition_attributions a
+    JOIN entries e ON e.id = a.entry_id
+    """
+):
+    parts = definitions.splitlines()
+    if definition_index < 0 or definition_index >= len(parts):
+        fail(f"Definition attribution index out of range: {language}/{definition_index}")
 
 orphan_definitions = connection.execute(
     """
@@ -110,6 +124,47 @@ reviewed_example = connection.execute(
 ).fetchone()
 if not reviewed_example or "look" not in reviewed_example[0] or "ressembles" not in reviewed_example[1]:
     fail("Expected reviewed bilingual example not found")
+
+for headword in ("真的", "游戏", "所有人", "驾驶执照", "杰", "阿里", "须"):
+    french = connection.execute(
+        "SELECT definitions_fr FROM entries WHERE simplified = ? LIMIT 1",
+        (headword,),
+    ).fetchone()
+    if not french or not french[0]:
+        fail(f"Expected v0.5 reviewed French definition not found: {headword}")
+
+bad_reviewed_markers = ("Définition manquante", "(Ajouter)")
+reviewed_french = [
+    definition
+    for row in connection.execute(
+        """
+        SELECT e.definitions_fr
+        FROM definition_attributions a
+        JOIN entries e ON e.id = a.entry_id
+        WHERE a.language = 'fr' AND a.reviewed = 1
+        """
+    )
+    for definition in row[0].splitlines()
+]
+for marker in bad_reviewed_markers:
+    if any(marker in definition for definition in reviewed_french):
+        fail(f"Rejected candidate text leaked into reviewed definitions: {marker}")
+if "Ari" in reviewed_french:
+    fail("Rejected candidate text leaked into reviewed definitions: Ari")
+
+source_split_example = connection.execute(
+    """
+    SELECT english, french, english_source, french_source
+    FROM examples WHERE chinese = '你会说中文吗?' LIMIT 1
+    """
+).fetchone()
+if source_split_example != (
+    "Do you speak Chinese?",
+    "Parles-tu chinois ?",
+    "Tatoeba",
+    "Pangmao",
+):
+    fail("Reviewed French example did not preserve its Tatoeba English source")
 
 connection.close()
 print(

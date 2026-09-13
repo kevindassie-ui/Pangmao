@@ -310,10 +310,20 @@ def load_pangmao_examples(path: Path, examples: list[MutableExample]) -> None:
             chinese = normalized_sentence(row["chinese"])
             english = normalized_sentence(row["english"])
             french = normalized_sentence(row["french"])
+            english_source = normalized_sentence(row.get("english_source", "")) or "Pangmao"
+            french_source = normalized_sentence(row.get("french_source", "")) or "Pangmao"
             if not chinese or not english or not french:
                 raise ValueError(f"Incomplete curated example in {path}: {row}")
+            if english_source not in {"Pangmao", "Tatoeba"}:
+                raise ValueError(f"Unsupported English example source in {path}: {english_source}")
+            if french_source not in {"Pangmao", "Tatoeba", "Wiktionnaire"}:
+                raise ValueError(f"Unsupported French example source in {path}: {french_source}")
             example = by_chinese.get(chinese)
             if example is None:
+                if english_source == "Tatoeba":
+                    raise ValueError(
+                        f"Tatoeba attribution requires an existing pinned pair in {path}: {chinese}"
+                    )
                 example = MutableExample(
                     chinese_id=0,
                     chinese=chinese,
@@ -321,12 +331,13 @@ def load_pangmao_examples(path: Path, examples: list[MutableExample]) -> None:
                 )
                 examples.append(example)
                 by_chinese[chinese] = example
-            example.english_id = 0
+            if english_source != "Tatoeba" or example.english != english:
+                example.english_id = 0
             example.english = english
             example.french_id = 0
             example.french = french
-            example.english_source = "Pangmao"
-            example.french_source = "Pangmao"
+            example.english_source = english_source
+            example.french_source = french_source
 
 
 def greedy_tokens(text: str, headwords: set[str], maximum_length: int) -> list[str]:
