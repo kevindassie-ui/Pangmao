@@ -81,9 +81,10 @@ Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RE
 - Ajouter une vue détaillée par source, registre et catégorie grammaticale quand
   la donnée est assez fiable.
 
-La v0.5.0 reste volontairement centrée sur les données. Les commandes audio et
-l’extension de l’explorateur passent dans un lot v0.5.1 distinct afin que chaque
-version possède des critères d’acceptation cohérents.
+La v0.5.0 reste volontairement centrée sur les données. La compatibilité TTS
+signalée sur l’appareil de test est isolée dans la v0.5.1; les commandes audio
+et l’extension de l’explorateur passent ensuite dans un lot distinct afin que
+chaque version possède des critères d’acceptation cohérents.
 
 La vue détaillée par définition reste également différée tant que les données
 fiables de source, registre et catégorie sont trop rares pour justifier un écran
@@ -91,7 +92,15 @@ supplémentaire.
 
 Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
 
-## v0.5.1 — écouter et explorer
+## v0.5.1 — compatibilité et corrections
+
+- Séparer les blocs logiques, visibles par défaut, de l’interprétation mot à mot
+  facultative.
+- Corriger la traduction contextuelle signalée avec `才` dans les deux surfaces.
+- Déclarer les moteurs TTS dans la visibilité Android et essayer les moteurs
+  installés en repli lorsque le moteur par défaut échoue.
+
+## v0.5.2 — écouter et explorer
 
 - Ajouter pause, vitesse, test de voix et suivi de lecture au TTS.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé

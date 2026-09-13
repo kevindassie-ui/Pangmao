@@ -8,6 +8,25 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.5.1 — 2026-09-13
+
+### Corrigé
+
+- Les blocs logiques de l’analyse restent visibles par défaut; seul le résumé
+  linéaire mot à mot est désormais repliable.
+- La construction signalée `我习惯每天晚上喝咖啡才去打球` utilise une traduction
+  française et anglaise relue dans le dictionnaire comme dans le Reader.
+- Android 11 et versions ultérieures peuvent découvrir les services TTS grâce à
+  la déclaration de visibilité requise dans le manifeste.
+- Le TTS essaie successivement le moteur par défaut puis les autres moteurs
+  installés, accepte les balises `zh` et `cmn`, et ne dépend plus d’une liste de
+  voix OEM complète pour reconnaître le mandarin.
+
+### Qualité
+
+- Deux tests couvrent les niveaux de disponibilité TTS et les balises de langue
+  chinoise; les traductions relues sont protégées contre tout appel au modèle.
+
 ## 0.5.0 — 2026-09-13
 
 ### Ajouté
@@ -154,6 +173,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.5.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1
 [0.5.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.0
 [0.4.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.1
 [0.4.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.0
