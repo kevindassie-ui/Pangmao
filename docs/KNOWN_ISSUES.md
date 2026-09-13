@@ -6,7 +6,7 @@ Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appar
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
 fois le correctif publié puis confirmé.
 
-## Corrigé dans la candidate v0.5.1
+## Corrigé dans la v0.5.1 — validation appareil en attente
 
 ### Divulgation de l’analyse de texte
 
@@ -32,7 +32,7 @@ l’analyse du dictionnaire.
 ### TTS sur Android/ColorOS
 
 La v0.5.0 pouvait afficher « Android text-to-speech is unavailable » alors
-qu’une voix chinoise était installée. La candidate v0.5.1 ajoute la visibilité
+qu’une voix chinoise était installée. La v0.5.1 ajoute la visibilité
 de service exigée par Android 11+, essaie tous les moteurs installés et accepte
 les balises mandarin `zh`/`cmn`. La validation finale reste à effectuer sur
 l’appareil qui a reproduit le défaut.

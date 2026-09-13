@@ -193,6 +193,25 @@ Checkpoint date: 2026-09-13
   `cf8706f17c358f2c1035a230544ed695104fed316e468859087b528abb082873`.
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.0/Pangmao-v0.5.0-universal.apk>
 
+## Corrective release 0.5.1
+
+- Tag: `v0.5.1` at commit `a22c095`.
+- Implementation CI run `34761953644` and final CI run `34762205792` passed
+  dictionary validation, Python and Android unit tests, lint and debug APK
+  assembly.
+- Release run `34762555388` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.5.1-arm64.apk` (84,483,134 bytes), SHA-256
+  `06f9b7af79239c0f080658611af406fe6279123956e29a4994167fadf7cfe40d`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.1/Pangmao-v0.5.1-arm64.apk>
+- Universal APK: `Pangmao-v0.5.1-universal.apk` (183,258,788 bytes), SHA-256
+  `90c4ccf9b6dbf4b790c52daa81fd0913522cb48b4a87a42c0ca64edfc0bf856c`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.5.1/Pangmao-v0.5.1-universal.apk>
+- Device acceptance remains to be completed for TTS on the reported ColorOS
+  device, the independently visible logical blocks and the reviewed `才`
+  sentence translation.
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced

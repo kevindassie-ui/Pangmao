@@ -92,7 +92,7 @@ supplémentaire.
 
 Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
 
-## v0.5.1 — compatibilité et corrections
+## v0.5.1 — compatibilité et corrections · publiée
 
 - Séparer les blocs logiques, visibles par défaut, de l’interprétation mot à mot
   facultative.
