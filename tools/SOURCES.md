@@ -43,6 +43,14 @@ with the same Chinese sentence replaces its target translations while retaining
 separate source labels. Machine translation is never presented as an authentic
 example.
 
+The official 2026-09-12 Tatoeba Mandarin and French sentence, direct-link and
+sentence-review exports were evaluated without changing the database. Although
+14,600 pinned Mandarin sentences have a direct French link, sentence reviews do
+not validate translation fidelity or register. The 826 identity-checked,
+positively reviewed candidates therefore remain a review queue rather than a
+production source. Method, hashes and decision:
+[`docs/TATOEBA_FRENCH_EXAMPLES_EVALUATION.md`](../docs/TATOEBA_FRENCH_EXAMPLES_EVALUATION.md).
+
 ## Reproduire l’audit de qualité
 
 Après la construction de la base, exécuter:

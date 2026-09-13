@@ -30,7 +30,7 @@ Checkpoint date: 2026-09-13
 
 - Dictionary integrity: 132,342 entries, 64,912 unique Chinese examples and
   14,622 character records.
-- Twelve reviewed Pangmao examples currently provide aligned French and English;
+- Twenty reviewed examples currently provide aligned French and English;
   broader bilingual coverage is tracked for v0.5.0.
 
 ## Verified on GitHub Actions
@@ -157,10 +157,22 @@ Checkpoint date: 2026-09-13
   debug APK assembly.
 - Baseline: 47,071 of 132,342 lexical entries are bilingual; coverage rises to
   81.65% among entries observed at least five times in the bundled corpus.
-- Examples are the main measured gap: only 12 of 64,912 unique Chinese
-  sentences currently have both French and English translations.
+- Examples are the main measured gap: the C2 supplement raised the baseline
+  from 12 to 20 of 64,912 unique Chinese sentences with both French and English.
 - This checkpoint changes neither the generated dictionary nor the APK. Lot B
   will evaluate candidate direct Chinese-French sources before any import.
+
+## Bilingual source and data checkpoints — v0.5 lots B–D0
+
+- Kaikki / Wiktionnaire français was limited to reviewed candidates; the full
+  extraction is not safe for automatic ingestion.
+- Schema 3 records compact per-definition provenance without increasing the
+  database size. CI run `34742487247` passed on commit `13fff9b`.
+- C2 added 77 reviewed French definitions for 46 frequent entries and eight
+  aligned examples. CI run `34742814129` passed on commit `7c198dc`.
+- D0 inspected the complete official Tatoeba link graph. Of 14,600 direct
+  Mandarin–French alignments, 826 pass the identity and sentence-review gate,
+  but they still require relation-level editorial review before import.
 
 ## Later iteration
 
