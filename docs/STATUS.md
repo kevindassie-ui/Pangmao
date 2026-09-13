@@ -1,6 +1,6 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-12
+Checkpoint date: 2026-09-13
 
 ## Implemented
 
@@ -148,6 +148,19 @@ Checkpoint date: 2026-09-12
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.4.1/Pangmao-v0.4.1-universal.apk>
 - Device acceptance remains to be completed for multiline hanzi, the existing
   Chinese TTS voice and `肉夹馍` in both translation surfaces.
+
+## Bilingual quality baseline — v0.5 lot A
+
+- Commit: `d016d31`.
+- CI run `34727407033` passed the deterministic bilingual audit and its tests,
+  full dictionary reconstruction and validation, Android unit tests, lint and
+  debug APK assembly.
+- Baseline: 47,071 of 132,342 lexical entries are bilingual; coverage rises to
+  81.65% among entries observed at least five times in the bundled corpus.
+- Examples are the main measured gap: only 12 of 64,912 unique Chinese
+  sentences currently have both French and English translations.
+- This checkpoint changes neither the generated dictionary nor the APK. Lot B
+  will evaluate candidate direct Chinese-French sources before any import.
 
 ## Later iteration
 
