@@ -29,6 +29,13 @@ downloaded from their official download endpoints.
 The database builder preserves attribution metadata inside the database and the
 application exposes the same notices from its About screen.
 
+Dictionary schema 3 records `CC-CEDICT` as the default source for English and
+`CFDICT` as the default source for French. Only reviewed or secondary-source
+attributions are stored as compact exceptions, referenced by definition index;
+this preserves per-definition provenance without duplicating the definition
+text. Reviewed rows use the strict format in
+[`tools/data/reviewed_definitions.tsv`](data/reviewed_definitions.tsv).
+
 The example builder normalizes Unicode and whitespace, then keeps one record
 per Chinese sentence. When several Tatoeba translations share the same Chinese
 text, the first pinned direct translation is retained. A Pangmao-reviewed row

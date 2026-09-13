@@ -41,8 +41,51 @@ required = {"schema_version", "cc_cedict_revision", "tatoeba_release", "unihan_v
 if not required.issubset(metadata):
     fail(f"Missing metadata: {required - metadata.keys()}")
 
-if metadata["schema_version"] != "2":
+if metadata["schema_version"] != "3":
     fail(f"Unexpected dictionary schema: {metadata['schema_version']}")
+if connection.execute("PRAGMA user_version").fetchone()[0] != 3:
+    fail("Unexpected SQLite user_version")
+
+definition_tables = {
+    row[0]
+    for row in connection.execute(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN "
+        "('definition_sources', 'definition_attributions')"
+    )
+}
+if definition_tables != {"definition_sources", "definition_attributions"}:
+    fail(f"Definition provenance tables are missing: {definition_tables}")
+
+definition_source_codes = {
+    row[0] for row in connection.execute("SELECT code FROM definition_sources")
+}
+required_definition_sources = {"CC-CEDICT", "CFDICT", "Pangmao", "Wiktionnaire"}
+if not required_definition_sources.issubset(definition_source_codes):
+    fail(f"Definition sources are missing: {required_definition_sources - definition_source_codes}")
+
+if metadata.get("default_definition_source_en") != "CC-CEDICT":
+    fail("Unexpected default English definition source")
+if metadata.get("default_definition_source_fr") != "CFDICT":
+    fail("Unexpected default French definition source")
+
+definition_attribution_count = connection.execute(
+    "SELECT count(*) FROM definition_attributions"
+).fetchone()[0]
+if definition_attribution_count != int(metadata.get("definition_attribution_count", "-1")):
+    fail("Definition attribution count does not match metadata")
+if int(metadata.get("definition_record_count", "0")) < 250_000:
+    fail("Conceptual definition provenance is unexpectedly sparse")
+
+orphan_definitions = connection.execute(
+    """
+    SELECT count(*) FROM definition_attributions d
+    LEFT JOIN entries e ON e.id = d.entry_id
+    LEFT JOIN definition_sources s ON s.code = d.source_code
+    WHERE e.id IS NULL OR s.code IS NULL
+    """
+).fetchone()[0]
+if orphan_definitions:
+    fail(f"Orphan definition provenance rows: {orphan_definitions}")
 
 duplicate_examples = connection.execute(
     "SELECT count(*) FROM (SELECT chinese FROM examples GROUP BY chinese HAVING count(*) > 1)"

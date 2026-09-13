@@ -34,6 +34,7 @@ python3 tools/build_dictionary.py \
   --cfdict "$work_dir/cfdict.u8" \
   --tatoeba "$tatoeba_dir/data/Sentence pairs in Mandarin Chinese-English - 2026-05-20.tsv" \
   --pangmao-examples tools/data/pangmao_examples.tsv \
+  --reviewed-definitions tools/data/reviewed_definitions.tsv \
   --unihan-dir "$unihan_dir/files" \
   --output app/src/main/assets/databases/pangmao.db \
   --cc-revision 3e29e175d6186f76a6978d8716d0976a2016923f \
