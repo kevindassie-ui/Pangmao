@@ -38,11 +38,14 @@ class TranslationQualityTest {
     fun `uses natural translations for reported reader sentences`() {
         val resemblance = TranslationQuality.curated("你很像你哥哥。")
         val food = TranslationQuality.curated("我上次去市中心买了三个肉夹馍")
+        val sequence = TranslationQuality.curated("我习惯每天晚上喝咖啡才去打球。")
 
         assertEquals("Tu ressembles beaucoup à ton frère aîné.", resemblance?.french)
         assertEquals("You look a lot like your older brother.", resemblance?.english)
         assertEquals("La dernière fois, je suis allé en centre-ville acheter trois roujiamos.", food?.french)
         assertEquals("Last time, I went downtown and bought three roujiamos.", food?.english)
+        assertEquals("Chaque soir, je ne vais jouer au ballon qu’après avoir bu un café.", sequence?.french)
+        assertEquals("Every evening, I only go play ball after having coffee.", sequence?.english)
     }
 
     @Test

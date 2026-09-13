@@ -52,6 +52,10 @@ object TranslationQuality {
             french = "J’aime boire du thé au lait.",
             english = "I like drinking milk tea.",
         ),
+        "我习惯每天晚上喝咖啡才去打球" to CuratedTranslation(
+            french = "Chaque soir, je ne vais jouer au ballon qu’après avoir bu un café.",
+            english = "Every evening, I only go play ball after having coffee.",
+        ),
         "今天我们一起学习中文。认识一个新词时，轻触它即可查看释义。" to CuratedTranslation(
             french = "Aujourd’hui, nous apprenons le chinois ensemble. Quand vous rencontrez un nouveau mot, touchez-le pour en afficher le sens.",
             english = "Today, we’re learning Chinese together. When you encounter a new word, tap it to see its meaning.",

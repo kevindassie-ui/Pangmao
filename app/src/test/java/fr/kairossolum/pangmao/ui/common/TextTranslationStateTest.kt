@@ -49,6 +49,24 @@ class TextTranslationStateTest {
     }
 
     @Test
+    fun `reported cai sentence uses reviewed bilingual translation`() = runTest {
+        val repository = RecordingTranslationRepository()
+        var state = TextTranslationState()
+
+        resolveTextTranslation(
+            analysis = analysis("我习惯每天晚上喝咖啡才去打球。"),
+            definitionLanguage = DefinitionLanguage.BOTH,
+            translation = repository,
+            update = { state = it },
+        )
+
+        assertEquals("Chaque soir, je ne vais jouer au ballon qu’après avoir bu un café.", state.french)
+        assertEquals("Every evening, I only go play ball after having coffee.", state.english)
+        assertEquals(0, repository.readinessChecks)
+        assertEquals(0, repository.translations)
+    }
+
+    @Test
     fun `reviewed bilingual example bypasses both translation models`() = runTest {
         val repository = RecordingTranslationRepository()
         var state = TextTranslationState()

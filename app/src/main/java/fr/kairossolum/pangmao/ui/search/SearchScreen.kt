@@ -270,7 +270,7 @@ private fun SearchAnalysisCard(
     val chineseTokens = analysis.tokens.filter { it.token.isChinese }
     val exactMeaning = analysis.exactEntry?.primaryDefinition(definitionLanguage)
     val gloss = chineseTokens.mapNotNull { it.entry?.primaryDefinition(definitionLanguage) }.joinToString(" · ")
-    var showBreakdown by remember(analysis.sourceText) { mutableStateOf(false) }
+    var showWordGloss by remember(analysis.sourceText) { mutableStateOf(false) }
     ElevatedCard(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
     ) {
@@ -324,27 +324,25 @@ private fun SearchAnalysisCard(
             if (!exactMeaning.isNullOrBlank()) {
                 MeaningBlock(R.string.search_whole_expression, exactMeaning)
             }
-            TextButton(onClick = { showBreakdown = !showBreakdown }) {
+            if (gloss.isNotBlank()) TextButton(onClick = { showWordGloss = !showWordGloss }) {
                 Icon(
-                    if (showBreakdown) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                    if (showWordGloss) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
                     contentDescription = null,
                 )
                 Text(
                     stringResource(
-                        if (showBreakdown) R.string.search_hide_breakdown
+                        if (showWordGloss) R.string.search_hide_breakdown
                         else R.string.search_show_breakdown
                     )
                 )
             }
-            if (showBreakdown) {
-                if (gloss.isNotBlank()) MeaningBlock(R.string.search_word_gloss, gloss)
-                Text(
-                    stringResource(R.string.search_breakdown),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                chineseTokens.forEach { token -> AnalysisTokenRow(token, definitionLanguage, onOpenEntry) }
-            }
+            if (showWordGloss) MeaningBlock(R.string.search_word_gloss, gloss)
+            Text(
+                stringResource(R.string.search_breakdown),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            chineseTokens.forEach { token -> AnalysisTokenRow(token, definitionLanguage, onOpenEntry) }
         }
     }
 }
