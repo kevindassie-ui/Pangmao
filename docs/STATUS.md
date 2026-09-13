@@ -224,9 +224,9 @@ Checkpoint date: 2026-09-13
   English-to-Chinese entries; they qualify for a filtered pilot, not a raw
   import. CI run `34772064048` passed 18 data tests, Android tests, lint and
   debug APK assembly.
-- No v0.6 release tag has been created. The next independent checkpoint is the
-  schema-v4 pilot import; public APK publication remains gated on real
-  profile-driven entries and device acceptance.
+- No v0.6 release tag has been created. Schema v4 and the profile-driven Android
+  screens are implemented; public APK publication remains gated on device
+  acceptance and final release checks.
 
 ## Learning dictionary schema — v0.6 lot D1
 
@@ -247,6 +247,11 @@ Checkpoint date: 2026-09-13
   repository queries without changing visible behavior. Accented and Hanzi
   reverse queries are covered; CI run `34781815388` passed all data and Android
   checks.
+- Commit `20db749` activates real offline French/English searches and lexical
+  entry screens. It keeps the Chinese Reader unchanged and deliberately leaves
+  favorites/cards disabled for the new entries until identifiers are safely
+  namespaced. CI run `34786545793` passed corpus reconstruction, Android tests,
+  lint and debug APK assembly.
 
 ## Later iteration
 
@@ -269,5 +274,6 @@ milestones are specified in [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
 Confirmed device regressions awaiting a later corrective release are kept in
 [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
-The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
-it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.
+The generated 92.34 MiB SQLite database is intentionally not committed. CI
+rebuilds it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba, Unihan and
+FreeDict/WikDict sources.
