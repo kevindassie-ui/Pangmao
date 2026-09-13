@@ -31,6 +31,8 @@ jobs:
         run: |
           tools/fetch_and_build_dictionary.sh
           python3 tools/verify_dictionary.py
+          python3 -m unittest discover -s tools/tests -p "test_*.py"
+          python3 tools/audit_dictionary_quality.py --json-out build/reports/dictionary-quality.json
           ./gradlew --no-daemon testDebugUnitTest lintDebug assembleRelease
       - name: Name and verify APKs
         run: |

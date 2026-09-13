@@ -162,6 +162,8 @@ The v0.2.1 corrective scope and remaining device acceptance are recorded in
 [ROADMAP.md](ROADMAP.md), with accepted trade-offs recorded in
 [PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md). The next isolated data-quality
 milestones are specified in [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
+Confirmed device regressions awaiting a later corrective release are kept in
+[KNOWN_ISSUES.md](KNOWN_ISSUES.md).
 
 The generated 66 MiB SQLite database is intentionally not committed. CI rebuilds
 it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba and Unihan sources.

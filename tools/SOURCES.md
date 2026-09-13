@@ -25,3 +25,18 @@ text, the first pinned direct translation is retained. A Pangmao-reviewed row
 with the same Chinese sentence replaces its target translations while retaining
 separate source labels. Machine translation is never presented as an authentic
 example.
+
+## Reproduire l’audit de qualité
+
+Après la construction de la base, exécuter:
+
+```bash
+python3 tools/audit_dictionary_quality.py \
+  --json-out build/reports/dictionary-quality.json
+```
+
+Le rapport mesure la couverture français/anglais par fréquence interne, la
+couverture bilingue des exemples, la provenance et un petit ensemble de
+candidats de revue. Il ne modifie jamais la base. Sa méthodologie et la mesure
+de référence v0.4.1 sont détaillées dans
+[`docs/DICTIONARY_QUALITY_BASELINE.md`](../docs/DICTIONARY_QUALITY_BASELINE.md).

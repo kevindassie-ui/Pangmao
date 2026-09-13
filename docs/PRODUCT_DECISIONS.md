@@ -92,9 +92,10 @@ clavier et l’écriture, plutôt qu’une destination de consultation durable.
 
 ## D-010 — analyse mot à mot à la demande
 
-**Décision:** la recherche montre d’abord le sens global. L’interprétation mot à
-mot et les blocs logiques sont réunis dans une section repliable, masquée par
-défaut et mémorisée pendant l’utilisation de l’écran.
+**Décision:** la recherche montre d’abord le sens global et les blocs logiques.
+Seule l’interprétation mot à mot linéaire est repliée par défaut. Les blocs
+logiques possèdent un état distinct, restent visibles par défaut et ne sont
+jamais masqués par l’ouverture ou la fermeture de l’interprétation linéaire.
 
 ## D-011 — registre français contextuel
 

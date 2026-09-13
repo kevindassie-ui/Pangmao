@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-12.
+Dernière mise à jour: 2026-09-13.
 
 ## Principes
 
