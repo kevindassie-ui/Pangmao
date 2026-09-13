@@ -70,7 +70,7 @@ Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RE
 - Protéger `肉夹馍`/`肉夾饃` avant la traduction automatique, dans le lecteur
   comme dans l’analyse de texte du dictionnaire.
 
-## v0.5.0 — profondeur et qualité du corpus
+## v0.5.0 — profondeur et qualité du corpus · candidate
 
 - Importer un corpus chinois–français direct, versionné et attribué; mesurer la
   couverture commune avec le corpus chinois–anglais.
@@ -84,6 +84,10 @@ Plan d’exécution et critères d’acceptation: [V0.4_RELEASE_PLAN.md](V0.4_RE
 La v0.5.0 reste volontairement centrée sur les données. Les commandes audio et
 l’extension de l’explorateur passent dans un lot v0.5.1 distinct afin que chaque
 version possède des critères d’acceptation cohérents.
+
+La vue détaillée par définition reste également différée tant que les données
+fiables de source, registre et catégorie sont trop rares pour justifier un écran
+supplémentaire.
 
 Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
 

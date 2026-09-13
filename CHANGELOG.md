@@ -8,6 +8,35 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.5.0 — 2026-09-13
+
+### Ajouté
+
+- Audit déterministe de la couverture bilingue, des doublons, de la provenance
+  et des anomalies candidates, archivé par la CI.
+- Schéma de dictionnaire v3 avec provenance compacte par définition et
+  remplacement fiable de l’ancienne base lors d’une mise à jour.
+- 77 définitions françaises relues pour 46 entrées fréquentes qui en étaient
+  dépourvues.
+- 26 exemples bilingues supplémentaires: huit alignements éditoriaux et 18
+  relations directes Tatoeba relues, portant le total de 12 à 38.
+- Évaluateurs reproductibles pour Wiktionnaire/Kaikki et les relations directes
+  Tatoeba mandarin–français.
+
+### Modifié
+
+- Les imports candidats sont désormais bloqués en cas d’identifiant, graphie,
+  pinyin, source ou seuil d’avis incohérent.
+- Les exemples conservent une provenance distincte pour l’anglais et le
+  français; les données Tatoeba non relues restent hors de la base.
+
+### Qualité
+
+- Aucun import automatique de l’extraction Wiktionnaire bruitée ni des 808
+  relations Tatoeba restant à examiner.
+- La base conserve 132 342 entrées et 64 912 phrases chinoises uniques pour
+  68,29 Mo.
+
 ## 0.4.1 — 2026-09-12
 
 ### Corrigé
@@ -125,6 +154,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.5.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.0
 [0.4.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.1
 [0.4.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.0
 [0.3.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.3.1
