@@ -69,6 +69,7 @@ import fr.kairossolum.pangmao.ui.common.primaryDefinition
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +86,7 @@ fun SearchScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val history by viewModel.history.collectAsStateWithLifecycle()
     val queryHistory by viewModel.queryHistory.collectAsStateWithLifecycle()
+    val learningLanguage by viewModel.learningLanguage.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
 
@@ -104,7 +106,7 @@ fun SearchScreen(
                     Column {
                         Text("胖猫", fontWeight = FontWeight.Bold)
                         Text(
-                            stringResource(R.string.search_subtitle),
+                            stringResource(learningLanguage.subtitleResource()),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -119,6 +121,10 @@ fun SearchScreen(
                     Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.about_and_licenses))
                 }
             },
+        )
+        LearningProfileSelector(
+            selected = learningLanguage,
+            onSelect = viewModel::setLearningLanguage,
         )
         OutlinedTextField(
             value = query,
@@ -136,7 +142,7 @@ fun SearchScreen(
                     }
                 }
             },
-            label = { Text(stringResource(R.string.search_hint)) },
+            label = { Text(stringResource(learningLanguage.searchHintResource())) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
         )
@@ -257,6 +263,53 @@ fun SearchScreen(
             }
         }
     }
+}
+
+@Composable
+private fun LearningProfileSelector(
+    selected: LearningLanguage,
+    onSelect: (LearningLanguage) -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            stringResource(R.string.learning_profile_label),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(LearningLanguage.entries, key = { it.name }) { language ->
+                InputChip(
+                    selected = language == selected,
+                    onClick = { onSelect(language) },
+                    label = { Text(stringResource(language.labelResource())) },
+                )
+            }
+        }
+    }
+}
+
+@StringRes
+private fun LearningLanguage.labelResource(): Int = when (this) {
+    LearningLanguage.CHINESE -> R.string.learning_profile_chinese
+    LearningLanguage.FRENCH -> R.string.learning_profile_french
+    LearningLanguage.ENGLISH -> R.string.learning_profile_english
+}
+
+@StringRes
+private fun LearningLanguage.subtitleResource(): Int = when (this) {
+    LearningLanguage.CHINESE -> R.string.search_subtitle
+    LearningLanguage.FRENCH -> R.string.search_subtitle_french_profile
+    LearningLanguage.ENGLISH -> R.string.search_subtitle_english_profile
+}
+
+@StringRes
+private fun LearningLanguage.searchHintResource(): Int = when (this) {
+    LearningLanguage.CHINESE -> R.string.search_hint
+    LearningLanguage.FRENCH -> R.string.search_hint_french_profile
+    LearningLanguage.ENGLISH -> R.string.search_hint_english_profile
 }
 
 @Composable

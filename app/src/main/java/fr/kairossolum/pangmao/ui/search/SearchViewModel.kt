@@ -9,6 +9,7 @@ import fr.kairossolum.pangmao.data.translation.TranslationRepository
 import fr.kairossolum.pangmao.data.user.StudyRepository
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.ui.common.resolveTextTranslation
@@ -39,7 +40,7 @@ data class SearchUiState(
 class SearchViewModel(
     private val dictionary: DictionaryRepository,
     private val study: StudyRepository,
-    settings: SettingsRepository,
+    private val settings: SettingsRepository,
     private val translation: TranslationRepository,
 ) : ViewModel() {
     val query = MutableStateFlow("")
@@ -49,6 +50,10 @@ class SearchViewModel(
     val history = study.history().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val queryHistory = study.queryHistory()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val learningLanguage = settings.settings
+        .map { it.learningLanguage }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LearningLanguage.CHINESE)
     private val translationRefresh = MutableStateFlow(0L)
 
     init {
@@ -72,6 +77,12 @@ class SearchViewModel(
 
     fun setQuery(value: String) {
         query.value = value
+    }
+
+    fun setLearningLanguage(value: LearningLanguage) {
+        if (value == learningLanguage.value) return
+        query.value = ""
+        viewModelScope.launch { settings.setLearningLanguage(value) }
     }
 
     fun deleteQuery(value: String) {

@@ -12,7 +12,11 @@
     <string name="nav_cards">Cartes</string>
 
     <string name="search_subtitle">Dictionnaire chinois hors ligne</string>
+    <string name="search_subtitle_french_profile">Profil français · aperçu bilingue</string>
+    <string name="search_subtitle_english_profile">Profil anglais · aperçu bilingue</string>
     <string name="search_hint">Hanzi, pinyin, français ou anglais</string>
+    <string name="search_hint_french_profile">Chinois, français ou pinyin</string>
+    <string name="search_hint_english_profile">Chinois, anglais ou pinyin</string>
     <string name="search_recent">Consultés récemment</string><string name="search_viewed_history">Fiches récemment consultées</string><string name="search_query_history">Recherches récentes</string><string name="clear_all">Tout effacer</string><string name="delete_history_item">Supprimer de l’historique</string>
     <string name="search_frequent">Mots fréquents</string>
     <string name="search_empty">Aucune entrée pour « %1$s »</string>
@@ -32,6 +36,10 @@
     <string name="input_handwriting">Écriture</string>
     <string name="input_ocr">OCR</string>
     <string name="input_radicals">Radicaux</string>
+    <string name="learning_profile_label">J’apprends</string>
+    <string name="learning_profile_chinese">Chinois</string>
+    <string name="learning_profile_french">Français</string>
+    <string name="learning_profile_english">Anglais</string>
 
     <string name="reader_title">Lecteur</string>
     <string name="reader_subtitle">Touchez un mot pour le définir</string>
