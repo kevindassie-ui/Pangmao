@@ -5,6 +5,8 @@ import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
+import fr.kairossolum.pangmao.domain.model.LearningDictionaryEntry
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
@@ -18,6 +20,12 @@ interface DictionaryRepository {
     suspend fun entry(identifier: Long): DictionaryEntry?
     suspend fun entries(identifiers: List<Long>): List<DictionaryEntry>
     suspend fun lookupExact(word: String): DictionaryEntry?
+    suspend fun searchLearning(
+        language: LearningLanguage,
+        query: String,
+        limit: Int = 80,
+    ): List<LearningDictionaryEntry>
+    suspend fun learningEntry(identifier: Long): LearningDictionaryEntry?
     suspend fun examples(headword: String, limit: Int = 6): List<ExampleSentence>
     suspend fun characters(text: String): List<CharacterInfo>
     suspend fun relatedWords(
@@ -43,6 +51,13 @@ class OfflineDictionaryRepository(
     override suspend fun entry(identifier: Long): DictionaryEntry? = io { source.entry(identifier) }
     override suspend fun entries(identifiers: List<Long>): List<DictionaryEntry> = io { source.entries(identifiers) }
     override suspend fun lookupExact(word: String): DictionaryEntry? = io { source.lookupExact(word) }
+    override suspend fun searchLearning(
+        language: LearningLanguage,
+        query: String,
+        limit: Int,
+    ): List<LearningDictionaryEntry> = io { source.searchLearning(language, query, limit) }
+    override suspend fun learningEntry(identifier: Long): LearningDictionaryEntry? =
+        io { source.learningEntry(identifier) }
     override suspend fun examples(headword: String, limit: Int): List<ExampleSentence> = io { source.examples(headword, limit) }
     override suspend fun characters(text: String): List<CharacterInfo> = io { source.characters(text) }
     override suspend fun relatedWords(

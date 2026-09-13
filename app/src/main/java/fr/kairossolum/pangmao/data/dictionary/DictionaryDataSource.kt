@@ -9,6 +9,9 @@ import fr.kairossolum.pangmao.domain.HeadwordMatch
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
+import fr.kairossolum.pangmao.domain.model.LearningDictionaryEntry
+import fr.kairossolum.pangmao.domain.model.LearningDictionarySense
+import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import java.io.File
@@ -104,6 +107,68 @@ class DictionaryDataSource(private val context: Context) {
         return ranked.values.take(limit)
     }
 
+    fun searchLearning(
+        language: LearningLanguage,
+        rawQuery: String,
+        limit: Int = 80,
+    ): List<LearningDictionaryEntry> {
+        val languageCode = LearningDictionaryQuery.languageCode(language)
+        val query = LearningDictionaryQuery.normalize(rawQuery)
+        if (query.isEmpty() || limit <= 0) return emptyList()
+        val ranked = linkedSetOf<Long>()
+
+        queryLearningEntryIds(
+            """
+            SELECT e.id FROM learning_forms f
+            JOIN learning_entries e ON e.id = f.entry_id
+            WHERE e.language = ? AND f.form_search = ?
+            GROUP BY e.id
+            ORDER BY length(e.primary_form), e.primary_form_search, e.id
+            LIMIT ?
+            """.trimIndent(),
+            arrayOf(languageCode, query, limit.toString()),
+        ).forEach(ranked::add)
+
+        if (ranked.size < limit) {
+            queryLearningEntryIds(
+                """
+                SELECT e.id FROM learning_forms f
+                JOIN learning_entries e ON e.id = f.entry_id
+                WHERE e.language = ? AND f.form_search LIKE ? ESCAPE '\'
+                GROUP BY e.id
+                ORDER BY CASE WHEN e.primary_form_search = ? THEN 0 ELSE 1 END,
+                    length(e.primary_form), e.primary_form_search, e.id
+                LIMIT ?
+                """.trimIndent(),
+                arrayOf(languageCode, "${escapeLike(query)}%", query, limit.toString()),
+            ).forEach(ranked::add)
+        }
+
+        if (ranked.size < limit) {
+            val match = LearningDictionaryQuery.fts(query)
+            if (match.isNotEmpty()) {
+                try {
+                    queryLearningEntryIds(
+                        """
+                        SELECT e.id FROM learning_entries_fts f
+                        JOIN learning_entries e ON e.id = f.docid
+                        WHERE e.language = ? AND learning_entries_fts MATCH ?
+                        ORDER BY length(e.primary_form), e.primary_form_search, e.id
+                        LIMIT ?
+                        """.trimIndent(),
+                        arrayOf(languageCode, match, limit.toString()),
+                    ).forEach(ranked::add)
+                } catch (_: SQLiteException) {
+                    // User input must not be able to crash full-text lookup.
+                }
+            }
+        }
+        return learningEntries(ranked.take(limit))
+    }
+
+    fun learningEntry(identifier: Long): LearningDictionaryEntry? =
+        learningEntries(listOf(identifier)).firstOrNull()
+
     fun popular(limit: Int = 30): List<DictionaryEntry> = queryEntries(
         "SELECT * FROM entries WHERE length(simplified) BETWEEN 1 AND 4 AND frequency > 0 ORDER BY frequency DESC, id LIMIT ?",
         arrayOf(limit.toString()),
@@ -128,7 +193,7 @@ class DictionaryDataSource(private val context: Context) {
         val cursor = database.rawQuery(
             "SELECT preferred_entry_id FROM headwords WHERE word = ? LIMIT 1",
             arrayOf(word),
-        )
+    )
         return cursor.use { if (it.moveToFirst()) entry(it.getLong(0)) else null }
     }
 
@@ -292,7 +357,100 @@ class DictionaryDataSource(private val context: Context) {
         definitionsFrench = getString(getColumnIndexOrThrow("definitions_fr")).lines().filter(String::isNotBlank),
         sources = getString(getColumnIndexOrThrow("sources")),
         frequency = getInt(getColumnIndexOrThrow("frequency")),
-    )
+        )
+
+    private fun queryLearningEntryIds(sql: String, arguments: Array<String>): List<Long> =
+        database.rawQuery(sql, arguments).use { cursor ->
+            buildList {
+                while (cursor.moveToNext()) add(cursor.getLong(0))
+            }
+        }
+
+    private fun learningEntries(identifiers: List<Long>): List<LearningDictionaryEntry> {
+        if (identifiers.isEmpty()) return emptyList()
+        val placeholders = identifiers.joinToString(",") { "?" }
+        val arguments = identifiers.map(Long::toString).toTypedArray()
+        val entries = linkedMapOf<Long, MutableLearningEntry>()
+        database.rawQuery(
+            """
+            SELECT id, language, primary_form, parts_of_speech, genders,
+                source_code, source_entry_index
+            FROM learning_entries WHERE id IN ($placeholders)
+            """.trimIndent(),
+            arguments,
+        ).use { cursor ->
+            while (cursor.moveToNext()) {
+                val identifier = cursor.getLong(0)
+                entries[identifier] = MutableLearningEntry(
+                    id = identifier,
+                    language = cursor.getString(1).toLearningLanguage(),
+                    primaryForm = cursor.getString(2),
+                    partsOfSpeech = cursor.getString(3).nonBlankLines(),
+                    genders = cursor.getString(4).nonBlankLines(),
+                    sourceCode = cursor.getString(5),
+                    sourceEntryIndex = cursor.getLong(6),
+                )
+            }
+        }
+        if (entries.isEmpty()) return emptyList()
+
+        database.rawQuery(
+            """
+            SELECT entry_id, form FROM learning_forms
+            WHERE entry_id IN ($placeholders) ORDER BY entry_id, position
+            """.trimIndent(),
+            arguments,
+        ).use { cursor ->
+            while (cursor.moveToNext()) entries[cursor.getLong(0)]?.forms?.add(cursor.getString(1))
+        }
+        database.rawQuery(
+            """
+            SELECT entry_id, pronunciation FROM learning_pronunciations
+            WHERE entry_id IN ($placeholders) ORDER BY entry_id, position
+            """.trimIndent(),
+            arguments,
+        ).use { cursor ->
+            while (cursor.moveToNext()) {
+                entries[cursor.getLong(0)]?.pronunciations?.add(cursor.getString(1))
+            }
+        }
+
+        val senses = linkedMapOf<Long, MutableLearningSense>()
+        database.rawQuery(
+            """
+            SELECT id, entry_id, definitions, source_code FROM learning_senses
+            WHERE entry_id IN ($placeholders) ORDER BY entry_id, position
+            """.trimIndent(),
+            arguments,
+        ).use { cursor ->
+            while (cursor.moveToNext()) {
+                val identifier = cursor.getLong(0)
+                val entryIdentifier = cursor.getLong(1)
+                val sense = MutableLearningSense(
+                    id = identifier,
+                    definitions = cursor.getString(2).nonBlankLines(),
+                    sourceCode = cursor.getString(3),
+                )
+                senses[identifier] = sense
+                entries[entryIdentifier]?.senses?.add(sense)
+            }
+        }
+        if (senses.isNotEmpty()) {
+            val sensePlaceholders = senses.keys.joinToString(",") { "?" }
+            database.rawQuery(
+                """
+                SELECT sense_id, chinese FROM learning_equivalents
+                WHERE sense_id IN ($sensePlaceholders) ORDER BY sense_id, position
+                """.trimIndent(),
+                senses.keys.map(Long::toString).toTypedArray(),
+            ).use { cursor ->
+                while (cursor.moveToNext()) {
+                    senses[cursor.getLong(0)]?.chineseEquivalents?.add(cursor.getString(1))
+                }
+            }
+        }
+        return identifiers.mapNotNull { entries[it]?.toModel() }
+    }
 
     private fun Cursor.nullableInt(column: String): Int? {
         val index = getColumnIndexOrThrow(column)
@@ -313,4 +471,51 @@ class DictionaryDataSource(private val context: Context) {
             codepoint in 0x4E00..0x9FFF ||
             codepoint in 0xF900..0xFAFF ||
             codepoint in 0x20000..0x323AF
+
+    private fun String.toLearningLanguage(): LearningLanguage = when (this) {
+        "fr" -> LearningLanguage.FRENCH
+        "en" -> LearningLanguage.ENGLISH
+        else -> error("Unsupported learning dictionary language: $this")
+    }
+
+    private fun String.nonBlankLines(): List<String> = lines().filter(String::isNotBlank)
+}
+
+private data class MutableLearningEntry(
+    val id: Long,
+    val language: LearningLanguage,
+    val primaryForm: String,
+    val partsOfSpeech: List<String>,
+    val genders: List<String>,
+    val sourceCode: String,
+    val sourceEntryIndex: Long,
+    val forms: MutableList<String> = mutableListOf(),
+    val pronunciations: MutableList<String> = mutableListOf(),
+    val senses: MutableList<MutableLearningSense> = mutableListOf(),
+) {
+    fun toModel(): LearningDictionaryEntry = LearningDictionaryEntry(
+        id = id,
+        language = language,
+        forms = forms.ifEmpty { listOf(primaryForm) },
+        pronunciations = pronunciations,
+        partsOfSpeech = partsOfSpeech,
+        genders = genders,
+        senses = senses.map(MutableLearningSense::toModel),
+        sourceCode = sourceCode,
+        sourceEntryIndex = sourceEntryIndex,
+    )
+}
+
+private data class MutableLearningSense(
+    val id: Long,
+    val definitions: List<String>,
+    val sourceCode: String,
+    val chineseEquivalents: MutableList<String> = mutableListOf(),
+) {
+    fun toModel(): LearningDictionarySense = LearningDictionarySense(
+        id = id,
+        definitions = definitions,
+        chineseEquivalents = chineseEquivalents,
+        sourceCode = sourceCode,
+    )
 }

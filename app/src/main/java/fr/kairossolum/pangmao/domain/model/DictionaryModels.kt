@@ -17,6 +17,31 @@ data class DictionaryEntry(
         get() = traditional.takeIf { it != simplified }
 }
 
+data class LearningDictionarySense(
+    val id: Long,
+    val definitions: List<String>,
+    val chineseEquivalents: List<String>,
+    val sourceCode: String,
+)
+
+data class LearningDictionaryEntry(
+    val id: Long,
+    val language: LearningLanguage,
+    val forms: List<String>,
+    val pronunciations: List<String>,
+    val partsOfSpeech: List<String>,
+    val genders: List<String>,
+    val senses: List<LearningDictionarySense>,
+    val sourceCode: String,
+    val sourceEntryIndex: Long,
+) {
+    val displayHeadword: String
+        get() = forms.firstOrNull().orEmpty()
+
+    val chineseMeanings: List<String>
+        get() = senses.flatMap(LearningDictionarySense::chineseEquivalents).distinct()
+}
+
 data class ExampleSentence(
     val id: Long,
     val chinese: String,
