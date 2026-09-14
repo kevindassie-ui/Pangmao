@@ -331,6 +331,15 @@ Checkpoint date: 2026-09-14
 
 ## Later iteration
 
+## Reader ergonomics candidate 0.8.1
+
+- Commit `9ac6f38` replaces the horizontally scrolling speech controls with a
+  persistent four-stop slider and a compact voice-actions menu.
+- CI run `34895404292` passed corpus reconstruction, JVM tests, Android lint and
+  debug APK assembly.
+- The future monolingual Chinese-definition mode and the bounded v0.9 known-word
+  and Reader-difficulty plan are recorded without changing dictionary data.
+
 Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
 tracking and interactive dictionary-source details are intentionally deferred.
 Collect device feedback, screenshots and reproducible bug reports.

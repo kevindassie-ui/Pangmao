@@ -8,6 +8,8 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.8.1 — 2026-09-14
+
 ### Modifié
 
 - Le sélecteur TTS horizontal est remplacé par un curseur compact à quatre
