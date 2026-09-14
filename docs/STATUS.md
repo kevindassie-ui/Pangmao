@@ -270,11 +270,21 @@ Checkpoint date: 2026-09-14
 - Device acceptance remains to cover upgrade from v0.5.1, profile persistence,
   accent-insensitive French lookup, English lookup and Hanzi reverse lookup.
 
+## Resumable TTS controls — v0.7 lot A1
+
+- Commit `734f0ce` adds sentence-based playback for long Reader texts, with
+  pause/resume from the current sentence, explicit stop and persistent speeds
+  of `0.8×`, `1×` and `1.2×`.
+- CI run `34816025784` passed full corpus reconstruction and audit, Android unit
+  tests, lint and debug APK assembly without changing dictionary data.
+- Device acceptance is required before adding visual tracking or preparing the
+  v0.7 release, because OEM TTS engines can differ in progress callbacks.
+
 ## Later iteration
 
-Exhaustive bilingual corpus alignment, richer authentic examples, advanced
-audio controls and interactive dictionary-source details are intentionally
-deferred. Collect device feedback, screenshots and reproducible bug reports.
+Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
+tracking and interactive dictionary-source details are intentionally deferred.
+Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
