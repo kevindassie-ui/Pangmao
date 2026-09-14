@@ -277,8 +277,25 @@ Checkpoint date: 2026-09-14
   of `0.8×`, `1×` and `1.2×`.
 - CI run `34816025784` passed full corpus reconstruction and audit, Android unit
   tests, lint and debug APK assembly without changing dictionary data.
-- Device acceptance is required before adding visual tracking or preparing the
-  v0.7 release, because OEM TTS engines can differ in progress callbacks.
+- Device acceptance is required before adding visual tracking, because OEM TTS
+  engines can differ in progress callbacks; v0.7.0 provides the signed test build.
+
+## Learning and listening release 0.7.0
+
+- Tag: `v0.7.0` at commit `207bb08`.
+- Lot B1 CI run `34817468421` and final CI run `34817879563` passed full corpus
+  reconstruction, tests, Android lint and debug APK assembly.
+- Release run `34818400857` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.7.0-arm64.apk` (95,247,506 bytes), SHA-256
+  `e5a676b68a0b203692287009deb1439e9cb6bc66915c9e77522118eb1016088d`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.7.0/Pangmao-v0.7.0-arm64.apk>
+- Universal APK: `Pangmao-v0.7.0-universal.apk` (194,023,160 bytes), SHA-256
+  `ecd18dbbb14a3bd07ef146a84e53e695404021ae5be11e386503a759be35f464`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.7.0/Pangmao-v0.7.0-universal.apk>
+- Device acceptance remains to cover long-text pause/resume/stop, all three
+  speech speeds and direct Reader-to-card actions.
 
 ## Later iteration
 
@@ -288,7 +305,7 @@ Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
-The v0.6 learning-profile release is complete. Offline/online services,
+The v0.7 learning-and-listening release is complete. Offline/online services,
 short-form STT, reusable meeting-transcription components, commercialization
 and iOS remain recorded for later work rather than mixed into that release.
 
