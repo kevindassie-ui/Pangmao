@@ -1,6 +1,6 @@
 # Décisions produit
 
-Dernière mise à jour: 2026-09-13.
+Dernière mise à jour: 2026-09-14.
 
 ## D-001 — séparer interface et apprentissage
 
@@ -160,3 +160,25 @@ pourront partager les contrats de moteur STT, le découpage audio, les modèles 
 langue et leurs tests. Ils conserveront toutefois des flux distincts: une saisie
 vocale courte n'a ni les contraintes de durée, ni la reprise après interruption,
 ni le stockage persistant d'une réunion.
+
+## D-019 — reprise audio honnête et navigable
+
+**Décision:** `Pause/Reprendre` conserve la plage parlée lorsque le moteur la
+fournit et revient sinon au début de la phrase courante. `Recommencer` repart du
+début du texte et reste une action distincte. Toucher une phrase lance la lecture
+depuis celle-ci.
+
+Pangmao ne présentera jamais une reprise comme « exacte » si le moteur Android
+n'émet pas de timing. La phrase active restera néanmoins visible. Les vitesses
+seront `0,6×`, `0,8×`, `1×` et `1,2×`: la première sert l'écoute analytique, la
+dernière les apprenants avancés et les voix OEM lentes; `1×` reste le défaut.
+
+## D-020 — sélectionner avant de définir
+
+**Décision:** dans le texte éditable, l'appui long conserve la sélection native
+et propose ensuite `Définir`; il n'ouvre pas immédiatement une fiche et ne prive
+pas l'utilisateur des commandes Copier/Couper/Coller.
+
+La mini-fiche réutilise le parcours déjà validé dans la lecture segmentée. Les
+copies de pinyin, traduction et mot sont des actions explicites, accessibles et
+confirmées, sans surcharger chaque bloc de boutons permanents.

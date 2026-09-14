@@ -142,10 +142,21 @@ Stratégie détaillée: [POST_V0.6_STRATEGY.md](POST_V0.6_STRATEGY.md).
 
 Plan d'exécution et validation: [V0.7_RELEASE_PLAN.md](V0.7_RELEASE_PLAN.md).
 
-## Après v0.7 — apprentissage avancé
+## v0.8.0 — Reader interactif · spécification prête
 
-- Valider le suivi visuel et le test de voix selon les événements réellement
-  fournis par les moteurs Android.
+- Ajouter `0,6×` tout en conservant `0,8×`, `1×` et `1,2×` dans un sélecteur
+  compact.
+- Distinguer reprise suivie, recommencement du texte et lecture depuis une phrase
+  touchée, avec repli explicite au début de la phrase selon le moteur TTS.
+- Surligner la phrase active et exploiter la plage parlée lorsqu'elle est fournie.
+- Définir une sélection faite par appui long dans le champ éditable.
+- Copier pinyin, traductions et contenu d'un mot segmenté.
+- Ajouter un test de voix et les détails du moteur dans une vue secondaire.
+
+Plan borné et critères d'acceptation: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN.md).
+
+## Après v0.8 — apprentissage avancé
+
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
 - Liste de mots connus et estimation de difficulté d'un texte.

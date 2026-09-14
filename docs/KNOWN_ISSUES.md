@@ -30,8 +30,27 @@ testés sur l'appareil de référence après mise à jour depuis v0.5.1:
 - ouverture d'un équivalent chinois depuis une fiche française ou anglaise;
 - absence de régression dans le profil chinois et le Reader.
 
+## Retour appareil sur la v0.7.0
+
+Confirmé:
+
+- la lecture TTS est claire aux vitesses proposées;
+- l'ajout direct d'un mot aux cartes depuis la mini-fiche du Reader fonctionne.
+
+À corriger dans la v0.8.0:
+
+- pause/reprise repart actuellement du début du texte sur le moteur ColorOS;
+- distinguer une vraie reprise suivie d'un recommencement volontaire;
+- permettre de lire directement depuis une phrase touchée;
+- ajouter `0,6×`; `1,2×` est conservé pour les moteurs lents et les utilisateurs
+  avancés, mais ne reste pas prioritaire dans la hiérarchie visuelle;
+- ouvrir une mini-fiche depuis une sélection longue dans le texte éditable;
+- copier pinyin, traductions et éléments de la lecture segmentée.
+
+Spécification: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN.md).
+
 ## Validé sur appareil
 
 Le TTS sur ColorOS et la séparation des blocs logiques ont été confirmés sur
-l'appareil le 2026-09-13. Aucun nouveau défaut n'a été signalé pour ces deux
-fonctions.
+l'appareil le 2026-09-13. Les vitesses et l'ajout Reader → cartes de la v0.7.0
+sont confirmés; le défaut de position de reprise reste suivi ci-dessus.
