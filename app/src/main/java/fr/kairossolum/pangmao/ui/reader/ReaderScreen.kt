@@ -1,5 +1,6 @@
 package fr.kairossolum.pangmao.ui.reader
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -31,6 +33,8 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -79,6 +83,7 @@ import fr.kairossolum.pangmao.domain.numberedPinyinReading
 import fr.kairossolum.pangmao.domain.speech.SpeechSegment
 import fr.kairossolum.pangmao.domain.speech.SpeechSourceRange
 import fr.kairossolum.pangmao.domain.speech.buildSpeechDocument
+import fr.kairossolum.pangmao.ui.common.coloredPinyin
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.HanziText
@@ -113,6 +118,7 @@ fun ReaderScreen(
     val scope = rememberCoroutineScope()
     val speaker = rememberMandarinSpeaker()
     val voiceSample = stringResource(R.string.tts_test_sample)
+    val copiedMessage = stringResource(R.string.reader_copied)
     val definitionLanguage = LocalDefinitionLanguage.current
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -153,6 +159,12 @@ fun ReaderScreen(
         )
     }
     val selectedText = editorValue.selectedTextOrNull()
+    val copyText: (String) -> Unit = { value ->
+        if (value.isNotBlank()) {
+            clipboard.setText(AnnotatedString(value))
+            Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     LaunchedEffect(revealPinyinAtTop) {
         if (revealPinyinAtTop) {
@@ -254,14 +266,22 @@ fun ReaderScreen(
             },
             visualTransformation = speechTransformation,
         )
-        if (selectedText != null && containsHan(selectedText)) {
+        if (text.isNotBlank() || (selectedText != null && containsHan(selectedText))) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
-                TextButton(onClick = { viewModel.defineSelection(selectedText) }) {
-                    Icon(Icons.Outlined.Search, contentDescription = null)
-                    Text(" ${stringResource(R.string.reader_define_selection)}")
+                if (text.isNotBlank()) {
+                    TextButton(onClick = { copyText(text) }) {
+                        Icon(Icons.Outlined.ContentCopy, contentDescription = null)
+                        Text(" ${stringResource(R.string.reader_copy_all)}")
+                    }
+                }
+                if (selectedText != null && containsHan(selectedText)) {
+                    TextButton(onClick = { viewModel.defineSelection(selectedText) }) {
+                        Icon(Icons.Outlined.Search, contentDescription = null)
+                        Text(" ${stringResource(R.string.reader_define_selection)}")
+                    }
                 }
             }
         }
@@ -332,7 +352,10 @@ fun ReaderScreen(
                 ) {
                     if (showPinyin) {
                         item(key = "continuous-pinyin") {
-                            ContinuousPinyin(currentAnalysis.numberedPinyinReading())
+                            ContinuousPinyin(
+                                numberedPinyin = currentAnalysis.numberedPinyinReading(),
+                                onCopy = copyText,
+                            )
                         }
                     }
                     item(key = "layers") {
@@ -368,6 +391,7 @@ fun ReaderScreen(
                             ReaderTranslationCard(
                                 translation = translation,
                                 onDownload = viewModel::downloadTranslationModels,
+                                onCopy = copyText,
                             )
                         }
                     }
@@ -391,6 +415,7 @@ fun ReaderScreen(
                             showPinyin = showPinyin,
                             showDefinitions = showDefinitions,
                             onClick = { viewModel.select(token) },
+                            onCopy = copyText,
                         )
                     }
                 }
@@ -408,6 +433,20 @@ fun ReaderScreen(
                         onOpenEntry(entry.id)
                     },
                 )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    EntryCopyMenu(
+                        hanzi = entry.displayHeadword,
+                        numberedPinyin = entry.pinyin,
+                        french = entry.definitionsFrench.firstOrNull(),
+                        english = entry.definitionsEnglish.firstOrNull(),
+                        definitionLanguage = definitionLanguage,
+                        iconOnly = false,
+                        onCopy = copyText,
+                    )
+                }
                 val flashcardReady = selectedFlashcard.isReady &&
                     selectedFlashcard.entryId == entry.id
                 val isSelectedFlashcard = flashcardReady && selectedFlashcard.isFlashcard
@@ -567,11 +606,12 @@ private fun SentenceNavigator(
 private fun ReaderTranslationCard(
     translation: TextTranslationState,
     onDownload: () -> Unit,
+    onCopy: (String) -> Unit,
 ) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             translation.french?.let {
-                TranslationLine(stringResource(R.string.french), it)
+                TranslationLine(stringResource(R.string.french), it, onCopy)
             }
             translation.english?.let {
                 val title = if (translation.englishIsAttested) {
@@ -579,7 +619,7 @@ private fun ReaderTranslationCard(
                 } else {
                     stringResource(R.string.english)
                 }
-                TranslationLine(title, it)
+                TranslationLine(title, it, onCopy)
             }
             if (translation.isBusy) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -619,25 +659,58 @@ private fun ReaderTranslationCard(
 }
 
 @Composable
-private fun ContinuousPinyin(numberedPinyin: String) {
+private fun ContinuousPinyin(
+    numberedPinyin: String,
+    onCopy: (String) -> Unit,
+) {
+    val markedPinyin = remember(numberedPinyin) { coloredPinyin(numberedPinyin).text }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.38f),
     ) {
-        PinyinText(
-            numbered = numberedPinyin,
-            fontSize = 17.sp,
-            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp),
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            PinyinText(
+                numbered = numberedPinyin,
+                fontSize = 17.sp,
+                modifier = Modifier.weight(1f).padding(start = 8.dp, top = 8.dp, bottom = 8.dp),
+            )
+            IconButton(onClick = { onCopy(markedPinyin) }) {
+                Icon(
+                    Icons.Outlined.ContentCopy,
+                    contentDescription = stringResource(R.string.reader_copy_pinyin),
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun TranslationLine(title: String, text: String) {
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-        Text(text, style = MaterialTheme.typography.bodyLarge)
+private fun TranslationLine(
+    title: String,
+    text: String,
+    onCopy: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Text(title, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+            Text(text, style = MaterialTheme.typography.bodyLarge)
+        }
+        IconButton(onClick = { onCopy(text) }) {
+            Icon(
+                Icons.Outlined.ContentCopy,
+                contentDescription = stringResource(R.string.reader_copy_translation, title),
+            )
+        }
     }
 }
 
@@ -648,6 +721,7 @@ private fun ReaderTokenCard(
     showPinyin: Boolean,
     showDefinitions: Boolean,
     onClick: () -> Unit,
+    onCopy: (String) -> Unit,
 ) {
     val entry = analyzed.entry
     Surface(
@@ -687,8 +761,103 @@ private fun ReaderTokenCard(
                     }
                 }
             }
+            EntryCopyMenu(
+                hanzi = analyzed.token.text,
+                numberedPinyin = entry?.pinyin,
+                french = entry?.definitionsFrench?.firstOrNull(),
+                english = entry?.definitionsEnglish?.firstOrNull(),
+                definitionLanguage = definitionLanguage,
+                iconOnly = true,
+                onCopy = onCopy,
+            )
         }
     }
+}
+
+@Composable
+private fun EntryCopyMenu(
+    hanzi: String,
+    numberedPinyin: String?,
+    french: String?,
+    english: String?,
+    definitionLanguage: DefinitionLanguage,
+    iconOnly: Boolean,
+    onCopy: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        if (iconOnly) {
+            IconButton(onClick = { expanded = true }) {
+                Icon(
+                    Icons.Outlined.ContentCopy,
+                    contentDescription = stringResource(R.string.reader_copy_word_data),
+                )
+            }
+        } else {
+            TextButton(onClick = { expanded = true }) {
+                Icon(Icons.Outlined.ContentCopy, contentDescription = null)
+                Text(" ${stringResource(R.string.copy)}")
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            CopyMenuItem(
+                label = stringResource(R.string.reader_copy_hanzi),
+                value = hanzi,
+                close = { expanded = false },
+                onCopy = onCopy,
+            )
+            numberedPinyin
+                ?.takeIf(String::isNotBlank)
+                ?.let { numbered ->
+                    CopyMenuItem(
+                        label = stringResource(R.string.reader_copy_pinyin),
+                        value = coloredPinyin(numbered).text,
+                        close = { expanded = false },
+                        onCopy = onCopy,
+                    )
+                }
+            if (definitionLanguage != DefinitionLanguage.ENGLISH) {
+                french?.takeIf(String::isNotBlank)?.let { definition ->
+                    CopyMenuItem(
+                        label = stringResource(R.string.reader_copy_french_definition),
+                        value = definition,
+                        close = { expanded = false },
+                        onCopy = onCopy,
+                    )
+                }
+            }
+            if (definitionLanguage != DefinitionLanguage.FRENCH) {
+                english?.takeIf(String::isNotBlank)?.let { definition ->
+                    CopyMenuItem(
+                        label = stringResource(R.string.reader_copy_english_definition),
+                        value = definition,
+                        close = { expanded = false },
+                        onCopy = onCopy,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CopyMenuItem(
+    label: String,
+    value: String,
+    close: () -> Unit,
+    onCopy: (String) -> Unit,
+) {
+    DropdownMenuItem(
+        text = { Text(label) },
+        leadingIcon = { Icon(Icons.Outlined.ContentCopy, contentDescription = null) },
+        onClick = {
+            close()
+            onCopy(value)
+        },
+    )
 }
 
 private class SpeechHighlightTransformation(

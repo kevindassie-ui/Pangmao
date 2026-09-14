@@ -55,6 +55,14 @@
     <string name="reader_define_selection">Définir la sélection</string>
     <string name="reader_selection_results">Blocs reconnus dans la sélection</string>
     <string name="reader_selection_none">Aucune entrée exacte ni aucun bloc connu n’a été trouvé.</string>
+    <string name="reader_copy_all">Copier tout</string>
+    <string name="reader_copy_hanzi">Copier les hanzi</string>
+    <string name="reader_copy_pinyin">Copier le pinyin</string>
+    <string name="reader_copy_translation">Copier la traduction %1$s</string>
+    <string name="reader_copy_word_data">Copier les données du mot</string>
+    <string name="reader_copy_french_definition">Copier la définition française</string>
+    <string name="reader_copy_english_definition">Copier la définition anglaise</string>
+    <string name="reader_copied">Copié dans le presse-papiers</string>
     <string name="reader_layer_pinyin">Pinyin</string><string name="reader_layer_translation">Traduction</string><string name="reader_layer_definitions">Définitions</string>
     <string name="reader_translation">Comprendre la phrase</string>
     <string name="reader_translation_local">Local · hors ligne</string>
