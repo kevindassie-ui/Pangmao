@@ -8,6 +8,37 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.6.0 — 2026-09-14
+
+### Ajouté
+
+- Profil étudié `chinois`, `français` ou `anglais`, persistant et indépendant
+  de la langue de l’interface et de celle des définitions.
+- Dictionnaires directs français–chinois et anglais–chinois issus des versions
+  FreeDict/WikDict 2025.11.23, filtrées et attribuées sous CC BY-SA 3.0.
+- 10 923 fiches françaises et 26 549 fiches anglaises conservant séparément
+  formes, prononciations, informations grammaticales et sens chinois.
+- Recherche exacte, par préfixe et plein texte dans la langue étudiée, recherche
+  française insensible aux accents et recherche inverse par sens chinois.
+- Fiches lexicales dédiées permettant d’ouvrir les équivalents chinois présents
+  dans le dictionnaire principal.
+
+### Modifié
+
+- L’accueil adapte ses libellés et ses méthodes de saisie au profil choisi;
+  OCR et écriture restent propres au profil chinois.
+- Le dictionnaire embarqué passe au schéma v4 sans modifier les 132 342 entrées
+  chinoises ni leurs identifiants.
+- Le Reader, les favoris et les cartes chinoises conservent leur comportement
+  de la v0.5.1.
+
+### Qualité
+
+- Les entrées sans sens chinois exploitable, les valeurs non chinoises et les
+  variantes de prononciation excédentaires sont rejetées déterministiquement.
+- La reconstruction vérifie six sources épinglées, leurs empreintes, les clés
+  étrangères, les index plein texte et les entrées témoins FR/EN.
+
 ## 0.5.1 — 2026-09-13
 
 ### Corrigé
@@ -173,6 +204,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.6.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.6.0
 [0.5.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1
 [0.5.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.0
 [0.4.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.4.1

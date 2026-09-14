@@ -4,7 +4,18 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## Version 0.5.1 highlights
+## Version 0.6.0 highlights
+
+- Independent learning profile: Chinese, French or English, regardless of the
+  app interface and Chinese-definition language.
+- New offline French–Chinese dictionary with 10,923 filtered lexical entries,
+  including available IPA, grammatical gender, forms and distinct senses.
+- New offline English–Chinese dictionary with 26,549 filtered lexical entries,
+  including available pronunciation, forms, grammar and distinct senses.
+- Accent-insensitive French lookup, exact/prefix/full-text search and reverse
+  lookup from a Chinese meaning.
+- Profile-specific lexical cards with tappable links back to matching Chinese
+  entries; the established Chinese Reader remains unchanged.
 
 - 132,342 Chinese entries with simplified/traditional forms and pinyin.
 - French (CFDICT) and English (CC-CEDICT) definitions with compact source
@@ -30,7 +41,7 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 ## Install
 
-Download [Pangmao v0.5.1](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1),
+Download [Pangmao v0.6.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.6.0),
 open the APK on Android,
 and allow installation from the browser or GitHub app when Android asks. Use the
 smaller `arm64` APK on recent Android phones; the `universal` APK is the fallback
