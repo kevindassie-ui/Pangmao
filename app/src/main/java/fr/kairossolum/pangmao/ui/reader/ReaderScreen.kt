@@ -21,7 +21,10 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderOpen
+import androidx.compose.material.icons.outlined.Pause
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RecordVoiceOver
+import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -56,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
+import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
@@ -64,6 +68,7 @@ import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
+import fr.kairossolum.pangmao.ui.common.SpeakerPlaybackState
 import fr.kairossolum.pangmao.ui.common.SpeakerStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,6 +87,7 @@ fun ReaderScreen(
     val translation by viewModel.translationState.collectAsStateWithLifecycle()
     val selected by viewModel.selectedEntry.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
+    val speechRate by viewModel.speechRate.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
@@ -110,6 +116,10 @@ fun ReaderScreen(
         }
     }
 
+    LaunchedEffect(text) {
+        speaker.stop()
+    }
+
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
@@ -120,10 +130,34 @@ fun ReaderScreen(
             },
             actions = {
                 IconButton(
-                    onClick = { speaker.speak(text) },
+                    onClick = {
+                        when (speaker.playbackState) {
+                            SpeakerPlaybackState.IDLE -> speaker.speak(text)
+                            SpeakerPlaybackState.PLAYING -> speaker.pause()
+                            SpeakerPlaybackState.PAUSED -> speaker.resume()
+                        }
+                    },
                     enabled = speaker.ready && text.isNotBlank(),
                 ) {
-                    Icon(Icons.Outlined.RecordVoiceOver, contentDescription = stringResource(R.string.reader_speak))
+                    val icon = when (speaker.playbackState) {
+                        SpeakerPlaybackState.IDLE -> Icons.Outlined.RecordVoiceOver
+                        SpeakerPlaybackState.PLAYING -> Icons.Outlined.Pause
+                        SpeakerPlaybackState.PAUSED -> Icons.Outlined.PlayArrow
+                    }
+                    val description = when (speaker.playbackState) {
+                        SpeakerPlaybackState.IDLE -> R.string.reader_speak
+                        SpeakerPlaybackState.PLAYING -> R.string.tts_pause
+                        SpeakerPlaybackState.PAUSED -> R.string.tts_resume
+                    }
+                    Icon(icon, contentDescription = stringResource(description))
+                }
+                if (speaker.playbackState != SpeakerPlaybackState.IDLE) {
+                    IconButton(onClick = speaker::stop) {
+                        Icon(
+                            Icons.Outlined.Stop,
+                            contentDescription = stringResource(R.string.tts_stop),
+                        )
+                    }
                 }
             },
         )
@@ -189,6 +223,12 @@ fun ReaderScreen(
                     }
                 }
             }
+        }
+        if (speaker.ready && text.isNotBlank()) {
+            SpeechRateSelector(
+                selected = speechRate,
+                onSelect = viewModel::setSpeechRate,
+            )
         }
         HorizontalDivider(Modifier.padding(top = 10.dp))
         when {
@@ -285,6 +325,31 @@ fun ReaderScreen(
                     onOpenEntry(entry.id)
                 },
                 modifier = Modifier.padding(bottom = 24.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpeechRateSelector(
+    selected: SpeechRate,
+    onSelect: (SpeechRate) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.tts_speed),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        SpeechRate.entries.forEach { rate ->
+            FilterChip(
+                selected = rate == selected,
+                onClick = { onSelect(rate) },
+                label = { Text(rate.label) },
             )
         }
     }

@@ -100,12 +100,6 @@ Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_
 - Déclarer les moteurs TTS dans la visibilité Android et essayer les moteurs
   installés en repli lorsque le moteur par défaut échoue.
 
-## Audio et explorateur — reportés après v0.6
-
-- Ajouter pause, vitesse, test de voix et suivi de lecture au TTS.
-- Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
-  et relations caractère–mot–expression.
-
 ## v0.6.0 — modes d'apprentissage · publiée
 
 Ajout d'un réglage distinct de la langue d'interface:
@@ -139,14 +133,21 @@ Plan d'exécution et portes de données: [V0.6_RELEASE_PLAN.md](V0.6_RELEASE_PLA
 
 Stratégie détaillée: [POST_V0.6_STRATEGY.md](POST_V0.6_STRATEGY.md).
 
-## v0.7.0 — apprendre et mémoriser
+## v0.7.0 — apprendre, écouter et mémoriser
 
+- Ajouter d'abord pause/reprise, arrêt, vitesse persistante et lecture robuste
+  des textes longs; valider ensuite le suivi visuel et le test de voix selon les
+  événements réellement fournis par les moteurs Android.
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
 - Ajout aux cartes depuis un mot du lecteur en un geste.
 - Liste de mots connus et estimation de difficulté d'un texte.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.
+- Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
+  et relations caractère–mot–expression.
 - Notes, étiquettes personnelles, export et sauvegarde locale chiffrée.
+
+Plan d'exécution: [V0.7_RELEASE_PLAN.md](V0.7_RELEASE_PLAN.md).
 
 ## Idées à évaluer, sans engagement
 

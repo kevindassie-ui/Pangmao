@@ -42,6 +42,7 @@ import fr.kairossolum.pangmao.ui.about.AboutViewModel
 import fr.kairossolum.pangmao.ui.common.viewModelFactory
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.LocalLearningProfile
+import fr.kairossolum.pangmao.ui.common.LocalSpeechRate
 import fr.kairossolum.pangmao.ui.entry.EntryScreen
 import fr.kairossolum.pangmao.ui.entry.EntryViewModel
 import fr.kairossolum.pangmao.ui.entry.LearningEntryScreen
@@ -76,6 +77,7 @@ class MainActivity : AppCompatActivity() {
             CompositionLocalProvider(
                 LocalDefinitionLanguage provides settings.definitionLanguage,
                 LocalLearningProfile provides settings.learningLanguage.presentation,
+                LocalSpeechRate provides settings.speechRate,
             ) {
                 PangmaoTheme(settings.themeMode) {
                     Surface {

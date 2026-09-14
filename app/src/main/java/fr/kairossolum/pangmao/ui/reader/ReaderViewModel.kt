@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import fr.kairossolum.pangmao.data.dictionary.DictionaryRepository
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SettingsRepository
+import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
@@ -21,6 +22,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 private data class ReaderRequest(
@@ -31,7 +34,7 @@ private data class ReaderRequest(
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReaderViewModel(
     private val dictionary: DictionaryRepository,
-    settings: SettingsRepository,
+    private val settings: SettingsRepository,
     private val translation: TranslationRepository,
 ) : ViewModel() {
     private val _text = MutableStateFlow("今天我们一起学习中文。认识一个新词时，轻触它即可查看释义。")
@@ -47,6 +50,10 @@ class ReaderViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     private val translationRefresh = MutableStateFlow(0L)
+    val speechRate = settings.settings
+        .map { it.speechRate }
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SpeechRate.NORMAL)
 
     init {
         viewModelScope.launch {
@@ -72,6 +79,10 @@ class ReaderViewModel(
 
     fun dismissSelection() {
         _selectedEntry.value = null
+    }
+
+    fun setSpeechRate(value: SpeechRate) {
+        viewModelScope.launch { settings.setSpeechRate(value) }
     }
 
     fun downloadTranslationModels() {

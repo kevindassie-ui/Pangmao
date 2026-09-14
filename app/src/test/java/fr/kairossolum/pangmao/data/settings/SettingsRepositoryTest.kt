@@ -21,6 +21,7 @@ class SettingsRepositoryTest {
         assertEquals(AppLanguage.ENGLISH, settings.language)
         assertEquals(DefinitionLanguage.BOTH, settings.definitionLanguage)
         assertEquals(LearningLanguage.CHINESE, settings.learningLanguage)
+        assertEquals(SpeechRate.NORMAL, settings.speechRate)
     }
 
     @Test
@@ -59,5 +60,18 @@ class SettingsRepositoryTest {
 
         assertEquals(DefinitionLanguage.ENGLISH, settings.definitionLanguage)
         assertEquals(LearningLanguage.FRENCH, settings.learningLanguage)
+    }
+
+    @Test
+    fun `speech rate persists and invalid legacy value falls back safely`() {
+        val fast = mutablePreferencesOf(
+            SettingsKeys.SPEECH_RATE to SpeechRate.FAST.name,
+        ).toAppSettings()
+        val invalid = mutablePreferencesOf(
+            SettingsKeys.SPEECH_RATE to "TURBO",
+        ).toAppSettings()
+
+        assertEquals(SpeechRate.FAST, fast.speechRate)
+        assertEquals(SpeechRate.NORMAL, invalid.speechRate)
     }
 }

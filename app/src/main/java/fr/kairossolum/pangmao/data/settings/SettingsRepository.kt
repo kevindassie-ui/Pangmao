@@ -18,6 +18,12 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 enum class DefinitionLanguage { FRENCH, ENGLISH, BOTH }
 
+enum class SpeechRate(val multiplier: Float, val label: String) {
+    SLOW(0.8f, "0.8×"),
+    NORMAL(1.0f, "1×"),
+    FAST(1.2f, "1.2×"),
+}
+
 enum class AppLanguage(val languageTag: String) {
     SYSTEM(""),
     FRENCH("fr"),
@@ -30,6 +36,7 @@ data class AppSettings(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val definitionLanguage: DefinitionLanguage = DefinitionLanguage.FRENCH,
     val learningLanguage: LearningLanguage = LearningLanguage.CHINESE,
+    val speechRate: SpeechRate = SpeechRate.NORMAL,
 )
 
 class SettingsRepository(private val context: Context) {
@@ -52,6 +59,10 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[SettingsKeys.LEARNING_LANGUAGE] = value.name }
     }
 
+    suspend fun setSpeechRate(value: SpeechRate) {
+        context.settingsDataStore.edit { it[SettingsKeys.SPEECH_RATE] = value.name }
+    }
+
     fun applyLanguage(value: AppLanguage) {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(value.languageTag))
     }
@@ -62,6 +73,7 @@ internal object SettingsKeys {
     val LANGUAGE = stringPreferencesKey("language")
     val DEFINITION_LANGUAGE = stringPreferencesKey("definition_language")
     val LEARNING_LANGUAGE = stringPreferencesKey("learning_language")
+    val SPEECH_RATE = stringPreferencesKey("speech_rate")
 }
 
 internal fun Preferences.toAppSettings(systemLanguage: String = Locale.getDefault().language): AppSettings {
@@ -73,6 +85,7 @@ internal fun Preferences.toAppSettings(systemLanguage: String = Locale.getDefaul
             ?: defaultDefinitionLanguage(language, systemLanguage),
         learningLanguage = this[SettingsKeys.LEARNING_LANGUAGE].toEnumOrNull<LearningLanguage>()
             ?: LearningLanguage.CHINESE,
+        speechRate = this[SettingsKeys.SPEECH_RATE].toEnumOrNull<SpeechRate>() ?: SpeechRate.NORMAL,
     )
 }
 

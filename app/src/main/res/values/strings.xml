@@ -156,4 +156,8 @@
     <string name="about_version">Pangmao · version %1$s</string><string name="about_description">Dictionnaire et compagnon d’apprentissage chinois, conçu pour un usage personnel, local et sans abonnement.</string>
     <string name="offline_content">Contenu hors ligne</string><string name="entries">Entrées</string><string name="examples">Exemples</string><string name="sources">Sources linguistiques</string><string name="independence">Indépendance</string>
     <string name="independence_body">Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.</string>
+    <string name="tts_pause">Mettre la lecture en pause</string>
+    <string name="tts_resume">Reprendre la lecture</string>
+    <string name="tts_stop">Arrêter la lecture</string>
+    <string name="tts_speed">Vitesse</string>
 </resources>
