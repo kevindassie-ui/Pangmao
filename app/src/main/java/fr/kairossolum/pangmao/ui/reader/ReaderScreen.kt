@@ -18,9 +18,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.ContentPaste
@@ -56,6 +60,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -722,39 +727,89 @@ private fun SentenceNavigator(
     activeSegmentIndex: Int?,
     onSelect: (Int) -> Unit,
 ) {
-    val state = rememberLazyListState()
+    var selectedIndex by remember(segments) { mutableIntStateOf(0) }
+    var expanded by remember { mutableStateOf(false) }
     LaunchedEffect(activeSegmentIndex) {
         activeSegmentIndex?.let { index ->
-            if (index in segments.indices) state.animateScrollToItem(index)
+            if (index in segments.indices) selectedIndex = index
         }
+    }
+    val displayedIndex = (activeSegmentIndex ?: selectedIndex).coerceIn(segments.indices)
+    val selectAndRead: (Int) -> Unit = { index ->
+        selectedIndex = index
+        onSelect(index)
     }
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             stringResource(R.string.reader_start_from_sentence),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        LazyRow(
-            state = state,
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            segments.forEach { segment ->
-                item(key = segment.index) {
-                    FilterChip(
-                        selected = segment.index == activeSegmentIndex,
-                        onClick = { onSelect(segment.index) },
-                        label = {
-                            Text(
-                                text = "${segment.index + 1} · ${segment.text.singleLinePreview()}",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        },
+            IconButton(
+                onClick = { selectAndRead(displayedIndex - 1) },
+                enabled = displayedIndex > 0,
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowBack,
+                    contentDescription = stringResource(R.string.reader_previous_sentence),
+                )
+            }
+            Box(Modifier.weight(1f)) {
+                OutlinedButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = "${displayedIndex + 1}/${segments.size} · " +
+                            segments[displayedIndex].text.singleLinePreview(maxCodePoints = 22),
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
+                    Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
                 }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.heightIn(max = 360.dp),
+                ) {
+                    segments.forEach { segment ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = "${segment.index + 1} · ${segment.text.singleLinePreview(36)}",
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            onClick = {
+                                expanded = false
+                                selectAndRead(segment.index)
+                            },
+                            trailingIcon = {
+                                if (segment.index == displayedIndex) {
+                                    Icon(Icons.Outlined.Check, contentDescription = null)
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+            IconButton(
+                onClick = { selectAndRead(displayedIndex + 1) },
+                enabled = displayedIndex < segments.lastIndex,
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    contentDescription = stringResource(R.string.reader_next_sentence),
+                )
             }
         }
     }

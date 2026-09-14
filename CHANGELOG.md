@@ -22,6 +22,8 @@ numéros suivent le versionnage sémantique.
   dans la mini-fiche du Reader, sans effet automatique sur les cartes SRS.
 - Résumé ouvrable de la couverture lexicale du Reader et surlignage facultatif
   des mots à revoir; la difficulté reste non évaluée si le profil est incomplet.
+- Navigation de lecture compacte avec phrase précédente/suivante, compteur,
+  extrait courant et liste complète accessible depuis le compteur.
 
 ## 0.8.1 — 2026-09-14
 

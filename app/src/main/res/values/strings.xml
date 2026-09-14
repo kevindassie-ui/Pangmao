@@ -206,4 +206,6 @@
     <string name="tts_voice_network">Connexion requise par cette voix</string>
     <string name="tts_voice_unknown">Non communiqué par Android</string>
     <string name="tts_voice_details_notice">Ces informations proviennent du moteur TTS installé sur cet appareil.</string>
+    <string name="reader_previous_sentence">Phrase précédente</string>
+    <string name="reader_next_sentence">Phrase suivante</string>
 </resources>
