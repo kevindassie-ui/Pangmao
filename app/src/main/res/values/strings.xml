@@ -51,6 +51,7 @@
     <string name="reader_segmented">LECTURE SEGMENTÉE</string>
     <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
     <string name="reader_speak">Lire tout le texte</string>
+    <string name="reader_start_from_sentence">Lire à partir d’une phrase</string>
     <string name="reader_layer_pinyin">Pinyin</string><string name="reader_layer_translation">Traduction</string><string name="reader_layer_definitions">Définitions</string>
     <string name="reader_translation">Comprendre la phrase</string>
     <string name="reader_translation_local">Local · hors ligne</string>
@@ -158,6 +159,9 @@
     <string name="independence_body">Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.</string>
     <string name="tts_pause">Mettre la lecture en pause</string>
     <string name="tts_resume">Reprendre la lecture</string>
+    <string name="tts_restart">Recommencer depuis le début</string>
     <string name="tts_stop">Arrêter la lecture</string>
     <string name="tts_speed">Vitesse</string>
+    <string name="tts_test_voice">Tester la voix</string>
+    <string name="tts_test_sample">你好，欢迎使用胖猫。</string>
 </resources>

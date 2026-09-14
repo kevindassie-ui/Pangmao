@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RecordVoiceOver
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,15 +48,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,6 +73,9 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
+import fr.kairossolum.pangmao.domain.speech.SpeechSegment
+import fr.kairossolum.pangmao.domain.speech.SpeechSourceRange
+import fr.kairossolum.pangmao.domain.speech.buildSpeechDocument
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.PinyinText
@@ -95,6 +107,7 @@ fun ReaderScreen(
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
     val speaker = rememberMandarinSpeaker()
+    val voiceSample = stringResource(R.string.tts_test_sample)
     val definitionLanguage = LocalDefinitionLanguage.current
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -111,6 +124,26 @@ fun ReaderScreen(
     var showDefinitions by rememberSaveable { mutableStateOf(true) }
     var revealPinyinAtTop by rememberSaveable { mutableStateOf(false) }
     val readingListState = rememberLazyListState()
+    val speechDocument = remember(text) { buildSpeechDocument(text) }
+    val activePlayback = speaker.playbackModel.takeIf { speaker.playbackSource == text }
+    val activeSegmentIndex = activePlayback?.position?.segmentIndex
+    val activeSegment = activeSegmentIndex?.let { speechDocument.segments.getOrNull(it) }
+    val sentenceHighlight = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.48f)
+    val spokenHighlight = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.78f)
+    val speechTransformation = remember(
+        activeSegment?.sourceStart,
+        activeSegment?.sourceEndExclusive,
+        activePlayback?.spokenRange,
+        sentenceHighlight,
+        spokenHighlight,
+    ) {
+        SpeechHighlightTransformation(
+            activeSegment = activeSegment,
+            spokenRange = activePlayback?.spokenRange,
+            sentenceColor = sentenceHighlight,
+            spokenColor = spokenHighlight,
+        )
+    }
 
     LaunchedEffect(revealPinyinAtTop) {
         if (revealPinyinAtTop) {
@@ -155,6 +188,12 @@ fun ReaderScreen(
                     Icon(icon, contentDescription = stringResource(description))
                 }
                 if (speaker.playbackState != SpeakerPlaybackState.IDLE) {
+                    IconButton(onClick = { speaker.restartSpeech(text) }) {
+                        Icon(
+                            Icons.Outlined.Replay,
+                            contentDescription = stringResource(R.string.tts_restart),
+                        )
+                    }
                     IconButton(onClick = speaker::stop) {
                         Icon(
                             Icons.Outlined.Stop,
@@ -193,7 +232,15 @@ fun ReaderScreen(
                     }
                 }
             },
+            visualTransformation = speechTransformation,
         )
+        if (speaker.ready && speechDocument.segments.size > 1) {
+            SentenceNavigator(
+                segments = speechDocument.segments,
+                activeSegmentIndex = activeSegmentIndex,
+                onSelect = { segmentIndex -> speaker.speakFrom(text, segmentIndex) },
+            )
+        }
         error?.let {
             Text(
                 it,
@@ -231,6 +278,7 @@ fun ReaderScreen(
             SpeechRateSelector(
                 selected = speechRate,
                 onSelect = viewModel::setSpeechRate,
+                onTestVoice = { speaker.previewVoice(voiceSample) },
             )
         }
         HorizontalDivider(Modifier.padding(top = 10.dp))
@@ -361,23 +409,77 @@ fun ReaderScreen(
 private fun SpeechRateSelector(
     selected: SpeechRate,
     onSelect: (SpeechRate) -> Unit,
+    onTestVoice: () -> Unit,
 ) {
-    Row(
+    LazyRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        item(key = "label") {
+            Text(
+                stringResource(R.string.tts_speed),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        SpeechRate.entries.forEach { rate ->
+            item(key = rate.name) {
+                FilterChip(
+                    selected = rate == selected,
+                    onClick = { onSelect(rate) },
+                    label = { Text(rate.label) },
+                )
+            }
+        }
+        item(key = "test") {
+            TextButton(onClick = onTestVoice) {
+                Text(stringResource(R.string.tts_test_voice))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SentenceNavigator(
+    segments: List<SpeechSegment>,
+    activeSegmentIndex: Int?,
+    onSelect: (Int) -> Unit,
+) {
+    val state = rememberLazyListState()
+    LaunchedEffect(activeSegmentIndex) {
+        activeSegmentIndex?.let { index ->
+            if (index in segments.indices) state.animateScrollToItem(index)
+        }
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
         Text(
-            stringResource(R.string.tts_speed),
-            style = MaterialTheme.typography.labelMedium,
+            stringResource(R.string.reader_start_from_sentence),
+            style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        SpeechRate.entries.forEach { rate ->
-            FilterChip(
-                selected = rate == selected,
-                onClick = { onSelect(rate) },
-                label = { Text(rate.label) },
-            )
+        LazyRow(
+            state = state,
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            segments.forEach { segment ->
+                item(key = segment.index) {
+                    FilterChip(
+                        selected = segment.index == activeSegmentIndex,
+                        onClick = { onSelect(segment.index) },
+                        label = {
+                            Text(
+                                text = "${segment.index + 1} · ${segment.text.singleLinePreview()}",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                    )
+                }
+            }
         }
     }
 }
@@ -509,3 +611,50 @@ private fun ReaderTokenCard(
         }
     }
 }
+
+private class SpeechHighlightTransformation(
+    private val activeSegment: SpeechSegment?,
+    private val spokenRange: SpeechSourceRange?,
+    private val sentenceColor: Color,
+    private val spokenColor: Color,
+) : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val segment = activeSegment
+        if (
+            segment == null ||
+            segment.sourceStart !in 0 until text.length ||
+            segment.sourceEndExclusive !in 1..text.length
+        ) {
+            return TransformedText(text, OffsetMapping.Identity)
+        }
+        val styled = AnnotatedString.Builder(text)
+        styled.addStyle(
+            SpanStyle(background = sentenceColor),
+            segment.sourceStart,
+            segment.sourceEndExclusive,
+        )
+        spokenRange
+            ?.takeIf {
+                it.segmentIndex == segment.index &&
+                    it.sourceStart >= segment.sourceStart &&
+                    it.sourceEndExclusive <= segment.sourceEndExclusive
+            }
+            ?.let { range ->
+                styled.addStyle(
+                    SpanStyle(background = spokenColor),
+                    range.sourceStart,
+                    range.sourceEndExclusive,
+                )
+            }
+        return TransformedText(styled.toAnnotatedString(), OffsetMapping.Identity)
+    }
+}
+
+private fun String.singleLinePreview(maxCodePoints: Int = 14): String {
+    val normalized = replace(whitespaceRuns, " ").trim()
+    if (normalized.codePointCount(0, normalized.length) <= maxCodePoints) return normalized
+    val end = normalized.offsetByCodePoints(0, maxCodePoints)
+    return normalized.substring(0, end) + "…"
+}
+
+private val whitespaceRuns = Regex("\\s+")

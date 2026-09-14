@@ -53,17 +53,44 @@ class MandarinSpeaker internal constructor() {
     internal var playbackModel by mutableStateOf(SpeechPlaybackModel())
         private set
 
+    /** Source currently owned by the playback state, used to reject stale UI highlights. */
+    internal val playbackSource: String?
+        get() = speechDocument?.source
+
     val ready: Boolean
         get() = status == SpeakerStatus.READY
 
-    fun speak(text: String): Boolean {
+    fun speak(text: String): Boolean = speakFrom(text, segmentIndex = 0)
+
+    fun speakFrom(text: String, segmentIndex: Int): Boolean {
         val current = engine ?: return false
         if (!ready || text.isBlank()) return false
         val document = buildSpeechDocument(text)
         if (document.segments.isEmpty()) return false
+        val started = SpeechPlaybackModel().startAt(document, segmentIndex)
+        val position = started.position ?: return false
         speechDocument = document
-        updatePlayback(SpeechPlaybackModel().startAt(document))
-        return queueFrom(current, document, checkNotNull(playbackModel.position))
+        updatePlayback(started)
+        return queueFrom(current, document, position)
+    }
+
+    /** Deliberately discard the resume point and read again from the first sentence. */
+    fun restartSpeech(text: String): Boolean = speakFrom(text, segmentIndex = 0)
+
+    /** Play a short diagnostic sample without replacing the Reader's source text. */
+    fun previewVoice(sample: String): Boolean {
+        val current = engine ?: return false
+        if (!ready || sample.isBlank()) return false
+        playbackGeneration += 1
+        current.stop()
+        clearPlayback()
+        runCatching { current.setSpeechRate(speechRate) }
+        return current.speak(
+            sample,
+            TextToSpeech.QUEUE_FLUSH,
+            null,
+            "pangmao-preview:$playbackGeneration",
+        ) == TextToSpeech.SUCCESS
     }
 
     fun pause(): Boolean {
