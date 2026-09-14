@@ -53,6 +53,25 @@ Implémenté dans la v0.8.0 publiée, à valider sur l'appareil:
 
 Spécification: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN.md).
 
+## Retour appareil sur la v0.8.0
+
+Confirmé:
+
+- lecture, découpage et lancement depuis une phrase fonctionnels;
+- les quatre vitesses et l'essai de voix fonctionnent;
+- les cartes peuvent être ajoutées directement depuis le Reader.
+
+Correctif v0.8.1 préparé:
+
+- la rangée TTS horizontalement défilable masque alternativement certaines
+  vitesses ou les actions `Tester/Détails` sur un écran étroit; elle est
+  remplacée par un curseur à quatre crans et un menu d'actions compact.
+
+Amélioration ergonomique reportée au lot Reader de la v0.9:
+
+- remplacer la rangée de phrases tronquées par une navigation compacte
+  précédent/suivant avec compteur et extrait de la phrase active.
+
 ## Validé sur appareil
 
 Le TTS sur ColorOS et la séparation des blocs logiques ont été confirmés sur

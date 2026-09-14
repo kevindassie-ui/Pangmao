@@ -182,3 +182,25 @@ pas l'utilisateur des commandes Copier/Couper/Coller.
 La mini-fiche réutilise le parcours déjà validé dans la lecture segmentée. Les
 copies de pinyin, traduction et mot sont des actions explicites, accessibles et
 confirmées, sans surcharger chaque bloc de boutons permanents.
+
+## D-021 — définitions monolingues graduées, sans fausse authenticité
+
+**Décision:** un futur mode avancé pourra afficher une définition chinoise pour
+un mot chinois, indépendamment de la langue de l'interface et des traductions
+françaises/anglaises. L'utilisateur choisira explicitement un niveau de lecture
+indicatif, de B1 à C2, et conservera toujours l'accès à la définition source.
+
+Les définitions chinoises authentiques devront provenir d'une source libre et
+attribuée. Une reformulation simplifiée ou complexifiée automatiquement sera
+clairement étiquetée comme aide pédagogique, jamais enregistrée silencieusement
+comme donnée lexicographique authentique. Ce mode ne sera développé qu'après
+audit des sources, définition d'une échelle testable et séparation entre niveau
+déclaré, niveau observé et langue de définition.
+
+## D-022 — commandes audio compactes mais explicites
+
+**Décision:** les vitesses TTS restent quatre valeurs discrètes et persistantes,
+mais utilisent un curseur sur les écrans étroits. L'essai de voix et les détails
+techniques restent disponibles dans un menu secondaire; les commandes de
+lecture, pause, reprise, recommencement et arrêt restent visibles, car elles
+modifient directement l'état de lecture.

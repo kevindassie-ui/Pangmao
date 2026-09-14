@@ -11,6 +11,7 @@ import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Locale
+import kotlin.math.abs
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
@@ -24,6 +25,9 @@ enum class SpeechRate(val multiplier: Float, val label: String) {
     NORMAL(1.0f, "1×"),
     FAST(1.2f, "1.2×"),
 }
+
+internal fun closestSpeechRate(multiplier: Float): SpeechRate =
+    SpeechRate.entries.minBy { rate -> abs(rate.multiplier - multiplier) }
 
 enum class AppLanguage(val languageTag: String) {
     SYSTEM(""),

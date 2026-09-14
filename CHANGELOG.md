@@ -8,6 +8,12 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Modifié
+
+- Le sélecteur TTS horizontal est remplacé par un curseur compact à quatre
+  crans (`0,6×`, `0,8×`, `1×`, `1,2×`); l'essai vocal et les détails du moteur
+  restent accessibles dans un menu secondaire sans masquer le texte du Reader.
+
 ## 0.8.0 — 2026-09-14
 
 ### Ajouté

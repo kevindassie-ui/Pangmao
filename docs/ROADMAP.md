@@ -159,7 +159,8 @@ Plan borné et critères d'acceptation: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN
 
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
-- Liste de mots connus et estimation de difficulté d'un texte.
+- Liste de mots connus et estimation de difficulté d'un texte: premier axe de
+  la v0.9, avec couverture lexicale honnête plutôt qu'un faux niveau CECR.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
   et relations caractère–mot–expression.
@@ -167,6 +168,8 @@ Plan borné et critères d'acceptation: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN
 
 ## Idées à évaluer, sans engagement
 
+- Définitions chinoises monolingues pour apprenants avancés, avec source
+  visible et reformulation pédagogique optionnelle graduée de B1 à C2.
 - Bascule simplifié/traditionnel et zhuyin.
 - Recherche floue pour pinyin fautif et variantes orthographiques.
 - Reprise rapide via partage Android, presse-papiers ou raccourci système.

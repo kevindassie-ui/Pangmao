@@ -11,6 +11,12 @@ Priorités possibles: explication des patrons grammaticaux, mots connus et
 difficulté d'un texte, entraînement aux tons, capture → Reader → carte en un
 geste, sources et registres visibles, export et sauvegarde chiffrée facultative.
 
+Pour les apprenants avancés, un mode monolingue pourra afficher des définitions
+chinoises authentiques et, séparément, une reformulation pédagogique adaptée à
+un niveau choisi. Ce travail dépend d'un audit de sources libres et d'une échelle
+de lisibilité testable; il ne doit pas transformer une génération automatique en
+donnée de dictionnaire prétendument authentique.
+
 ## Architecture locale et en ligne
 
 Le mode hors ligne reste le comportement par défaut et couvre le produit

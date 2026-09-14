@@ -78,4 +78,12 @@ class SettingsRepositoryTest {
         assertEquals(SpeechRate.VERY_SLOW, verySlow.speechRate)
         assertEquals(SpeechRate.NORMAL, invalid.speechRate)
     }
+
+    @Test
+    fun `slider values resolve to the closest supported speech rate`() {
+        assertEquals(SpeechRate.VERY_SLOW, closestSpeechRate(0.6f))
+        assertEquals(SpeechRate.SLOW, closestSpeechRate(0.79f))
+        assertEquals(SpeechRate.NORMAL, closestSpeechRate(1.01f))
+        assertEquals(SpeechRate.FAST, closestSpeechRate(1.2f))
+    }
 }

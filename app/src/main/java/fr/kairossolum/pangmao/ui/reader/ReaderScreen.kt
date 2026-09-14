@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ContentCopy
@@ -46,6 +47,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -78,6 +80,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SpeechRate
+import fr.kairossolum.pangmao.data.settings.closestSpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
@@ -545,39 +548,66 @@ private fun SpeechRateSelector(
     onShowVoiceDetails: () -> Unit,
     voiceDetailsAvailable: Boolean,
 ) {
-    LazyRow(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    var sliderValue by remember(selected) { mutableStateOf(selected.multiplier) }
+    var menuExpanded by remember { mutableStateOf(false) }
+    val previewRate = closestSpeechRate(sliderValue)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        item(key = "label") {
-            Text(
-                stringResource(R.string.tts_speed),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        SpeechRate.entries.forEach { rate ->
-            item(key = rate.name) {
-                FilterChip(
-                    selected = rate == selected,
-                    onClick = { onSelect(rate) },
-                    label = { Text(rate.label) },
+        Text(
+            text = "${stringResource(R.string.tts_speed)} · ${previewRate.label}",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+        )
+        Slider(
+            value = sliderValue,
+            onValueChange = { sliderValue = it },
+            onValueChangeFinished = {
+                val chosenRate = closestSpeechRate(sliderValue)
+                sliderValue = chosenRate.multiplier
+                if (chosenRate != selected) onSelect(chosenRate)
+            },
+            modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+            valueRange = SpeechRate.VERY_SLOW.multiplier..SpeechRate.FAST.multiplier,
+            steps = SpeechRate.entries.size - 2,
+        )
+        Box {
+            IconButton(onClick = { menuExpanded = true }) {
+                Icon(
+                    Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.tts_more_actions),
                 )
             }
-        }
-        item(key = "test") {
-            TextButton(onClick = onTestVoice) {
-                Text(stringResource(R.string.tts_test_voice))
-            }
-        }
-        item(key = "details") {
-            TextButton(
-                onClick = onShowVoiceDetails,
-                enabled = voiceDetailsAvailable,
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
             ) {
-                Icon(Icons.Outlined.Info, contentDescription = null)
-                Text(" ${stringResource(R.string.tts_voice_details)}")
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.tts_test_voice)) },
+                    onClick = {
+                        menuExpanded = false
+                        onTestVoice()
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Outlined.RecordVoiceOver, contentDescription = null)
+                    },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.tts_voice_details)) },
+                    onClick = {
+                        menuExpanded = false
+                        onShowVoiceDetails()
+                    },
+                    enabled = voiceDetailsAvailable,
+                    leadingIcon = {
+                        Icon(Icons.Outlined.Info, contentDescription = null)
+                    },
+                )
             }
         }
     }

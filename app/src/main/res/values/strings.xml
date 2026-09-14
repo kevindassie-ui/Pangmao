@@ -173,6 +173,7 @@
     <string name="tts_restart">Recommencer depuis le début</string>
     <string name="tts_stop">Arrêter la lecture</string>
     <string name="tts_speed">Vitesse</string>
+    <string name="tts_more_actions">Autres actions vocales</string>
     <string name="tts_test_voice">Tester la voix</string>
     <string name="tts_test_sample">你好，欢迎使用胖猫。</string>
     <string name="tts_voice_details">Détails</string>
