@@ -37,7 +37,7 @@ Confirmé:
 - la lecture TTS est claire aux vitesses proposées;
 - l'ajout direct d'un mot aux cartes depuis la mini-fiche du Reader fonctionne.
 
-Implémenté dans le candidat v0.8.0, à valider sur l'appareil:
+Implémenté dans la v0.8.0 publiée, à valider sur l'appareil:
 
 - pause/reprise au dernier offset fourni par ColorOS, avec repli au début de la
   phrase plutôt qu'au début du texte;

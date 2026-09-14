@@ -297,7 +297,7 @@ Checkpoint date: 2026-09-14
 - Device acceptance remains to cover long-text pause/resume/stop, all three
   speech speeds and direct Reader-to-card actions.
 
-## Interactive Reader candidate 0.8.0
+## Interactive Reader implementation 0.8.0
 
 - A0/A1 establish source-preserving UTF-16 sentence offsets, tracked Android
   ranges, stale-callback protection, precise resume with sentence fallback and
@@ -310,8 +310,24 @@ Checkpoint date: 2026-09-14
   word data with a uniform confirmation. CI run `34844255209` passed.
 - D reports the Android engine package, selected voice, locale and network
   requirement. CI run `34844833919` passed.
-- The signed tag remains gated on one final CI run of the versioned release
-  commit; ColorOS acceptance is tracked in [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+- ColorOS acceptance is tracked in [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+
+## Interactive Reader release 0.8.0
+
+- Tag: `v0.8.0` at commit `0b27dcd`.
+- Final CI run `34845407781` passed corpus reconstruction, tests, Android lint
+  and debug APK assembly.
+- Release run `34846019637` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.8.0-arm64.apk` (95,293,686 bytes), SHA-256
+  `e83be29d2d35767f6db0a819bb4e9d0e39b6882ef80075081f0add4cea624cf8`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.8.0/Pangmao-v0.8.0-arm64.apk>
+- Universal APK: `Pangmao-v0.8.0-universal.apk` (194,069,340 bytes), SHA-256
+  `88ecf5feff9f26a549bf29a6afbbf21f3b790a7089845076f18169c99f3fb969`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.8.0/Pangmao-v0.8.0-universal.apk>
+- Device acceptance remains to cover ColorOS range callbacks, the selection
+  workflow, all copy targets, sentence navigation and reported voice details.
 
 ## Later iteration
 
@@ -321,7 +337,7 @@ Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
-The v0.8 interactive Reader is the active release candidate. Offline/online services,
+The v0.8 interactive Reader release is complete. Offline/online services,
 short-form STT, reusable meeting-transcription components, commercialization
 and iOS remain recorded for later work rather than mixed into that release.
 
