@@ -7,6 +7,7 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SettingsRepository
 import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
+import fr.kairossolum.pangmao.data.user.StudyRepository
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
@@ -15,14 +16,17 @@ import fr.kairossolum.pangmao.ui.common.resolveTextTranslation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -31,11 +35,18 @@ private data class ReaderRequest(
     val definitionLanguage: DefinitionLanguage,
 )
 
+data class SelectedFlashcardState(
+    val entryId: Long? = null,
+    val isFlashcard: Boolean = false,
+    val isReady: Boolean = false,
+)
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class ReaderViewModel(
     private val dictionary: DictionaryRepository,
     private val settings: SettingsRepository,
     private val translation: TranslationRepository,
+    private val study: StudyRepository,
 ) : ViewModel() {
     private val _text = MutableStateFlow("今天我们一起学习中文。认识一个新词时，轻触它即可查看释义。")
     val text: StateFlow<String> = _text.asStateFlow()
@@ -47,6 +58,23 @@ class ReaderViewModel(
     val translationState: StateFlow<TextTranslationState> = _translationState.asStateFlow()
     private val _selectedEntry = MutableStateFlow<DictionaryEntry?>(null)
     val selectedEntry: StateFlow<DictionaryEntry?> = _selectedEntry.asStateFlow()
+    val selectedFlashcard = _selectedEntry
+        .flatMapLatest { entry ->
+            if (entry == null) {
+                flowOf(SelectedFlashcardState())
+            } else {
+                study.isFlashcard(entry.id)
+                    .map { isFlashcard ->
+                        SelectedFlashcardState(
+                            entryId = entry.id,
+                            isFlashcard = isFlashcard,
+                            isReady = true,
+                        )
+                    }
+                    .onStart { emit(SelectedFlashcardState(entryId = entry.id)) }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SelectedFlashcardState())
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     private val translationRefresh = MutableStateFlow(0L)
@@ -79,6 +107,19 @@ class ReaderViewModel(
 
     fun dismissSelection() {
         _selectedEntry.value = null
+    }
+
+    fun toggleSelectedFlashcard() {
+        val entry = _selectedEntry.value ?: return
+        val membership = selectedFlashcard.value
+        if (!membership.isReady || membership.entryId != entry.id) return
+        viewModelScope.launch {
+            if (membership.isFlashcard) {
+                study.removeFlashcard(entry.id)
+            } else {
+                study.addFlashcard(entry.id)
+            }
+        }
     }
 
     fun setSpeechRate(value: SpeechRate) {

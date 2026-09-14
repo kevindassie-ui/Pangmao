@@ -17,7 +17,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderOpen
@@ -86,6 +88,7 @@ fun ReaderScreen(
     val isAnalyzing by viewModel.isAnalyzing.collectAsStateWithLifecycle()
     val translation by viewModel.translationState.collectAsStateWithLifecycle()
     val selected by viewModel.selectedEntry.collectAsStateWithLifecycle()
+    val selectedFlashcard by viewModel.selectedFlashcard.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val speechRate by viewModel.speechRate.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -318,14 +321,38 @@ fun ReaderScreen(
 
     selected?.let { entry ->
         ModalBottomSheet(onDismissRequest = viewModel::dismissSelection) {
-            QuickEntryCard(
-                entry = entry,
-                onOpen = {
-                    viewModel.dismissSelection()
-                    onOpenEntry(entry.id)
-                },
-                modifier = Modifier.padding(bottom = 24.dp),
-            )
+            Column(Modifier.padding(bottom = 24.dp)) {
+                QuickEntryCard(
+                    entry = entry,
+                    onOpen = {
+                        viewModel.dismissSelection()
+                        onOpenEntry(entry.id)
+                    },
+                )
+                val flashcardReady = selectedFlashcard.isReady &&
+                    selectedFlashcard.entryId == entry.id
+                val isSelectedFlashcard = flashcardReady && selectedFlashcard.isFlashcard
+                Button(
+                    onClick = viewModel::toggleSelectedFlashcard,
+                    enabled = flashcardReady,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 18.dp, vertical = 8.dp),
+                ) {
+                    Icon(
+                        if (isSelectedFlashcard) Icons.Filled.Bookmark
+                        else Icons.Outlined.BookmarkBorder,
+                        contentDescription = null,
+                    )
+                    Text(
+                        stringResource(
+                            if (isSelectedFlashcard) R.string.card_remove
+                            else R.string.card_add
+                        ),
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+            }
         }
     }
 }

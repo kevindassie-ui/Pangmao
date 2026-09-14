@@ -187,7 +187,12 @@ private fun PangmaoApp(
                 composable("reader") {
                     val model: ReaderViewModel = viewModel(
                         factory = viewModelFactory {
-                            ReaderViewModel(container.dictionary, container.settings, container.translation)
+                            ReaderViewModel(
+                                container.dictionary,
+                                container.settings,
+                                container.translation,
+                                container.study,
+                            )
                         }
                     )
                     LaunchedEffect(incomingText) {

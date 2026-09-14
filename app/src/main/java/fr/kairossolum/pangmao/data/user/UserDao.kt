@@ -81,6 +81,9 @@ interface UserDao {
     @Query("SELECT * FROM flashcards WHERE entryId = :entryId LIMIT 1")
     suspend fun flashcard(entryId: Long): FlashcardEntity?
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFlashcard(card: FlashcardEntity)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertFlashcard(card: FlashcardEntity)
 

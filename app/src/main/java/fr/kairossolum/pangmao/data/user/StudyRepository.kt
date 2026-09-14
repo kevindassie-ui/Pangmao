@@ -45,7 +45,7 @@ class StudyRepository(
 
     suspend fun addFlashcard(entryId: Long) {
         val today = LocalDate.now().toEpochDay()
-        dao.upsertFlashcard(FlashcardEntity(entryId = entryId, dueEpochDay = today))
+        dao.insertFlashcard(FlashcardEntity(entryId = entryId, dueEpochDay = today))
     }
 
     suspend fun removeFlashcard(entryId: Long) = dao.deleteFlashcard(entryId)
