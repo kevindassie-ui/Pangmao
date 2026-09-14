@@ -105,6 +105,24 @@ class SpeechPlaybackModelTest {
     }
 
     @Test
+    fun `queue starts with the tracked suffix then continues with whole sentences`() {
+        val document = buildSpeechDocument("第一句。今天学习中文。明天继续。")
+        val second = document.segments[1]
+        val position = SpeechPosition(
+            segmentIndex = second.index,
+            sourceOffset = second.sourceStart + 2,
+            precision = SpeechResumePrecision.RANGE,
+        )
+
+        val utterances = document.utterancesFrom(position)
+
+        assertEquals(listOf("学习中文。", "明天继续。"), utterances.map { it.text })
+        assertEquals(second.sourceStart + 2, utterances.first().sourceStart)
+        assertEquals(second.index, utterances.first().segmentIndex)
+        assertEquals(2, utterances.size)
+    }
+
+    @Test
     fun `completion advances by sentence and final completion stops`() {
         val document = buildSpeechDocument("第一句。第二句。")
         val first = SpeechPlaybackModel().startAt(document)
@@ -138,8 +156,16 @@ class SpeechPlaybackModelTest {
             rangeStart = 0,
             rangeEndExclusive = document.segments[0].text.length + 1,
         )
+        val invalidBase = playing.markSpokenRange(
+            document = document,
+            segmentIndex = 0,
+            utteranceSourceStart = document.segments[0].sourceStart - 1,
+            rangeStart = 1,
+            rangeEndExclusive = 2,
+        )
 
         assertSame(playing, stale)
         assertSame(playing, outside)
+        assertSame(playing, invalidBase)
     }
 }

@@ -137,6 +137,28 @@ internal data class SpeechSourceRange(
     val sourceEndExclusive: Int,
 )
 
+internal data class SpeechUtterance(
+    val segmentIndex: Int,
+    val sourceStart: Int,
+    val text: String,
+)
+
+/** Build the Android queue, shortening only the first utterance when resuming. */
+internal fun SpeechDocument.utterancesFrom(position: SpeechPosition): List<SpeechUtterance> {
+    val first = segments.getOrNull(position.segmentIndex) ?: return emptyList()
+    if (!first.containsSourceOffset(position.sourceOffset)) return emptyList()
+    return segments
+        .subList(first.index, segments.size)
+        .mapIndexed { relativeIndex, segment ->
+            val sourceStart = if (relativeIndex == 0) position.sourceOffset else segment.sourceStart
+            SpeechUtterance(
+                segmentIndex = segment.index,
+                sourceStart = sourceStart,
+                text = source.substring(sourceStart, segment.sourceEndExclusive),
+            )
+        }
+}
+
 /** Pure playback state. Android callbacks will be adapted to it in v0.8 lot A1. */
 internal data class SpeechPlaybackModel(
     val phase: SpeechPlaybackPhase = SpeechPlaybackPhase.IDLE,
@@ -190,6 +212,7 @@ internal data class SpeechPlaybackModel(
     ): SpeechPlaybackModel {
         if (phase != SpeechPlaybackPhase.PLAYING || position?.segmentIndex != segmentIndex) return this
         val segment = document.segments.getOrNull(segmentIndex) ?: return this
+        if (!segment.containsSourceOffset(utteranceSourceStart)) return this
         if (rangeStart < 0 || rangeEndExclusive <= rangeStart) return this
         val absoluteStart = utteranceSourceStart + rangeStart
         val absoluteEndExclusive = utteranceSourceStart + rangeEndExclusive

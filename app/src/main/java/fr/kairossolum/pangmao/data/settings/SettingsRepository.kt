@@ -19,6 +19,7 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 enum class DefinitionLanguage { FRENCH, ENGLISH, BOTH }
 
 enum class SpeechRate(val multiplier: Float, val label: String) {
+    VERY_SLOW(0.6f, "0.6×"),
     SLOW(0.8f, "0.8×"),
     NORMAL(1.0f, "1×"),
     FAST(1.2f, "1.2×"),

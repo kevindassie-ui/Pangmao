@@ -18,6 +18,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import fr.kairossolum.pangmao.domain.speech.SpeechDocument
+import fr.kairossolum.pangmao.domain.speech.SpeechPlaybackModel
+import fr.kairossolum.pangmao.domain.speech.SpeechPlaybackPhase
+import fr.kairossolum.pangmao.domain.speech.SpeechPosition
+import fr.kairossolum.pangmao.domain.speech.buildSpeechDocument
+import fr.kairossolum.pangmao.domain.speech.utterancesFrom
 import java.util.Locale
 
 enum class SpeakerStatus {
@@ -37,14 +43,15 @@ class MandarinSpeaker internal constructor() {
     private var initializationGeneration = 0
     private var playbackGeneration = 0L
     private var speechRate = 1.0f
-    private var speechChunks: List<String> = emptyList()
-    private var currentChunkIndex = 0
+    private var speechDocument: SpeechDocument? = null
     private val mainHandler = Handler(Looper.getMainLooper())
     internal var engine: TextToSpeech? = null
     var status by mutableStateOf(SpeakerStatus.INITIALIZING)
         internal set
     var playbackState by mutableStateOf(SpeakerPlaybackState.IDLE)
         internal set
+    internal var playbackModel by mutableStateOf(SpeechPlaybackModel())
+        private set
 
     val ready: Boolean
         get() = status == SpeakerStatus.READY
@@ -52,35 +59,41 @@ class MandarinSpeaker internal constructor() {
     fun speak(text: String): Boolean {
         val current = engine ?: return false
         if (!ready || text.isBlank()) return false
-        val chunks = chunkSpeechText(text)
-        if (chunks.isEmpty()) return false
-        speechChunks = chunks
-        currentChunkIndex = 0
-        return queueFrom(current, currentChunkIndex)
+        val document = buildSpeechDocument(text)
+        if (document.segments.isEmpty()) return false
+        speechDocument = document
+        updatePlayback(SpeechPlaybackModel().startAt(document))
+        return queueFrom(current, document, checkNotNull(playbackModel.position))
     }
 
     fun pause(): Boolean {
-        if (playbackState != SpeakerPlaybackState.PLAYING || speechChunks.isEmpty()) return false
+        val current = engine ?: return false
+        if (playbackModel.phase != SpeechPlaybackPhase.PLAYING || speechDocument == null) return false
         playbackGeneration += 1
-        engine?.stop()
-        playbackState = SpeakerPlaybackState.PAUSED
+        current.stop()
+        updatePlayback(playbackModel.pause())
         return true
     }
 
     fun resume(): Boolean {
         val current = engine ?: return false
-        if (!ready || playbackState != SpeakerPlaybackState.PAUSED || speechChunks.isEmpty()) {
+        val document = speechDocument
+        if (
+            !ready ||
+            playbackModel.phase != SpeechPlaybackPhase.PAUSED ||
+            document == null ||
+            playbackModel.position == null
+        ) {
             return false
         }
-        return queueFrom(current, currentChunkIndex)
+        updatePlayback(playbackModel.resume())
+        return queueFrom(current, document, checkNotNull(playbackModel.position))
     }
 
     fun stop() {
         playbackGeneration += 1
         engine?.stop()
-        speechChunks = emptyList()
-        currentChunkIndex = 0
-        playbackState = SpeakerPlaybackState.IDLE
+        clearPlayback()
     }
 
     fun setSpeechRate(value: Float) {
@@ -185,9 +198,7 @@ class MandarinSpeaker internal constructor() {
         engine?.stop()
         engine?.shutdown()
         engine = null
-        speechChunks = emptyList()
-        currentChunkIndex = 0
-        playbackState = SpeakerPlaybackState.IDLE
+        clearPlayback()
     }
 
     private fun handleInitialization(
@@ -240,31 +251,43 @@ class MandarinSpeaker internal constructor() {
         return configured
     }
 
-    private fun queueFrom(current: TextToSpeech, startIndex: Int): Boolean {
-        if (startIndex !in speechChunks.indices) return false
+    private fun queueFrom(
+        current: TextToSpeech,
+        document: SpeechDocument,
+        position: SpeechPosition,
+    ): Boolean {
+        val utterances = document.utterancesFrom(position)
+        if (utterances.isEmpty()) {
+            clearPlayback()
+            return false
+        }
         playbackGeneration += 1
         val generation = playbackGeneration
         current.stop()
         runCatching { current.setSpeechRate(speechRate) }
-        for (index in startIndex..speechChunks.lastIndex) {
-            val queueMode = if (index == startIndex) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
+        utterances.forEachIndexed { queueIndex, utterance ->
+            val queueMode = if (queueIndex == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
             val result = current.speak(
-                speechChunks[index],
+                utterance.text,
                 queueMode,
                 null,
-                utteranceId(generation, index),
+                utteranceId(generation, utterance.segmentIndex, utterance.sourceStart),
             )
             if (result != TextToSpeech.SUCCESS) {
                 playbackGeneration += 1
                 current.stop()
-                speechChunks = emptyList()
-                currentChunkIndex = 0
-                playbackState = SpeakerPlaybackState.IDLE
+                clearPlayback()
                 return false
             }
         }
-        currentChunkIndex = startIndex
-        playbackState = SpeakerPlaybackState.PLAYING
+        val first = utterances.first()
+        updatePlayback(
+            playbackModel.markSegmentStarted(
+                document = document,
+                segmentIndex = first.segmentIndex,
+                utteranceSourceStart = first.sourceStart,
+            )
+        )
         return true
     }
 
@@ -274,23 +297,49 @@ class MandarinSpeaker internal constructor() {
                 override fun onStart(utteranceId: String?) {
                     val progress = utteranceId?.toPlaybackProgress() ?: return
                     mainHandler.post {
-                        if (progress.first == playbackGeneration) {
-                            currentChunkIndex = progress.second
-                            playbackState = SpeakerPlaybackState.PLAYING
-                        }
+                        val document = speechDocument
+                        if (progress.generation != playbackGeneration || document == null) return@post
+                        updatePlayback(
+                            playbackModel.markSegmentStarted(
+                                document = document,
+                                segmentIndex = progress.segmentIndex,
+                                utteranceSourceStart = progress.sourceStart,
+                            )
+                        )
+                    }
+                }
+
+                override fun onRangeStart(
+                    utteranceId: String?,
+                    start: Int,
+                    end: Int,
+                    frame: Int,
+                ) {
+                    val progress = utteranceId?.toPlaybackProgress() ?: return
+                    mainHandler.post {
+                        val document = speechDocument
+                        if (progress.generation != playbackGeneration || document == null) return@post
+                        updatePlayback(
+                            playbackModel.markSpokenRange(
+                                document = document,
+                                segmentIndex = progress.segmentIndex,
+                                utteranceSourceStart = progress.sourceStart,
+                                rangeStart = start,
+                                rangeEndExclusive = end,
+                            )
+                        )
                     }
                 }
 
                 override fun onDone(utteranceId: String?) {
                     val progress = utteranceId?.toPlaybackProgress() ?: return
                     mainHandler.post {
-                        if (
-                            progress.first == playbackGeneration &&
-                            progress.second == speechChunks.lastIndex
-                        ) {
-                            speechChunks = emptyList()
-                            currentChunkIndex = 0
-                            playbackState = SpeakerPlaybackState.IDLE
+                        val document = speechDocument
+                        if (progress.generation != playbackGeneration || document == null) return@post
+                        val updated = playbackModel.markSegmentDone(document, progress.segmentIndex)
+                        updatePlayback(updated)
+                        if (updated.phase == SpeechPlaybackPhase.IDLE) {
+                            speechDocument = null
                         }
                     }
                 }
@@ -299,10 +348,8 @@ class MandarinSpeaker internal constructor() {
                 override fun onError(utteranceId: String?) {
                     val progress = utteranceId?.toPlaybackProgress() ?: return
                     mainHandler.post {
-                        if (progress.first == playbackGeneration) {
-                            speechChunks = emptyList()
-                            currentChunkIndex = 0
-                            playbackState = SpeakerPlaybackState.IDLE
+                        if (progress.generation == playbackGeneration) {
+                            clearPlayback()
                         }
                     }
                 }
@@ -310,15 +357,27 @@ class MandarinSpeaker internal constructor() {
                 override fun onStop(utteranceId: String?, interrupted: Boolean) {
                     val progress = utteranceId?.toPlaybackProgress() ?: return
                     mainHandler.post {
-                        if (progress.first == playbackGeneration) {
-                            speechChunks = emptyList()
-                            currentChunkIndex = 0
-                            playbackState = SpeakerPlaybackState.IDLE
+                        if (progress.generation == playbackGeneration) {
+                            clearPlayback()
                         }
                     }
                 }
             }
         )
+    }
+
+    private fun updatePlayback(updated: SpeechPlaybackModel) {
+        playbackModel = updated
+        playbackState = when (updated.phase) {
+            SpeechPlaybackPhase.IDLE -> SpeakerPlaybackState.IDLE
+            SpeechPlaybackPhase.PLAYING -> SpeakerPlaybackState.PLAYING
+            SpeechPlaybackPhase.PAUSED -> SpeakerPlaybackState.PAUSED
+        }
+    }
+
+    private fun clearPlayback() {
+        speechDocument = null
+        updatePlayback(playbackModel.stopped())
     }
 
     private companion object {
@@ -337,39 +396,27 @@ class MandarinSpeaker internal constructor() {
     }
 }
 
-private fun utteranceId(generation: Long, chunkIndex: Int): String =
-    "pangmao:$generation:$chunkIndex"
+internal data class PlaybackProgress(
+    val generation: Long,
+    val segmentIndex: Int,
+    val sourceStart: Int,
+)
 
-private fun String.toPlaybackProgress(): Pair<Long, Int>? {
+internal fun utteranceId(generation: Long, segmentIndex: Int, sourceStart: Int): String =
+    "pangmao:$generation:$segmentIndex:$sourceStart"
+
+internal fun String.toPlaybackProgress(): PlaybackProgress? {
     val components = split(':')
-    if (components.size != 3 || components[0] != "pangmao") return null
-    return components[1].toLongOrNull()?.let { generation ->
-        components[2].toIntOrNull()?.let { index -> generation to index }
-    }
+    if (components.size != 4 || components[0] != "pangmao") return null
+    val generation = components[1].toLongOrNull() ?: return null
+    val segmentIndex = components[2].toIntOrNull() ?: return null
+    val sourceStart = components[3].toIntOrNull() ?: return null
+    if (generation < 0 || segmentIndex < 0 || sourceStart < 0) return null
+    return PlaybackProgress(generation, segmentIndex, sourceStart)
 }
 
-internal fun chunkSpeechText(text: String, maximumLength: Int = 180): List<String> {
-    require(maximumLength > 0)
-    val chunks = mutableListOf<String>()
-    val current = StringBuilder()
-
-    fun flush() {
-        current.toString().trim().takeIf(String::isNotEmpty)?.let(chunks::add)
-        current.clear()
-    }
-
-    text.codePoints().forEachOrdered { codePoint ->
-        current.appendCodePoint(codePoint)
-        if (codePoint.isSpeechBoundary() || current.length >= maximumLength) flush()
-    }
-    flush()
-    return chunks
-}
-
-private fun Int.isSpeechBoundary(): Boolean = when (this) {
-    '\n'.code, '。'.code, '！'.code, '？'.code, '!'.code, '?'.code, '；'.code, ';'.code -> true
-    else -> false
-}
+internal fun chunkSpeechText(text: String, maximumLength: Int = 180): List<String> =
+    buildSpeechDocument(text, maximumLength).segments.map { it.text }
 
 private val Voice.isInstalled: Boolean
     get() = features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) != true

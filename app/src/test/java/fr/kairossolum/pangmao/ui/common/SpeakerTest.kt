@@ -43,4 +43,14 @@ class SpeakerTest {
         )
         assertEquals(emptyList<String>(), chunkSpeechText("   \n  "))
     }
+
+    @Test
+    fun `utterance identifiers preserve generation segment and source offset`() {
+        val identifier = utteranceId(generation = 12, segmentIndex = 3, sourceStart = 27)
+
+        assertEquals(PlaybackProgress(12, 3, 27), identifier.toPlaybackProgress())
+        assertEquals(null, "pangmao:12:3".toPlaybackProgress())
+        assertEquals(null, "pangmao:12:-1:27".toPlaybackProgress())
+        assertEquals(null, "foreign:12:3:27".toPlaybackProgress())
+    }
 }

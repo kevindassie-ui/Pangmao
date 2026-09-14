@@ -67,11 +67,15 @@ class SettingsRepositoryTest {
         val fast = mutablePreferencesOf(
             SettingsKeys.SPEECH_RATE to SpeechRate.FAST.name,
         ).toAppSettings()
+        val verySlow = mutablePreferencesOf(
+            SettingsKeys.SPEECH_RATE to SpeechRate.VERY_SLOW.name,
+        ).toAppSettings()
         val invalid = mutablePreferencesOf(
             SettingsKeys.SPEECH_RATE to "TURBO",
         ).toAppSettings()
 
         assertEquals(SpeechRate.FAST, fast.speechRate)
+        assertEquals(SpeechRate.VERY_SLOW, verySlow.speechRate)
         assertEquals(SpeechRate.NORMAL, invalid.speechRate)
     }
 }
