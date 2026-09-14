@@ -20,6 +20,8 @@ numéros suivent le versionnage sémantique.
   tant qu'une part suffisante du vocabulaire n'a pas été classée.
 - Choix local `Non marqué / À apprendre / Connu` dans la fiche dictionnaire et
   dans la mini-fiche du Reader, sans effet automatique sur les cartes SRS.
+- Résumé ouvrable de la couverture lexicale du Reader et surlignage facultatif
+  des mots à revoir; la difficulté reste non évaluée si le profil est incomplet.
 
 ## 0.8.1 — 2026-09-14
 

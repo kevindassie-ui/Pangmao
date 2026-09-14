@@ -63,6 +63,24 @@
     <string name="reader_copy_french_definition">Copier la définition française</string>
     <string name="reader_copy_english_definition">Copier la définition anglaise</string>
     <string name="reader_copied">Copié dans le presse-papiers</string>
+    <string name="reader_coverage_title">Vocabulaire du texte</string>
+    <string name="reader_coverage_details">Afficher le détail de la couverture</string>
+    <string name="reader_coverage_profile_pending">%1$d/%2$d mots distincts classés</string>
+    <string name="reader_coverage_summary">%1$d %% connus · %2$s</string>
+    <string name="reader_coverage_unrated">Profil à compléter</string>
+    <string name="reader_coverage_accessible">Accessible</string>
+    <string name="reader_coverage_stimulating">Stimulant</string>
+    <string name="reader_coverage_dense">Dense</string>
+    <string name="reader_coverage_recognized">Occurrences reconnues</string>
+    <string name="reader_coverage_distinct">Mots distincts</string>
+    <string name="reader_coverage_known">Connus</string>
+    <string name="reader_coverage_learning">À apprendre</string>
+    <string name="reader_coverage_unmarked">Non marqués</string>
+    <string name="reader_coverage_unknown">Blocs sans entrée</string>
+    <string name="reader_coverage_occurrence_words">%1$d occ. · %2$d mots</string>
+    <string name="reader_coverage_pending_help">Classez au moins 80 %% des occurrences et des mots distincts pour obtenir une indication fiable.</string>
+    <string name="reader_coverage_method">Indication descriptive fondée sur votre couverture locale ; elle ne constitue pas un niveau CECR.</string>
+    <string name="reader_coverage_highlight">Surligner les mots à revoir</string>
     <string name="reader_layer_pinyin">Pinyin</string><string name="reader_layer_translation">Traduction</string><string name="reader_layer_definitions">Définitions</string>
     <string name="reader_translation">Comprendre la phrase</string>
     <string name="reader_translation_local">Local · hors ligne</string>

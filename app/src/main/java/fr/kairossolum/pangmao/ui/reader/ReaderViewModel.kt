@@ -8,6 +8,8 @@ import fr.kairossolum.pangmao.data.settings.SettingsRepository
 import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
 import fr.kairossolum.pangmao.data.user.StudyRepository
+import fr.kairossolum.pangmao.domain.ReadingCoverage
+import fr.kairossolum.pangmao.domain.calculateReadingCoverage
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
@@ -120,6 +122,16 @@ class ReaderViewModel(
         .map { it.speechRate }
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SpeechRate.NORMAL)
+    val wordKnowledgeByEntryId = study.wordKnowledge()
+        .map { values -> values.associate { value -> value.entryId to value.status } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+    val readingCoverage = combine(_analysis, wordKnowledgeByEntryId) { currentAnalysis, knowledge ->
+        currentAnalysis?.let { value -> calculateReadingCoverage(value.tokens, knowledge) }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        null as ReadingCoverage?,
+    )
 
     init {
         viewModelScope.launch {

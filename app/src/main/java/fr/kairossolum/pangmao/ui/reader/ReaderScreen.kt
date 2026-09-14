@@ -49,6 +49,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -82,6 +83,9 @@ import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.data.settings.closestSpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
+import fr.kairossolum.pangmao.domain.ReadingCoverage
+import fr.kairossolum.pangmao.domain.ReadingDifficultyBand
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
 import fr.kairossolum.pangmao.domain.speech.SpeechSegment
@@ -102,6 +106,7 @@ import fr.kairossolum.pangmao.ui.common.SpeakerVoiceInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("DEPRECATION")
@@ -120,6 +125,8 @@ fun ReaderScreen(
     val selectedWordKnowledge by viewModel.selectedWordKnowledge.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val speechRate by viewModel.speechRate.collectAsStateWithLifecycle()
+    val readingCoverage by viewModel.readingCoverage.collectAsStateWithLifecycle()
+    val wordKnowledgeByEntryId by viewModel.wordKnowledgeByEntryId.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val scope = rememberCoroutineScope()
@@ -127,6 +134,8 @@ fun ReaderScreen(
     val voiceSample = stringResource(R.string.tts_test_sample)
     val copiedMessage = stringResource(R.string.reader_copied)
     val definitionLanguage = LocalDefinitionLanguage.current
+    var showCoverageDetails by rememberSaveable { mutableStateOf(false) }
+    var highlightReviewWords by rememberSaveable { mutableStateOf(false) }
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             scope.launch {
@@ -396,6 +405,14 @@ fun ReaderScreen(
                             }
                         }
                     }
+                    readingCoverage?.let { coverage ->
+                        item(key = "reading-coverage") {
+                            ReadingCoverageSummary(
+                                coverage = coverage,
+                                onClick = { showCoverageDetails = true },
+                            )
+                        }
+                    }
                     if (showTranslation) {
                         item(key = "translation") {
                             ReaderTranslationCard(
@@ -424,6 +441,10 @@ fun ReaderScreen(
                             definitionLanguage = definitionLanguage,
                             showPinyin = showPinyin,
                             showDefinitions = showDefinitions,
+                            knowledgeStatus = token.token.entryId
+                                ?.let(wordKnowledgeByEntryId::get)
+                                ?: WordKnowledgeStatus.UNMARKED,
+                            highlightForReview = highlightReviewWords,
                             onClick = { viewModel.select(token) },
                             onCopy = copyText,
                         )
@@ -544,6 +565,17 @@ fun ReaderScreen(
         ModalBottomSheet(onDismissRequest = { showVoiceDetails = false }) {
             SpeakerVoiceDetails(
                 info = speaker.voiceInfo,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+            )
+        }
+    }
+
+    readingCoverage?.takeIf { showCoverageDetails }?.let { coverage ->
+        ModalBottomSheet(onDismissRequest = { showCoverageDetails = false }) {
+            ReadingCoverageDetails(
+                coverage = coverage,
+                highlightForReview = highlightReviewWords,
+                onHighlightChange = { highlightReviewWords = it },
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
             )
         }
@@ -841,21 +873,172 @@ private fun TranslationLine(
 }
 
 @Composable
+private fun ReadingCoverageSummary(
+    coverage: ReadingCoverage,
+    onClick: () -> Unit,
+) {
+    val classifiedDistinctWords = coverage.knownDistinctWords + coverage.learningDistinctWords
+    val summary = if (coverage.difficulty == ReadingDifficultyBand.UNRATED) {
+        stringResource(
+            R.string.reader_coverage_profile_pending,
+            classifiedDistinctWords,
+            coverage.distinctRecognizedWords,
+        )
+    } else {
+        stringResource(
+            R.string.reader_coverage_summary,
+            (coverage.knownCoverageRatio * 100).roundToInt(),
+            difficultyLabel(coverage.difficulty),
+        )
+    }
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.38f),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    stringResource(R.string.reader_coverage_title),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(summary, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+            }
+            Icon(
+                Icons.Outlined.Info,
+                contentDescription = stringResource(R.string.reader_coverage_details),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReadingCoverageDetails(
+    coverage: ReadingCoverage,
+    highlightForReview: Boolean,
+    onHighlightChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            stringResource(R.string.reader_coverage_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_recognized),
+            coverage.recognizedOccurrences.toString(),
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_distinct),
+            coverage.distinctRecognizedWords.toString(),
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_known),
+            stringResource(
+                R.string.reader_coverage_occurrence_words,
+                coverage.knownOccurrences,
+                coverage.knownDistinctWords,
+            ),
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_learning),
+            stringResource(
+                R.string.reader_coverage_occurrence_words,
+                coverage.learningOccurrences,
+                coverage.learningDistinctWords,
+            ),
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_unmarked),
+            stringResource(
+                R.string.reader_coverage_occurrence_words,
+                coverage.unmarkedOccurrences,
+                coverage.unmarkedDistinctWords,
+            ),
+        )
+        CoverageMetric(
+            stringResource(R.string.reader_coverage_unknown),
+            coverage.unknownChineseBlocks.toString(),
+        )
+        Text(
+            stringResource(
+                if (coverage.difficulty == ReadingDifficultyBand.UNRATED) {
+                    R.string.reader_coverage_pending_help
+                } else {
+                    R.string.reader_coverage_method
+                }
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                stringResource(R.string.reader_coverage_highlight),
+                modifier = Modifier.weight(1f).padding(end = 12.dp),
+            )
+            Switch(checked = highlightForReview, onCheckedChange = onHighlightChange)
+        }
+    }
+}
+
+@Composable
+private fun CoverageMetric(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun difficultyLabel(difficulty: ReadingDifficultyBand): String = stringResource(
+    when (difficulty) {
+        ReadingDifficultyBand.UNRATED -> R.string.reader_coverage_unrated
+        ReadingDifficultyBand.ACCESSIBLE -> R.string.reader_coverage_accessible
+        ReadingDifficultyBand.STIMULATING -> R.string.reader_coverage_stimulating
+        ReadingDifficultyBand.DENSE -> R.string.reader_coverage_dense
+    }
+)
+
+@Composable
 private fun ReaderTokenCard(
     analyzed: AnalyzedToken,
     definitionLanguage: DefinitionLanguage,
     showPinyin: Boolean,
     showDefinitions: Boolean,
+    knowledgeStatus: WordKnowledgeStatus,
+    highlightForReview: Boolean,
     onClick: () -> Unit,
     onCopy: (String) -> Unit,
 ) {
     val entry = analyzed.entry
+    val needsReview = entry == null || knowledgeStatus != WordKnowledgeStatus.KNOWN
     Surface(
         onClick = onClick,
         enabled = entry != null,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        color = if (highlightForReview && needsReview) {
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.48f)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+        },
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp),
