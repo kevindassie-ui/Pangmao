@@ -8,6 +8,29 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.7.0 — 2026-09-14
+
+### Ajouté
+
+- Commandes pause, reprise et arrêt pour la lecture vocale du Reader.
+- Vitesses `0,8×`, `1×` et `1,2×`, avec choix persistant appliqué à toutes les
+  lectures chinoises de l’application.
+- Ajout ou retrait d’un mot dans les cartes directement depuis sa mini-fiche du
+  Reader, sans ouvrir la fiche complète.
+
+### Modifié
+
+- Les textes longs sont découpés en phrases courtes; reprendre recommence la
+  phrase interrompue plutôt que l’ensemble du texte.
+- Modifier le texte arrête immédiatement l’ancienne lecture.
+- Ajouter une carte déjà existante est désormais sans effet et ne réinitialise
+  jamais sa progression de répétition espacée.
+
+### Qualité
+
+- Le corpus, les identifiants du dictionnaire et le schéma utilisateur restent
+  inchangés; les nouveaux états sont exposés en français, anglais et chinois.
+
 ## 0.6.0 — 2026-09-14
 
 ### Ajouté
@@ -204,6 +227,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.7.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.7.0
 [0.6.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.6.0
 [0.5.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1
 [0.5.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.0
