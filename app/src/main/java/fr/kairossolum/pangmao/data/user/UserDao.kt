@@ -89,4 +89,16 @@ interface UserDao {
 
     @Query("DELETE FROM flashcards WHERE entryId = :entryId")
     suspend fun deleteFlashcard(entryId: Long)
+
+    @Query("SELECT * FROM word_knowledge ORDER BY updatedAt DESC")
+    fun wordKnowledge(): Flow<List<WordKnowledgeEntity>>
+
+    @Query("SELECT * FROM word_knowledge WHERE entryId = :entryId LIMIT 1")
+    fun wordKnowledge(entryId: Long): Flow<WordKnowledgeEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertWordKnowledge(value: WordKnowledgeEntity)
+
+    @Query("DELETE FROM word_knowledge WHERE entryId = :entryId")
+    suspend fun deleteWordKnowledge(entryId: Long)
 }

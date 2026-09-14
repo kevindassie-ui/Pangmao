@@ -7,6 +7,7 @@ import fr.kairossolum.pangmao.domain.ReviewState
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 
 data class StudyCard(
@@ -27,6 +28,12 @@ class StudyRepository(
     fun isFavorite(entryId: Long): Flow<Boolean> = dao.isFavorite(entryId)
 
     fun isFlashcard(entryId: Long): Flow<Boolean> = dao.isFlashcard(entryId)
+
+    fun wordKnowledgeStatus(entryId: Long): Flow<WordKnowledgeStatus> =
+        dao.wordKnowledge(entryId).map { value -> WordKnowledgeStatus.fromStored(value?.status) }
+
+    fun wordKnowledge(): Flow<List<WordKnowledge>> =
+        dao.wordKnowledge().map { values -> values.mapNotNull(WordKnowledgeEntity::toModel) }
 
     suspend fun toggleFavorite(entryId: Long, currentlyFavorite: Boolean) {
         if (currentlyFavorite) dao.deleteFavorite(entryId) else dao.insertFavorite(FavoriteEntity(entryId))
@@ -49,6 +56,11 @@ class StudyRepository(
     }
 
     suspend fun removeFlashcard(entryId: Long) = dao.deleteFlashcard(entryId)
+
+    suspend fun setWordKnowledgeStatus(entryId: Long, status: WordKnowledgeStatus) {
+        val value = status.toEntity(entryId)
+        if (value == null) dao.deleteWordKnowledge(entryId) else dao.upsertWordKnowledge(value)
+    }
 
     fun allCards(): Flow<List<StudyCard>> = dao.flashcards().mapLatest(::resolveCards)
 

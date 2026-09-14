@@ -8,8 +8,14 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [FavoriteEntity::class, HistoryEntity::class, QueryHistoryEntity::class, FlashcardEntity::class],
-    version = 2,
+    entities = [
+        FavoriteEntity::class,
+        HistoryEntity::class,
+        QueryHistoryEntity::class,
+        FlashcardEntity::class,
+        WordKnowledgeEntity::class,
+    ],
+    version = 3,
     exportSchema = false,
 )
 abstract class PangmaoUserDatabase : RoomDatabase() {
@@ -20,7 +26,7 @@ abstract class PangmaoUserDatabase : RoomDatabase() {
             context.applicationContext,
             PangmaoUserDatabase::class.java,
             "pangmao_user.db",
-        ).addMigrations(MIGRATION_1_2).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
 
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -31,6 +37,21 @@ abstract class PangmaoUserDatabase : RoomDatabase() {
                         `lastSearchedAt` INTEGER NOT NULL,
                         `searchCount` INTEGER NOT NULL,
                         PRIMARY KEY(`query`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `word_knowledge` (
+                        `entryId` INTEGER NOT NULL,
+                        `status` TEXT NOT NULL,
+                        `updatedAt` INTEGER NOT NULL,
+                        PRIMARY KEY(`entryId`)
                     )
                     """.trimIndent()
                 )

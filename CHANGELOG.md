@@ -8,6 +8,14 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Ajouté
+
+- Fondation locale de la v0.9 pour marquer séparément un mot `À apprendre` ou
+  `Connu`; l'absence de marquage reste un troisième état et ne dépend ni des
+  favoris ni des cartes SRS.
+- Migration additive de la base personnelle de la version 2 à la version 3,
+  sans modification du dictionnaire embarqué ni des données existantes.
+
 ## 0.8.1 — 2026-09-14
 
 ### Modifié

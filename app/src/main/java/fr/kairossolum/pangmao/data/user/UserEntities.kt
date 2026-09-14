@@ -34,3 +34,41 @@ data class FlashcardEntity(
     val lapses: Int = 0,
     val lastReviewedAt: Long? = null,
 )
+
+enum class WordKnowledgeStatus {
+    UNMARKED,
+    LEARNING,
+    KNOWN;
+
+    companion object {
+        internal fun fromStored(value: String?): WordKnowledgeStatus =
+            entries.firstOrNull { status -> status.name == value } ?: UNMARKED
+    }
+}
+
+data class WordKnowledge(
+    val entryId: Long,
+    val status: WordKnowledgeStatus,
+    val updatedAt: Long,
+)
+
+@Entity(tableName = "word_knowledge")
+data class WordKnowledgeEntity(
+    @PrimaryKey val entryId: Long,
+    val status: String,
+    val updatedAt: Long = System.currentTimeMillis(),
+)
+
+internal fun WordKnowledgeStatus.toEntity(
+    entryId: Long,
+    updatedAt: Long = System.currentTimeMillis(),
+): WordKnowledgeEntity? = takeUnless { it == WordKnowledgeStatus.UNMARKED }?.let { status ->
+    WordKnowledgeEntity(entryId = entryId, status = status.name, updatedAt = updatedAt)
+}
+
+internal fun WordKnowledgeEntity.toModel(): WordKnowledge? {
+    val parsedStatus = WordKnowledgeStatus.fromStored(status)
+    return if (parsedStatus == WordKnowledgeStatus.UNMARKED) null else {
+        WordKnowledge(entryId = entryId, status = parsedStatus, updatedAt = updatedAt)
+    }
+}
