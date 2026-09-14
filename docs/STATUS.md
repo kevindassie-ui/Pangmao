@@ -1,6 +1,6 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-13
+Checkpoint date: 2026-09-14
 
 ## Implemented
 
@@ -224,9 +224,8 @@ Checkpoint date: 2026-09-13
   English-to-Chinese entries; they qualify for a filtered pilot, not a raw
   import. CI run `34772064048` passed 18 data tests, Android tests, lint and
   debug APK assembly.
-- No v0.6 release tag has been created. Schema v4 and the profile-driven Android
-  screens are implemented; public APK publication remains gated on device
-  acceptance and final release checks.
+- Schema v4 and the profile-driven Android screens are published in v0.6.0;
+  device acceptance remains to be recorded.
 
 ## Learning dictionary schema — v0.6 lot D1
 
@@ -236,8 +235,8 @@ Checkpoint date: 2026-09-13
   166 source entries without a usable Chinese sense and 144 non-Han values are
   rejected deterministically.
 - The existing 132,342 Chinese entries and stable identifiers are unchanged.
-- The generated database grows from about 69 MiB to 92.34 MiB. Publication is
-  still gated on profile-driven Android search, entry rendering and device QA.
+- The generated database grows from about 69 MiB to 92.34 MiB. Profile-driven
+  Android search and entry rendering are now published; device QA remains.
 - Commit `ccd7549` passed the full GitHub Actions run `34781393394`, including
   pinned-source reconstruction, 21 Python tests, Android tests, lint and debug
   APK assembly.
@@ -253,6 +252,24 @@ Checkpoint date: 2026-09-13
   namespaced. CI run `34786545793` passed corpus reconstruction, Android tests,
   lint and debug APK assembly.
 
+## Learning profiles release 0.6.0
+
+- Tag: `v0.6.0` at commit `b4a6eb0`.
+- Final CI run `34812967331` passed reconstruction of all six pinned sources,
+  dictionary validation, 21 Python tests, Android unit tests, lint and debug APK
+  assembly.
+- Release run `34813530300` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.6.0-arm64.apk` (95,229,198 bytes), SHA-256
+  `f6e2532ff4bc378e19c68d73e1b3f83c300679a0b96a6b626c0ed72a85252334`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.6.0/Pangmao-v0.6.0-arm64.apk>
+- Universal APK: `Pangmao-v0.6.0-universal.apk` (194,004,852 bytes), SHA-256
+  `5e14e097d2c74009c34f9da85226e508d9c5884846d99754773f0da3eaefd02e`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.6.0/Pangmao-v0.6.0-universal.apk>
+- Device acceptance remains to cover upgrade from v0.5.1, profile persistence,
+  accent-insensitive French lookup, English lookup and Hanzi reverse lookup.
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, advanced
@@ -261,10 +278,9 @@ deferred. Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
-The initial v0.6 plan now isolates learning-profile persistence as the next
-bounded checkpoint. Offline/online services, short-form STT, reusable meeting
-transcription components, commercialization and iOS are recorded for work after
-v0.6 rather than mixed into that release.
+The v0.6 learning-profile release is complete. Offline/online services,
+short-form STT, reusable meeting-transcription components, commercialization
+and iOS remain recorded for later work rather than mixed into that release.
 
 The v0.2.1 corrective scope and remaining device acceptance are recorded in
 [NEXT_RELEASE.md](NEXT_RELEASE.md). Longer-term product work is tracked in

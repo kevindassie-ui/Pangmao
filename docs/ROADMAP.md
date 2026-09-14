@@ -106,24 +106,23 @@ Plan d’exécution et portes de décision: [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
   et relations caractère–mot–expression.
 
-## v0.6.0 — modes d'apprentissage
+## v0.6.0 — modes d'apprentissage · publiée
 
-Ajouter un réglage distinct de la langue d'interface:
+Ajout d'un réglage distinct de la langue d'interface:
 
 - `J'apprends le chinois`;
 - `J'apprends le français`;
 - `J'apprends l'anglais`.
 
-Un sélecteur compact sur l'accueil permettra de changer rapidement de profil.
+Un sélecteur compact sur l'accueil permet de changer rapidement de profil.
 Le mode chinois conserve hanzi, pinyin, tons et caractères au premier plan. Les
 modes français et anglais inversent la hiérarchie: mot cible, prononciation,
-grammaire, formes, exemples et sens chinois.
+grammaire, formes et sens chinois.
 
-Le mode français nécessitera notamment genre, pluriel, IPA et conjugaisons. Le
-mode anglais nécessitera formes, variantes UK/US, collocations et prononciations
-distinctes. Ces modes ne seront publiés qu'avec des données libres suffisamment
-riches: la base actuelle permet une consultation élémentaire, pas encore un vrai
-dictionnaire d'apprentissage pour sinophones.
+La v0.6 livre la consultation directe avec les formes, prononciations, genres et
+catégories disponibles dans FreeDict/WikDict. Les conjugaisons françaises, les
+variantes UK/US et les collocations anglaises restent différées jusqu'à disposer
+de sources libres dont la couverture et la qualité auront été mesurées.
 
 Plan d'exécution et portes de données: [V0.6_RELEASE_PLAN.md](V0.6_RELEASE_PLAN.md).
 

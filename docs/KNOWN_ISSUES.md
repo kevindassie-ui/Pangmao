@@ -1,6 +1,6 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-09-13.
+Dernière mise à jour: 2026-09-14.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
@@ -17,6 +17,18 @@ Sens désormais fourni selon le contexte: « Chaque soir, je ne vais jouer au ba
 qu’après avoir bu un café » / “Every evening, I only go play ball after having
 coffee.” Cette phrase relue contourne le modèle local dans le Reader et dans
 l’analyse du dictionnaire. Le résultat sur appareil reste à confirmer.
+
+## Validation appareil de la v0.6.0
+
+La CI et les signatures sont validées. Les nouveaux profils doivent encore être
+testés sur l'appareil de référence après mise à jour depuis v0.5.1:
+
+- persistance du profil indépendamment de la langue de l'interface;
+- recherches françaises `être`, `etre` et `chat`;
+- recherche anglaise `learn`;
+- recherche inverse avec un sens chinois;
+- ouverture d'un équivalent chinois depuis une fiche française ou anglaise;
+- absence de régression dans le profil chinois et le Reader.
 
 ## Validé sur appareil
 
