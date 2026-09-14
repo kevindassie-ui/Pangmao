@@ -37,15 +37,19 @@ Confirmé:
 - la lecture TTS est claire aux vitesses proposées;
 - l'ajout direct d'un mot aux cartes depuis la mini-fiche du Reader fonctionne.
 
-À corriger dans la v0.8.0:
+Implémenté dans le candidat v0.8.0, à valider sur l'appareil:
 
-- pause/reprise repart actuellement du début du texte sur le moteur ColorOS;
-- distinguer une vraie reprise suivie d'un recommencement volontaire;
-- permettre de lire directement depuis une phrase touchée;
-- ajouter `0,6×`; `1,2×` est conservé pour les moteurs lents et les utilisateurs
-  avancés, mais ne reste pas prioritaire dans la hiérarchie visuelle;
-- ouvrir une mini-fiche depuis une sélection longue dans le texte éditable;
-- copier pinyin, traductions et éléments de la lecture segmentée.
+- pause/reprise au dernier offset fourni par ColorOS, avec repli au début de la
+  phrase plutôt qu'au début du texte;
+- commandes distinctes pour reprendre, recommencer et arrêter;
+- lecture directe depuis une phrase touchée et surlignage de la phrase active;
+- ajout de `0,6×`; `1,2×` reste disponible pour les moteurs lents et les
+  utilisateurs avancés;
+- ouverture d'une mini-fiche ou des blocs logiques depuis une sélection longue
+  dans le texte éditable;
+- copie du pinyin, des traductions et des éléments de la lecture segmentée;
+- exactitude des informations moteur/voix/locale/réseau affichées dans le panneau
+  TTS secondaire.
 
 Spécification: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN.md).
 

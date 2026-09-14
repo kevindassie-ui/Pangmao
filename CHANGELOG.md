@@ -8,6 +8,38 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.8.0 — 2026-09-14
+
+### Ajouté
+
+- Vitesse vocale `0,6×`, navigation tactile par phrase et mise en évidence de la
+  phrase active; la plage précise est accentuée lorsque le moteur Android la
+  fournit.
+- Commande `Recommencer` distincte de `Pause / Reprendre` et d’`Arrêter`, avec
+  reprise au dernier passage suivi ou, à défaut, au début de la phrase courante.
+- Définition d’un caractère, mot ou passage sélectionné dans le champ éditable:
+  une entrée exacte ouvre sa mini-fiche, sinon les blocs logiques reconnus sont
+  proposés.
+- Copie explicite du texte complet, du pinyin avec marques de ton, de chaque
+  traduction et des données visibles d’un mot segmenté ou d’une mini-fiche.
+- Essai vocal court et panneau indiquant le moteur TTS, la voix, la locale et la
+  dépendance éventuelle au réseau signalés par l’appareil.
+
+### Modifié
+
+- Les quatre vitesses `0,6×`, `0,8×`, `1×` et `1,2×` utilisent un sélecteur
+  défilable et restent persistantes.
+- Le champ du Reader conserve l’édition, le curseur et la sélection Android
+  natives pendant le suivi vocal.
+
+### Qualité
+
+- Les offsets TTS restent reliés au texte source en UTF-16, y compris avec les
+  caractères hors BMP; les callbacks anciens ne peuvent plus déplacer une
+  nouvelle lecture.
+- Chaque lot A1, A2, B, C et D a passé séparément la reconstruction du corpus,
+  les tests JVM, le lint Android et la compilation d’un APK debug.
+
 ## 0.7.0 — 2026-09-14
 
 ### Ajouté

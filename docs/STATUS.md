@@ -297,6 +297,22 @@ Checkpoint date: 2026-09-14
 - Device acceptance remains to cover long-text pause/resume/stop, all three
   speech speeds and direct Reader-to-card actions.
 
+## Interactive Reader candidate 0.8.0
+
+- A0/A1 establish source-preserving UTF-16 sentence offsets, tracked Android
+  ranges, stale-callback protection, precise resume with sentence fallback and
+  the persistent `0.6×` speed. CI runs `34840167767` and `34842064354` passed.
+- A2 adds sentence navigation and highlighting, distinct restart/stop controls
+  and an independent voice test. CI run `34842943581` passed.
+- B preserves native selection and defines an exact selection or exposes its
+  recognized logical blocks. CI run `34843566276` passed.
+- C copies the full text, tone-marked pinyin, separate translations and visible
+  word data with a uniform confirmation. CI run `34844255209` passed.
+- D reports the Android engine package, selected voice, locale and network
+  requirement. CI run `34844833919` passed.
+- The signed tag remains gated on one final CI run of the versioned release
+  commit; ColorOS acceptance is tracked in [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+
 ## Later iteration
 
 Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
@@ -305,7 +321,7 @@ Collect device feedback, screenshots and reproducible bug reports.
 Keep the same application ID and GitHub signing secrets so future signed APKs
 update this install.
 
-The v0.7 learning-and-listening release is complete. Offline/online services,
+The v0.8 interactive Reader is the active release candidate. Offline/online services,
 short-form STT, reusable meeting-transcription components, commercialization
 and iOS remain recorded for later work rather than mixed into that release.
 

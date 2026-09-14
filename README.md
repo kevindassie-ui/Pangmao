@@ -4,16 +4,20 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## Version 0.7.0 highlights
+## Version 0.8.0 highlights
 
-- Resumable Chinese text-to-speech in the Reader, with pause, stop and
-  sentence-safe playback for long texts.
-- Persistent `0.8×`, `1×` and `1.2×` speech speeds across Chinese entry,
-  example and Reader playback.
+- Interactive Chinese text-to-speech with precise pause/resume when supported,
+  sentence fallback, restart, stop and playback from any selected sentence.
+- Active-sentence highlighting, optional spoken-range tracking and persistent
+  `0.6×`, `0.8×`, `1×` and `1.2×` speeds.
+- Native long-press text selection followed by an explicit definition action:
+  exact entries open directly and longer selections expose recognized blocks.
+- One-tap copy for the full text, tone-marked pinyin, each translation, hanzi,
+  pinyin and visible word definitions.
+- Voice test and an inspectable panel for the active Android TTS engine, voice,
+  locale and offline/network requirement.
 - Add or remove a selected Reader word from local SRS cards without opening
-  its full dictionary entry.
-- Idempotent card insertion protects an existing review schedule from being
-  reset by a repeated add action.
+  its full entry; repeated additions preserve the existing review schedule.
 
 - Independent learning profile: Chinese, French or English, regardless of the
   app interface and Chinese-definition language.
@@ -50,7 +54,7 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 ## Install
 
-Download [Pangmao v0.7.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.7.0),
+Download [Pangmao v0.8.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.8.0),
 open the APK on Android,
 and allow installation from the browser or GitHub app when Android asks. Use the
 smaller `arm64` APK on recent Android phones; the `universal` APK is the fallback

@@ -142,7 +142,7 @@ Stratégie détaillée: [POST_V0.6_STRATEGY.md](POST_V0.6_STRATEGY.md).
 
 Plan d'exécution et validation: [V0.7_RELEASE_PLAN.md](V0.7_RELEASE_PLAN.md).
 
-## v0.8.0 — Reader interactif · spécification prête
+## v0.8.0 — Reader interactif · candidat en validation
 
 - Ajouter `0,6×` tout en conservant `0,8×`, `1×` et `1,2×` dans un sélecteur
   compact.
