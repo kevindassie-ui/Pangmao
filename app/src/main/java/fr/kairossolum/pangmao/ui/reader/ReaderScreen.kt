@@ -94,6 +94,7 @@ import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
+import fr.kairossolum.pangmao.ui.common.WordKnowledgeSelector
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
 import fr.kairossolum.pangmao.ui.common.SpeakerPlaybackState
 import fr.kairossolum.pangmao.ui.common.SpeakerStatus
@@ -116,6 +117,7 @@ fun ReaderScreen(
     val selected by viewModel.selectedEntry.collectAsStateWithLifecycle()
     val selectionLookup by viewModel.selectionLookup.collectAsStateWithLifecycle()
     val selectedFlashcard by viewModel.selectedFlashcard.collectAsStateWithLifecycle()
+    val selectedWordKnowledge by viewModel.selectedWordKnowledge.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val speechRate by viewModel.speechRate.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -440,6 +442,14 @@ fun ReaderScreen(
                         viewModel.dismissSelection()
                         onOpenEntry(entry.id)
                     },
+                )
+                val knowledgeReady = selectedWordKnowledge.isReady &&
+                    selectedWordKnowledge.entryId == entry.id
+                WordKnowledgeSelector(
+                    status = selectedWordKnowledge.status,
+                    onSelect = viewModel::setSelectedWordKnowledgeStatus,
+                    enabled = knowledgeReady,
+                    modifier = Modifier.padding(horizontal = 18.dp, vertical = 4.dp),
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),

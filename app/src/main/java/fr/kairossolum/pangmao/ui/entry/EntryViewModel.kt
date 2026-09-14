@@ -9,6 +9,7 @@ import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
@@ -46,6 +47,12 @@ class EntryViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
     val isFlashcard = study.isFlashcard(entryId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+    val wordKnowledgeStatus = study.wordKnowledgeStatus(entryId)
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            WordKnowledgeStatus.UNMARKED,
+        )
     private var relatedWordsJob: Job? = null
 
     init {
@@ -91,6 +98,10 @@ class EntryViewModel(
         viewModelScope.launch {
             if (isFlashcard.value) study.removeFlashcard(entryId) else study.addFlashcard(entryId)
         }
+    }
+
+    fun setWordKnowledgeStatus(status: WordKnowledgeStatus) {
+        viewModelScope.launch { study.setWordKnowledgeStatus(entryId, status) }
     }
 
     fun setRelatedWordPosition(position: RelatedWordPosition) {

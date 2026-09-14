@@ -59,6 +59,7 @@ import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
+import fr.kairossolum.pangmao.ui.common.WordKnowledgeSelector
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +72,7 @@ fun EntryScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     val isFlashcard by viewModel.isFlashcard.collectAsStateWithLifecycle()
+    val wordKnowledgeStatus by viewModel.wordKnowledgeStatus.collectAsStateWithLifecycle()
     val speaker = rememberMandarinSpeaker()
     val definitionLanguage = LocalDefinitionLanguage.current
 
@@ -147,6 +149,11 @@ fun EntryScreen(
                             Icon(Icons.Outlined.RecordVoiceOver, contentDescription = stringResource(R.string.pronounce))
                         }
                     }
+
+                    WordKnowledgeSelector(
+                        status = wordKnowledgeStatus,
+                        onSelect = viewModel::setWordKnowledgeStatus,
+                    )
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         entry.sources.split(" · ").forEach { source ->

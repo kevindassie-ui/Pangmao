@@ -11,6 +11,7 @@ import fr.kairossolum.pangmao.data.user.StudyRepository
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.TextAnalysis
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.ui.common.resolveTextTranslation
@@ -40,6 +41,12 @@ private data class ReaderRequest(
 data class SelectedFlashcardState(
     val entryId: Long? = null,
     val isFlashcard: Boolean = false,
+    val isReady: Boolean = false,
+)
+
+data class SelectedWordKnowledgeState(
+    val entryId: Long? = null,
+    val status: WordKnowledgeStatus = WordKnowledgeStatus.UNMARKED,
     val isReady: Boolean = false,
 )
 
@@ -85,6 +92,27 @@ class ReaderViewModel(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SelectedFlashcardState())
+    val selectedWordKnowledge = _selectedEntry
+        .flatMapLatest { entry ->
+            if (entry == null) {
+                flowOf(SelectedWordKnowledgeState())
+            } else {
+                study.wordKnowledgeStatus(entry.id)
+                    .map { status ->
+                        SelectedWordKnowledgeState(
+                            entryId = entry.id,
+                            status = status,
+                            isReady = true,
+                        )
+                    }
+                    .onStart { emit(SelectedWordKnowledgeState(entryId = entry.id)) }
+            }
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            SelectedWordKnowledgeState(),
+        )
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     private val translationRefresh = MutableStateFlow(0L)
@@ -162,6 +190,13 @@ class ReaderViewModel(
                 study.addFlashcard(entry.id)
             }
         }
+    }
+
+    fun setSelectedWordKnowledgeStatus(status: WordKnowledgeStatus) {
+        val entry = _selectedEntry.value ?: return
+        val selection = selectedWordKnowledge.value
+        if (!selection.isReady || selection.entryId != entry.id) return
+        viewModelScope.launch { study.setWordKnowledgeStatus(entry.id, status) }
     }
 
     fun setSpeechRate(value: SpeechRate) {
