@@ -39,6 +39,13 @@ enum class SpeakerPlaybackState {
     PAUSED,
 }
 
+data class SpeakerVoiceInfo(
+    val enginePackage: String?,
+    val voiceName: String?,
+    val localeTag: String?,
+    val requiresNetwork: Boolean?,
+)
+
 class MandarinSpeaker internal constructor() {
     private var initializationGeneration = 0
     private var playbackGeneration = 0L
@@ -50,6 +57,8 @@ class MandarinSpeaker internal constructor() {
         internal set
     var playbackState by mutableStateOf(SpeakerPlaybackState.IDLE)
         internal set
+    var voiceInfo by mutableStateOf<SpeakerVoiceInfo?>(null)
+        private set
     internal var playbackModel by mutableStateOf(SpeechPlaybackModel())
         private set
 
@@ -225,6 +234,7 @@ class MandarinSpeaker internal constructor() {
         engine?.stop()
         engine?.shutdown()
         engine = null
+        voiceInfo = null
         clearPlayback()
     }
 
@@ -242,7 +252,12 @@ class MandarinSpeaker internal constructor() {
             return
         }
         val initialized = statusCode == TextToSpeech.SUCCESS
-        if (initialized && configureMandarin(createdEngine)) {
+        if (
+            initialized && configureMandarin(
+                current = createdEngine,
+                requestedEnginePackage = candidates[candidateIndex],
+            )
+        ) {
             status = SpeakerStatus.READY
             return
         }
@@ -258,22 +273,34 @@ class MandarinSpeaker internal constructor() {
         )
     }
 
-    private fun configureMandarin(current: TextToSpeech): Boolean {
+    private fun configureMandarin(
+        current: TextToSpeech,
+        requestedEnginePackage: String?,
+    ): Boolean {
         val compatible = runCatching { current.voices.orEmpty() }
             .getOrDefault(emptySet())
             .filter { voice -> isMandarinLocale(voice.locale) && voice.isInstalled }
             .sortedWith(chineseVoicePreference)
-        val languageAvailable = mandarinLocales.any { locale ->
-            runCatching { isTtsLanguageResultUsable(current.setLanguage(locale)) }
-                .getOrDefault(false)
+        val configuredLocale = mandarinLocales.firstOrNull { locale ->
+            runCatching {
+                isTtsLanguageResultUsable(current.setLanguage(locale))
+            }.getOrDefault(false)
         }
         val selectedVoice = compatible.firstOrNull { voice ->
             runCatching { current.setVoice(voice) == TextToSpeech.SUCCESS }.getOrDefault(false)
         }
-        val configured = languageAvailable || selectedVoice != null
+        val configured = configuredLocale != null || selectedVoice != null
         if (configured) {
             runCatching { current.setSpeechRate(speechRate) }
             installProgressListener(current)
+            val activeVoice = selectedVoice ?: runCatching { current.voice }.getOrNull()
+            voiceInfo = SpeakerVoiceInfo(
+                enginePackage = requestedEnginePackage
+                    ?: runCatching { current.defaultEngine }.getOrNull(),
+                voiceName = activeVoice?.name,
+                localeTag = (activeVoice?.locale ?: configuredLocale)?.toLanguageTag(),
+                requiresNetwork = activeVoice?.isNetworkConnectionRequired,
+            )
         }
         return configured
     }

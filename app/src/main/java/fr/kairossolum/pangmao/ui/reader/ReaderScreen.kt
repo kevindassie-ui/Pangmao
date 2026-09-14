@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderOpen
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RecordVoiceOver
@@ -93,6 +94,7 @@ import fr.kairossolum.pangmao.ui.common.TextTranslationState
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
 import fr.kairossolum.pangmao.ui.common.SpeakerPlaybackState
 import fr.kairossolum.pangmao.ui.common.SpeakerStatus
+import fr.kairossolum.pangmao.ui.common.SpeakerVoiceInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -134,6 +136,7 @@ fun ReaderScreen(
     var showTranslation by rememberSaveable { mutableStateOf(true) }
     var showDefinitions by rememberSaveable { mutableStateOf(true) }
     var revealPinyinAtTop by rememberSaveable { mutableStateOf(false) }
+    var showVoiceDetails by rememberSaveable { mutableStateOf(false) }
     var editorValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(text))
     }
@@ -330,6 +333,8 @@ fun ReaderScreen(
                 selected = speechRate,
                 onSelect = viewModel::setSpeechRate,
                 onTestVoice = { speaker.previewVoice(voiceSample) },
+                onShowVoiceDetails = { showVoiceDetails = true },
+                voiceDetailsAvailable = speaker.voiceInfo != null,
             )
         }
         HorizontalDivider(Modifier.padding(top = 10.dp))
@@ -521,6 +526,15 @@ fun ReaderScreen(
             }
         }
     }
+
+    if (showVoiceDetails) {
+        ModalBottomSheet(onDismissRequest = { showVoiceDetails = false }) {
+            SpeakerVoiceDetails(
+                info = speaker.voiceInfo,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+            )
+        }
+    }
 }
 
 @Composable
@@ -528,6 +542,8 @@ private fun SpeechRateSelector(
     selected: SpeechRate,
     onSelect: (SpeechRate) -> Unit,
     onTestVoice: () -> Unit,
+    onShowVoiceDetails: () -> Unit,
+    voiceDetailsAvailable: Boolean,
 ) {
     LazyRow(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
@@ -555,6 +571,76 @@ private fun SpeechRateSelector(
                 Text(stringResource(R.string.tts_test_voice))
             }
         }
+        item(key = "details") {
+            TextButton(
+                onClick = onShowVoiceDetails,
+                enabled = voiceDetailsAvailable,
+            ) {
+                Icon(Icons.Outlined.Info, contentDescription = null)
+                Text(" ${stringResource(R.string.tts_voice_details)}")
+            }
+        }
+    }
+}
+
+@Composable
+private fun SpeakerVoiceDetails(
+    info: SpeakerVoiceInfo?,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth().padding(bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            stringResource(R.string.tts_voice_details_title),
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+        )
+        if (info == null) {
+            Text(
+                stringResource(R.string.tts_voice_details_unavailable),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        } else {
+            VoiceDetailRow(
+                label = stringResource(R.string.tts_voice_engine),
+                value = info.enginePackage ?: stringResource(R.string.tts_voice_unknown),
+            )
+            VoiceDetailRow(
+                label = stringResource(R.string.tts_voice_name),
+                value = info.voiceName ?: stringResource(R.string.tts_voice_unknown),
+            )
+            VoiceDetailRow(
+                label = stringResource(R.string.tts_voice_locale),
+                value = info.localeTag ?: stringResource(R.string.tts_voice_unknown),
+            )
+            VoiceDetailRow(
+                label = stringResource(R.string.tts_voice_connection),
+                value = when (info.requiresNetwork) {
+                    false -> stringResource(R.string.tts_voice_offline)
+                    true -> stringResource(R.string.tts_voice_network)
+                    null -> stringResource(R.string.tts_voice_unknown)
+                },
+            )
+            Text(
+                stringResource(R.string.tts_voice_details_notice),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun VoiceDetailRow(label: String, value: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

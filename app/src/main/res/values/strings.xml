@@ -175,4 +175,15 @@
     <string name="tts_speed">Vitesse</string>
     <string name="tts_test_voice">Tester la voix</string>
     <string name="tts_test_sample">你好，欢迎使用胖猫。</string>
+    <string name="tts_voice_details">Détails</string>
+    <string name="tts_voice_details_title">Voix chinoise utilisée</string>
+    <string name="tts_voice_details_unavailable">Les informations de la voix ne sont pas encore disponibles.</string>
+    <string name="tts_voice_engine">Moteur Android</string>
+    <string name="tts_voice_name">Voix</string>
+    <string name="tts_voice_locale">Locale</string>
+    <string name="tts_voice_connection">Fonctionnement</string>
+    <string name="tts_voice_offline">Disponible hors ligne</string>
+    <string name="tts_voice_network">Connexion requise par cette voix</string>
+    <string name="tts_voice_unknown">Non communiqué par Android</string>
+    <string name="tts_voice_details_notice">Ces informations proviennent du moteur TTS installé sur cet appareil.</string>
 </resources>
