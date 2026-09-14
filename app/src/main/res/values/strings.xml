@@ -208,4 +208,9 @@
     <string name="tts_voice_details_notice">Ces informations proviennent du moteur TTS installé sur cet appareil.</string>
     <string name="reader_previous_sentence">Phrase précédente</string>
     <string name="reader_next_sentence">Phrase suivante</string>
+    <string name="study_tab_cards">Cartes · %1$d</string>
+    <string name="study_tab_learning">À apprendre · %1$d</string>
+    <string name="study_tab_known">Connus · %1$d</string>
+    <string name="study_tab_favorites">Favoris · %1$d</string>
+    <string name="study_collection_empty">Aucun mot dans cette liste.</string>
 </resources>

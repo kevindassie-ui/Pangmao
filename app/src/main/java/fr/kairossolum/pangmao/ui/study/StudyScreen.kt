@@ -27,10 +27,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import fr.kairossolum.pangmao.data.user.StudyCard
 import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.domain.ReviewRating
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.HanziText
@@ -55,7 +62,15 @@ fun StudyScreen(
     val due by viewModel.dueCards.collectAsStateWithLifecycle()
     val allCards by viewModel.allCards.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
+    val vocabulary by viewModel.vocabulary.collectAsStateWithLifecycle()
     val session by viewModel.session.collectAsStateWithLifecycle()
+    var selectedCollection by rememberSaveable { mutableIntStateOf(0) }
+    val learningWords = remember(vocabulary) {
+        vocabulary.filter { value -> value.knowledge.status == WordKnowledgeStatus.LEARNING }
+    }
+    val knownWords = remember(vocabulary) {
+        vocabulary.filter { value -> value.knowledge.status == WordKnowledgeStatus.KNOWN }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
@@ -79,54 +94,122 @@ fun StudyScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 28.dp),
             ) {
-                item {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(18.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                item(key = "collections") {
+                    val labels = listOf(
+                        stringResource(R.string.study_tab_cards, allCards.size),
+                        stringResource(R.string.study_tab_learning, learningWords.size),
+                        stringResource(R.string.study_tab_known, knownWords.size),
+                        stringResource(R.string.study_tab_favorites, favorites.size),
+                    )
+                    ScrollableTabRow(
+                        selectedTabIndex = selectedCollection,
+                        edgePadding = 12.dp,
+                        divider = {},
                     ) {
-                        Column(
-                            modifier = Modifier.padding(18.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                Icon(Icons.Outlined.School, contentDescription = null)
-                                Text(
-                                    if (due.isEmpty()) stringResource(R.string.cards_up_to_date) else stringResource(R.string.cards_due, due.size),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                            Text(
-                                stringResource(if (due.isEmpty()) R.string.cards_add_help else R.string.cards_review_help),
+                        labels.forEachIndexed { index, label ->
+                            Tab(
+                                selected = selectedCollection == index,
+                                onClick = { selectedCollection = index },
+                                text = { Text(label, maxLines = 1) },
                             )
-                            Button(onClick = viewModel::startReview, enabled = due.isNotEmpty()) {
-                                Text(stringResource(R.string.cards_start))
-                            }
                         }
                     }
                 }
-                if (allCards.isNotEmpty()) {
-                    item { ListTitle(stringResource(R.string.cards_all, allCards.size)) }
-                    items(allCards, key = { it.entry.id }) { card ->
-                        StudyCardRow(
-                            card = card,
-                            onOpen = { onOpenEntry(card.entry.id) },
-                            onRemove = { viewModel.remove(card.entry.id) },
-                        )
+
+                when (selectedCollection) {
+                    0 -> {
+                        item(key = "review-summary") {
+                            ReviewSummary(
+                                dueCount = due.size,
+                                onStartReview = viewModel::startReview,
+                            )
+                        }
+                        if (allCards.isNotEmpty()) {
+                            item(key = "all-cards-title") {
+                                ListTitle(stringResource(R.string.cards_all, allCards.size))
+                            }
+                            items(allCards, key = { "card-${it.entry.id}" }) { card ->
+                                StudyCardRow(
+                                    card = card,
+                                    onOpen = { onOpenEntry(card.entry.id) },
+                                    onRemove = { viewModel.remove(card.entry.id) },
+                                )
+                            }
+                        }
                     }
-                }
-                if (favorites.isNotEmpty()) {
-                    item { ListTitle(stringResource(R.string.favorites)) }
-                    items(favorites, key = { "favorite-${it.id}" }) { entry ->
-                        EntryRow(entry, onClick = { onOpenEntry(entry.id) })
+                    1 -> {
+                        if (learningWords.isEmpty()) {
+                            item(key = "learning-empty") { EmptyCollection() }
+                        } else {
+                            items(learningWords, key = { "learning-${it.entry.id}" }) { value ->
+                                EntryRow(value.entry, onClick = { onOpenEntry(value.entry.id) })
+                            }
+                        }
+                    }
+                    2 -> {
+                        if (knownWords.isEmpty()) {
+                            item(key = "known-empty") { EmptyCollection() }
+                        } else {
+                            items(knownWords, key = { "known-${it.entry.id}" }) { value ->
+                                EntryRow(value.entry, onClick = { onOpenEntry(value.entry.id) })
+                            }
+                        }
+                    }
+                    else -> {
+                        if (favorites.isEmpty()) {
+                            item(key = "favorites-empty") { EmptyCollection() }
+                        } else {
+                            items(favorites, key = { "favorite-${it.id}" }) { entry ->
+                                EntryRow(entry, onClick = { onOpenEntry(entry.id) })
+                            }
+                        }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun ReviewSummary(dueCount: Int, onStartReview: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = RoundedCornerShape(18.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+    ) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(Icons.Outlined.School, contentDescription = null)
+                Text(
+                    if (dueCount == 0) stringResource(R.string.cards_up_to_date)
+                    else stringResource(R.string.cards_due, dueCount),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Text(stringResource(if (dueCount == 0) R.string.cards_add_help else R.string.cards_review_help))
+            Button(onClick = onStartReview, enabled = dueCount > 0) {
+                Text(stringResource(R.string.cards_start))
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyCollection() {
+    Text(
+        stringResource(R.string.study_collection_empty),
+        modifier = Modifier.padding(horizontal = 18.dp, vertical = 24.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Composable

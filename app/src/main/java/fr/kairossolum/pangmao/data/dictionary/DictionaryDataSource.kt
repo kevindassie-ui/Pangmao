@@ -16,6 +16,11 @@ import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import java.io.File
 
+private const val MAX_ENTRY_QUERY_PARAMETERS = 500
+
+internal fun entryIdentifierBatches(identifiers: List<Long>): List<List<Long>> =
+    identifiers.distinct().chunked(MAX_ENTRY_QUERY_PARAMETERS)
+
 class DictionaryDataSource(private val context: Context) {
     private val database: SQLiteDatabase by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         val directory = File(context.filesDir, "dictionary/v4").apply { mkdirs() }
@@ -181,11 +186,15 @@ class DictionaryDataSource(private val context: Context) {
 
     fun entries(identifiers: List<Long>): List<DictionaryEntry> {
         if (identifiers.isEmpty()) return emptyList()
-        val placeholders = identifiers.joinToString(",") { "?" }
-        val byId = queryEntries(
-            "SELECT * FROM entries WHERE id IN ($placeholders)",
-            identifiers.map(Long::toString).toTypedArray(),
-        ).associateBy(DictionaryEntry::id)
+        val byId = entryIdentifierBatches(identifiers)
+            .flatMap { chunk ->
+                val placeholders = chunk.joinToString(",") { "?" }
+                queryEntries(
+                    "SELECT * FROM entries WHERE id IN ($placeholders)",
+                    chunk.map(Long::toString).toTypedArray(),
+                )
+            }
+            .associateBy(DictionaryEntry::id)
         return identifiers.mapNotNull(byId::get)
     }
 

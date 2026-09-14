@@ -24,6 +24,14 @@ numéros suivent le versionnage sémantique.
   des mots à revoir; la difficulté reste non évaluée si le profil est incomplet.
 - Navigation de lecture compacte avec phrase précédente/suivante, compteur,
   extrait courant et liste complète accessible depuis le compteur.
+- Onglets internes dans l'écran Cartes pour retrouver séparément les cartes,
+  les mots à apprendre, les mots connus et les favoris, avec leurs compteurs.
+
+### Qualité
+
+- Les résolutions de grandes listes d'entrées sont découpées en requêtes SQLite
+  de 500 paramètres, ce qui évite une limite OEM après plusieurs centaines de
+  mots marqués.
 
 ## 0.8.1 — 2026-09-14
 

@@ -29,6 +29,8 @@ class StudyViewModel(private val study: StudyRepository) : ViewModel() {
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val favorites = study.favorites()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val vocabulary = study.vocabulary()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _session = MutableStateFlow(ReviewSession())
     val session: StateFlow<ReviewSession> = _session.asStateFlow()
@@ -62,4 +64,3 @@ class StudyViewModel(private val study: StudyRepository) : ViewModel() {
         viewModelScope.launch { study.removeFlashcard(entryId) }
     }
 }
-

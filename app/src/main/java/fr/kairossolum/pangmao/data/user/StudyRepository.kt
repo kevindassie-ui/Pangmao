@@ -17,6 +17,11 @@ data class StudyCard(
     val scheduling: FlashcardEntity,
 )
 
+data class StudyVocabularyWord(
+    val entry: DictionaryEntry,
+    val knowledge: WordKnowledge,
+)
+
 class StudyRepository(
     private val dao: UserDao,
     private val dictionary: DictionaryRepository,
@@ -36,6 +41,9 @@ class StudyRepository(
 
     fun wordKnowledge(): Flow<List<WordKnowledge>> =
         dao.wordKnowledge().map { values -> values.mapNotNull(WordKnowledgeEntity::toModel) }
+
+    fun vocabulary(): Flow<List<StudyVocabularyWord>> =
+        wordKnowledge().mapLatest(::resolveVocabulary)
 
     suspend fun toggleFavorite(entryId: Long, currentlyFavorite: Boolean) {
         if (currentlyFavorite) dao.deleteFavorite(entryId) else dao.insertFavorite(FavoriteEntity(entryId))
@@ -91,6 +99,14 @@ class StudyRepository(
     private suspend fun resolveCards(cards: List<FlashcardEntity>): List<StudyCard> {
         val entries = dictionary.entries(cards.map(FlashcardEntity::entryId)).associateBy(DictionaryEntry::id)
         return cards.mapNotNull { card -> entries[card.entryId]?.let { StudyCard(it, card) } }
+    }
+
+    private suspend fun resolveVocabulary(values: List<WordKnowledge>): List<StudyVocabularyWord> {
+        val entries = dictionary.entries(values.map(WordKnowledge::entryId))
+            .associateBy(DictionaryEntry::id)
+        return values.mapNotNull { value ->
+            entries[value.entryId]?.let { entry -> StudyVocabularyWord(entry, value) }
+        }
     }
 
     private companion object {
