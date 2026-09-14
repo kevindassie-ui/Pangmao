@@ -5,6 +5,8 @@ import fr.kairossolum.pangmao.domain.ReviewRating
 import fr.kairossolum.pangmao.domain.ReviewScheduler
 import fr.kairossolum.pangmao.domain.ReviewState
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
+import fr.kairossolum.pangmao.domain.model.WordKnowledge
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,7 +32,7 @@ class StudyRepository(
     fun isFlashcard(entryId: Long): Flow<Boolean> = dao.isFlashcard(entryId)
 
     fun wordKnowledgeStatus(entryId: Long): Flow<WordKnowledgeStatus> =
-        dao.wordKnowledge(entryId).map { value -> WordKnowledgeStatus.fromStored(value?.status) }
+        dao.wordKnowledge(entryId).map { value -> storedWordKnowledgeStatus(value?.status) }
 
     fun wordKnowledge(): Flow<List<WordKnowledge>> =
         dao.wordKnowledge().map { values -> values.mapNotNull(WordKnowledgeEntity::toModel) }

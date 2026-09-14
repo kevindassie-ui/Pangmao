@@ -2,6 +2,8 @@ package fr.kairossolum.pangmao.data.user
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import fr.kairossolum.pangmao.domain.model.WordKnowledge
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 
 @Entity(tableName = "favorites")
 data class FavoriteEntity(
@@ -35,23 +37,6 @@ data class FlashcardEntity(
     val lastReviewedAt: Long? = null,
 )
 
-enum class WordKnowledgeStatus {
-    UNMARKED,
-    LEARNING,
-    KNOWN;
-
-    companion object {
-        internal fun fromStored(value: String?): WordKnowledgeStatus =
-            entries.firstOrNull { status -> status.name == value } ?: UNMARKED
-    }
-}
-
-data class WordKnowledge(
-    val entryId: Long,
-    val status: WordKnowledgeStatus,
-    val updatedAt: Long,
-)
-
 @Entity(tableName = "word_knowledge")
 data class WordKnowledgeEntity(
     @PrimaryKey val entryId: Long,
@@ -67,8 +52,12 @@ internal fun WordKnowledgeStatus.toEntity(
 }
 
 internal fun WordKnowledgeEntity.toModel(): WordKnowledge? {
-    val parsedStatus = WordKnowledgeStatus.fromStored(status)
+    val parsedStatus = storedWordKnowledgeStatus(status)
     return if (parsedStatus == WordKnowledgeStatus.UNMARKED) null else {
         WordKnowledge(entryId = entryId, status = parsedStatus, updatedAt = updatedAt)
     }
 }
+
+internal fun storedWordKnowledgeStatus(value: String?): WordKnowledgeStatus =
+    WordKnowledgeStatus.entries.firstOrNull { status -> status.name == value }
+        ?: WordKnowledgeStatus.UNMARKED

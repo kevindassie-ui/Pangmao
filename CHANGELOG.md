@@ -15,6 +15,9 @@ numéros suivent le versionnage sémantique.
   favoris ni des cartes SRS.
 - Migration additive de la base personnelle de la version 2 à la version 3,
   sans modification du dictionnaire embarqué ni des données existantes.
+- Calcul pur de couverture distinguant occurrences, mots uniques, blocs
+  inconnus et complétude du profil; aucun niveau de difficulté n'est annoncé
+  tant qu'une part suffisante du vocabulaire n'a pas été classée.
 
 ## 0.8.1 — 2026-09-14
 

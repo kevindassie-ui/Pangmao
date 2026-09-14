@@ -1,5 +1,7 @@
 package fr.kairossolum.pangmao.data.user
 
+import fr.kairossolum.pangmao.domain.model.WordKnowledge
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -7,10 +9,10 @@ import org.junit.Test
 class WordKnowledgeTest {
     @Test
     fun `stored values restore a safe explicit status`() {
-        assertEquals(WordKnowledgeStatus.LEARNING, WordKnowledgeStatus.fromStored("LEARNING"))
-        assertEquals(WordKnowledgeStatus.KNOWN, WordKnowledgeStatus.fromStored("KNOWN"))
-        assertEquals(WordKnowledgeStatus.UNMARKED, WordKnowledgeStatus.fromStored(null))
-        assertEquals(WordKnowledgeStatus.UNMARKED, WordKnowledgeStatus.fromStored("OBSOLETE"))
+        assertEquals(WordKnowledgeStatus.LEARNING, storedWordKnowledgeStatus("LEARNING"))
+        assertEquals(WordKnowledgeStatus.KNOWN, storedWordKnowledgeStatus("KNOWN"))
+        assertEquals(WordKnowledgeStatus.UNMARKED, storedWordKnowledgeStatus(null))
+        assertEquals(WordKnowledgeStatus.UNMARKED, storedWordKnowledgeStatus("OBSOLETE"))
     }
 
     @Test
