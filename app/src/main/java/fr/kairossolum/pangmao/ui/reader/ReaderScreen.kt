@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RecordVoiceOver
 import androidx.compose.material.icons.outlined.Replay
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -62,6 +63,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,11 +74,13 @@ import fr.kairossolum.pangmao.R
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
 import fr.kairossolum.pangmao.data.settings.SpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
+import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
 import fr.kairossolum.pangmao.domain.speech.SpeechSegment
 import fr.kairossolum.pangmao.domain.speech.SpeechSourceRange
 import fr.kairossolum.pangmao.domain.speech.buildSpeechDocument
 import fr.kairossolum.pangmao.ui.common.LocalDefinitionLanguage
+import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.HanziText
 import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.QuickEntryCard
@@ -100,6 +104,7 @@ fun ReaderScreen(
     val isAnalyzing by viewModel.isAnalyzing.collectAsStateWithLifecycle()
     val translation by viewModel.translationState.collectAsStateWithLifecycle()
     val selected by viewModel.selectedEntry.collectAsStateWithLifecycle()
+    val selectionLookup by viewModel.selectionLookup.collectAsStateWithLifecycle()
     val selectedFlashcard by viewModel.selectedFlashcard.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     val speechRate by viewModel.speechRate.collectAsStateWithLifecycle()
@@ -123,6 +128,9 @@ fun ReaderScreen(
     var showTranslation by rememberSaveable { mutableStateOf(true) }
     var showDefinitions by rememberSaveable { mutableStateOf(true) }
     var revealPinyinAtTop by rememberSaveable { mutableStateOf(false) }
+    var editorValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(text))
+    }
     val readingListState = rememberLazyListState()
     val speechDocument = remember(text) { buildSpeechDocument(text) }
     val activePlayback = speaker.playbackModel.takeIf { speaker.playbackSource == text }
@@ -144,6 +152,7 @@ fun ReaderScreen(
             spokenColor = spokenHighlight,
         )
     }
+    val selectedText = editorValue.selectedTextOrNull()
 
     LaunchedEffect(revealPinyinAtTop) {
         if (revealPinyinAtTop) {
@@ -153,6 +162,9 @@ fun ReaderScreen(
     }
 
     LaunchedEffect(text) {
+        if (editorValue.text != text) {
+            editorValue = TextFieldValue(text, selection = androidx.compose.ui.text.TextRange(text.length))
+        }
         speaker.stop()
     }
 
@@ -217,8 +229,11 @@ fun ReaderScreen(
             }
         }
         OutlinedTextField(
-            value = text,
-            onValueChange = viewModel::setText,
+            value = editorValue,
+            onValueChange = { updated ->
+                editorValue = updated
+                viewModel.setText(updated.text)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 110.dp, max = 175.dp)
@@ -227,13 +242,29 @@ fun ReaderScreen(
             placeholder = { Text(stringResource(R.string.reader_placeholder)) },
             trailingIcon = {
                 if (text.isNotEmpty()) {
-                    IconButton(onClick = { viewModel.setText("") }) {
+                    IconButton(
+                        onClick = {
+                            editorValue = TextFieldValue("")
+                            viewModel.setText("")
+                        },
+                    ) {
                         Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.clear))
                     }
                 }
             },
             visualTransformation = speechTransformation,
         )
+        if (selectedText != null && containsHan(selectedText)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = { viewModel.defineSelection(selectedText) }) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                    Text(" ${stringResource(R.string.reader_define_selection)}")
+                }
+            }
+        }
         if (speaker.ready && speechDocument.segments.size > 1) {
             SentenceNavigator(
                 segments = speechDocument.segments,
@@ -399,6 +430,54 @@ fun ReaderScreen(
                         ),
                         modifier = Modifier.padding(start = 8.dp),
                     )
+                }
+            }
+        }
+    }
+
+    selectionLookup?.let { lookup ->
+        ModalBottomSheet(onDismissRequest = viewModel::dismissSelectionLookup) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth().heightIn(max = 560.dp),
+                contentPadding = PaddingValues(bottom = 24.dp),
+            ) {
+                item(key = "selection-title") {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        Text(
+                            stringResource(R.string.reader_selection_results),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            lookup.query,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                if (lookup.entries.isEmpty()) {
+                    item(key = "selection-empty") {
+                        Text(
+                            stringResource(R.string.reader_selection_none),
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    itemsIndexed(
+                        lookup.entries,
+                        key = { _, entry -> entry.id },
+                    ) { _, entry ->
+                        EntryRow(
+                            entry = entry,
+                            onClick = {
+                                viewModel.dismissSelectionLookup()
+                                onOpenEntry(entry.id)
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -658,3 +737,10 @@ private fun String.singleLinePreview(maxCodePoints: Int = 14): String {
 }
 
 private val whitespaceRuns = Regex("\\s+")
+
+private fun TextFieldValue.selectedTextOrNull(): String? {
+    if (selection.collapsed) return null
+    val start = selection.min.coerceIn(0, text.length)
+    val end = selection.max.coerceIn(start, text.length)
+    return text.substring(start, end).trim().takeIf(String::isNotEmpty)
+}

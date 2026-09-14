@@ -52,6 +52,9 @@
     <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
     <string name="reader_speak">Lire tout le texte</string>
     <string name="reader_start_from_sentence">Lire à partir d’une phrase</string>
+    <string name="reader_define_selection">Définir la sélection</string>
+    <string name="reader_selection_results">Blocs reconnus dans la sélection</string>
+    <string name="reader_selection_none">Aucune entrée exacte ni aucun bloc connu n’a été trouvé.</string>
     <string name="reader_layer_pinyin">Pinyin</string><string name="reader_layer_translation">Traduction</string><string name="reader_layer_definitions">Définitions</string>
     <string name="reader_translation">Comprendre la phrase</string>
     <string name="reader_translation_local">Local · hors ligne</string>
