@@ -95,6 +95,7 @@ normal free Maven dependencies:
 
 ```bash
 tools/fetch_and_build_dictionary.sh
+tools/fetch_and_build_strokes.sh
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
@@ -107,6 +108,7 @@ signed ARM64 APK as a GitHub release.
 - Kotlin, Jetpack Compose and Material 3.
 - MVVM with `StateFlow` and repositories.
 - Immutable, pre-indexed SQLite dictionary asset.
+- Separate compressed SQLite asset for offline vector stroke-order data.
 - Separate Room database for user-owned favorites, history and SRS state.
 - CameraX plus bundled ML Kit Chinese Text Recognition v2.
 - Optional ML Kit Digital Ink and on-device Translation models.

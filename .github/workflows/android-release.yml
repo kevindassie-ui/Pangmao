@@ -28,6 +28,15 @@ jobs:
       - name: Build offline database
         if: steps.dictionary-cache.outputs.cache-hit != 'true'
         run: tools/fetch_and_build_dictionary.sh
+      - name: Restore stroke-order data
+        id: stroke-cache
+        uses: actions/cache@v4
+        with:
+          path: app/src/main/assets/databases/strokes.db
+          key: pangmao-strokes-v1-${{ hashFiles('tools/fetch_and_build_strokes.sh', 'tools/build_stroke_database.py') }}
+      - name: Build stroke-order database
+        if: steps.stroke-cache.outputs.cache-hit != 'true'
+        run: tools/fetch_and_build_strokes.sh
       - name: Restore release signing key
         env:
           KEYSTORE_BASE64: ${{ secrets.PANGMAO_KEYSTORE_BASE64 }}
@@ -40,6 +49,7 @@ jobs:
           PANGMAO_SIGNING_PASSWORD: ${{ secrets.PANGMAO_SIGNING_PASSWORD }}
         run: |
           python3 tools/verify_dictionary.py
+          python3 tools/verify_strokes.py
           python3 -m unittest discover -s tools/tests -p "test_*.py"
           python3 tools/audit_dictionary_quality.py --json-out build/reports/dictionary-quality.json
           ./gradlew --no-daemon testDebugUnitTest lintDebug assembleRelease

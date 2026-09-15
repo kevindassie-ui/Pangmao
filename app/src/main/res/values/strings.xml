@@ -158,6 +158,7 @@
     <string name="entry_tab_examples">Exemples</string>
     <string name="entry_tab_characters">Caractères</string>
     <string name="entry_tab_words">Mots associés</string>
+    <string name="entry_tab_stroke_order">Tracé</string>
     <string name="entry_no_examples">Aucun exemple disponible pour cette entrée.</string>
     <string name="entry_no_characters">Aucune information de caractère disponible.</string>
     <string name="entry_no_words">Aucun mot ne correspond à ces filtres.</string>
@@ -176,6 +177,30 @@
     <string name="frequent">Fréquent %1$d</string><string name="pronounce_sentence">Prononcer la phrase</string>
     <string name="entry_sources_note">Définitions : %1$s. Exemples : contributeurs Tatoeba (CC BY 2.0 FR) et compléments éditoriaux Pangmao. Informations caractères : Unicode Unihan.</string>
     <string name="strokes">%1$s traits</string><string name="radical_detail">clé %1$s%2$s</string><string name="simplified_short">simpl. %1$s</string><string name="traditional_short">trad. %1$s</string>
+    <string name="stroke_mode_animation">Animation</string>
+    <string name="stroke_mode_practice">Entraînement</string>
+    <string name="stroke_order_subtitle">Ordre standard de Chine continentale · hors ligne</string>
+    <string name="stroke_order_unavailable">Le tracé animé n’est pas encore disponible pour ce caractère.</string>
+    <string name="stroke_order_error">Impossible de charger le tracé de ce caractère.</string>
+    <string name="stroke_progress">Trait %1$d sur %2$d</string>
+    <string name="stroke_progress_complete">Les %1$d traits sont affichés</string>
+    <string name="stroke_previous">Trait précédent</string>
+    <string name="stroke_next">Trait suivant</string>
+    <string name="stroke_play">Lire l’animation</string>
+    <string name="stroke_pause">Mettre l’animation en pause</string>
+    <string name="stroke_restart">Recommencer l’animation</string>
+    <string name="stroke_animation_canvas">Animation de l’ordre des traits de %1$s</string>
+    <string name="stroke_practice_canvas">Zone d’entraînement pour écrire %1$s</string>
+    <string name="stroke_practice_instruction">Tracez le trait %1$d sur %2$d.</string>
+    <string name="stroke_practice_correct">Bien ! Passez au trait suivant.</string>
+    <string name="stroke_practice_wrong_direction">Le trait est reconnu, mais partez dans l’autre sens.</string>
+    <string name="stroke_practice_out_of_order">Ce tracé correspond plutôt au trait %1$d. Suivez l’ordre indiqué.</string>
+    <string name="stroke_practice_retry">Réessayez en suivant le guide plus précisément.</string>
+    <string name="stroke_practice_complete">Caractère terminé ! Les traits ont été tracés dans l’ordre.</string>
+    <string name="stroke_practice_reset">Recommencer</string>
+    <string name="stroke_practice_show_hint">Afficher l’indice</string>
+    <string name="stroke_practice_hide_hint">Masquer l’indice</string>
+    <string name="stroke_practice_notice">Évaluation locale et volontairement tolérante : elle guide le geste sans modifier vos cartes.</string>
 
     <string name="cards_title">Cartes</string>
     <string name="cards_subtitle">Répétition espacée locale</string>
@@ -190,7 +215,8 @@
     <string name="privacy_title">Vie privée par conception</string>
     <string name="privacy_body">Le dictionnaire, les textes, l’OCR, les traductions, l’historique et les cartes restent sur cet appareil. Les modèles manuscrit et de traduction sont téléchargés uniquement à votre demande.</string>
     <string name="about_version">Pangmao · version %1$s</string><string name="about_description">Dictionnaire et compagnon d’apprentissage chinois, conçu pour un usage personnel, local et sans abonnement.</string>
-    <string name="offline_content">Contenu hors ligne</string><string name="entries">Entrées</string><string name="examples">Exemples</string><string name="sources">Sources linguistiques</string><string name="independence">Indépendance</string>
+    <string name="offline_content">Contenu hors ligne</string><string name="entries">Entrées</string><string name="examples">Exemples</string><string name="stroke_characters">Tracés animés</string><string name="sources">Sources et licences</string><string name="independence">Indépendance</string>
+    <string name="stroke_source_license">Tracés vectoriels PRC · licence publique Arphic</string>
     <string name="independence_body">Pangmao est un projet indépendant. Il n’est ni affilié à Pleco Software, ni approuvé par celle-ci. Il ne contient aucun dictionnaire, modèle, code, marque graphique ou contenu propriétaire de Pleco.</string>
     <string name="tts_pause">Mettre la lecture en pause</string>
     <string name="tts_resume">Reprendre la lecture</string>

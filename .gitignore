@@ -12,3 +12,4 @@ captures/
 __pycache__/
 *.py[cod]
 app/src/main/assets/databases/pangmao.db
+app/src/main/assets/databases/strokes.db

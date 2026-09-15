@@ -184,7 +184,24 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 - Préparer une aide contextuelle puis une FAQ recherchable; un assistant en
   ligne ne sera évalué qu’après stabilisation de cette documentation.
 
-- Ordre des traits animé et entraînement manuscrit évalué.
+### v0.11.0 — tracé des caractères · en cours
+
+- Ajouter l’ordre des traits animé, contrôlable et entièrement hors ligne dans
+  les fiches à un caractère.
+- Proposer un entraînement manuscrit guidé et tolérant qui vérifie ordre,
+  direction et trajectoire générale sans toucher aux cartes SRS.
+- Isoler les données graphiques du dictionnaire et conserver leur licence et
+  transformation reproductible.
+
+Plan et critères d’acceptation: [V0.11_RELEASE_PLAN.md](V0.11_RELEASE_PLAN.md).
+
+### v0.12.0 — première saisie vocale
+
+- Commencer le STT court comme quatrième saisie de l’accueil, avec microphone
+  toujours explicite et correction avant recherche ou Reader.
+- Séparer les contrats de moteur et de capture du parcours UI afin de pouvoir
+  réutiliser ces briques dans l’application de transcription longue.
+
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé

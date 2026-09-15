@@ -8,6 +8,21 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Ajouté
+
+- Base hors ligne séparée de 9 574 caractères avec chemins vectoriels et
+  médianes Make Me a Hanzi, épinglée, compressée et attribuée sous licence
+  publique Arphic.
+- Onglet `Tracé` dans les fiches à un caractère, avec animation automatique,
+  pause, pas précédent/suivant et recommencement.
+- Entraînement guidé trait par trait distinguant geste correct, sens inversé,
+  ordre incorrect et tracé à reprendre, sans modifier le statut ni les cartes.
+
+### Qualité
+
+- Reconstruction et contrôle dédiés de la base de tracés en CI, avec témoins
+  simplifiés et traditionnels et tests purs du codec et de l’évaluation.
+
 ## 0.10.0 — 2026-09-15
 
 ### Ajouté

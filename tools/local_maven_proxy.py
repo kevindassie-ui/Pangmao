@@ -8,7 +8,6 @@ official HTTPS repositories configured in settings.gradle.kts.
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import mimetypes
 import os
@@ -25,6 +24,25 @@ ORIGINS = {
     "plugins": "https://plugins.gradle.org/m2/",
 }
 ORIGIN_PRIORITY = tuple(ORIGINS)
+
+GOOGLE_REPOSITORY_PREFIXES = (
+    "androidx/",
+    "com/android/",
+    "com/google/android/",
+    "com/google/firebase/",
+    "com/google/mlkit/",
+)
+
+
+def origin_priority(relative: str) -> tuple[str, ...]:
+    """Try the repository most likely to own an artifact before fallbacks."""
+    if ".gradle.plugin/" in relative:
+        preferred = "plugins"
+    elif relative.startswith(GOOGLE_REPOSITORY_PREFIXES):
+        preferred = "google"
+    else:
+        preferred = "central"
+    return (preferred, *(origin for origin in ORIGIN_PRIORITY if origin != preferred))
 
 
 class MavenProxy(BaseHTTPRequestHandler):
@@ -107,7 +125,7 @@ class MavenProxy(BaseHTTPRequestHandler):
         destination.parent.mkdir(parents=True, exist_ok=True)
         request_id = threading.get_ident()
 
-        def download(origin_name: str) -> tuple[str, Path, int]:
+        for origin_name in origin_priority(relative):
             temporary = destination.with_name(
                 f".{destination.name}.{request_id}.{origin_name}.part"
             )
@@ -125,21 +143,11 @@ class MavenProxy(BaseHTTPRequestHandler):
                     ],
                     check=False,
                 )
-            return origin_name, temporary, result.returncode
-
-        with ThreadPoolExecutor(max_workers=len(ORIGIN_PRIORITY)) as pool:
-            results = list(pool.map(download, ORIGIN_PRIORITY))
-
-        winner: Path | None = None
-        for origin_name in ORIGIN_PRIORITY:
-            _, temporary, return_code = next(row for row in results if row[0] == origin_name)
-            if winner is None and return_code == 0:
-                winner = temporary
-            elif temporary.exists():
+            if result.returncode == 0:
+                os.replace(temporary, destination)
+                return True
+            if temporary.exists():
                 temporary.unlink()
-        if winner is not None:
-            os.replace(winner, destination)
-            return True
         miss_file.touch()
         return False
 

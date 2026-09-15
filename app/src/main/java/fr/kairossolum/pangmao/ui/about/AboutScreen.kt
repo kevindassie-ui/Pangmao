@@ -84,6 +84,7 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                         Metric(stringResource(R.string.entries), metadata["entry_count"])
                         Metric(stringResource(R.string.examples), metadata["example_count"])
                         Metric(stringResource(R.string.characters), metadata["character_count"])
+                        Metric(stringResource(R.string.stroke_characters), metadata["stroke_character_count"])
                         Metric("Français → 中文", metadata["learning_entry_count_fr"])
                         Metric("English → 中文", metadata["learning_entry_count_en"])
                         Metric("Unihan", metadata["unihan_version"])
@@ -114,6 +115,12 @@ fun AboutScreen(viewModel: AboutViewModel, onBack: () -> Unit) {
                 "Unicode Unihan 17.0",
                 "Lectures et propriétés des caractères · Unicode License v3",
                 "https://www.unicode.org/license.txt",
+                uriHandler::openUri,
+            )
+            LicenseItem(
+                "Hanzi Writer Data / Make Me a Hanzi",
+                stringResource(R.string.stroke_source_license),
+                "https://github.com/chanind/hanzi-writer-data",
                 uriHandler::openUri,
             )
             LicenseItem(
