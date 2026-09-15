@@ -29,9 +29,19 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Restore generated dictionary
+        id: dictionary-cache
+        uses: actions/cache@v4
+        with:
+          path: app/src/main/assets/databases/pangmao.db
+          key: pangmao-db-v4-${{ hashFiles('tools/fetch_and_build_dictionary.sh', 'tools/build_dictionary.py', 'tools/data/**') }}
+
+      - name: Build offline database
+        if: steps.dictionary-cache.outputs.cache-hit != 'true'
+        run: tools/fetch_and_build_dictionary.sh
+
       - name: Validate offline database
         run: |
-          tools/fetch_and_build_dictionary.sh
           python3 tools/verify_dictionary.py
           python3 -m unittest discover -s tools/tests -p "test_*.py"
           python3 tools/audit_dictionary_quality.py --json-out build/reports/dictionary-quality.json
@@ -48,13 +58,13 @@ jobs:
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
 
       - name: Collect installable APK
-        run: cp app/build/outputs/apk/debug/app-universal-debug.apk Pangmao-MVP-debug.apk
+        run: cp app/build/outputs/apk/debug/app-arm64-v8a-debug.apk Pangmao-arm64-debug.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Pangmao-MVP-APK
-          path: Pangmao-MVP-debug.apk
+          name: Pangmao-ARM64-APK
+          path: Pangmao-arm64-debug.apk
           if-no-files-found: error
           retention-days: 30
 

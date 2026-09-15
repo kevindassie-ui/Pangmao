@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.RecordVoiceOver
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +33,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,6 +43,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +58,7 @@ import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
+import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import fr.kairossolum.pangmao.ui.common.DefinitionList
 import fr.kairossolum.pangmao.ui.common.EntryRow
 import fr.kairossolum.pangmao.ui.common.HanziText
@@ -61,6 +67,7 @@ import fr.kairossolum.pangmao.ui.common.PinyinText
 import fr.kairossolum.pangmao.ui.common.rememberMandarinSpeaker
 import fr.kairossolum.pangmao.ui.common.WordKnowledgeSelector
 import fr.kairossolum.pangmao.data.settings.DefinitionLanguage
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,7 +82,12 @@ fun EntryScreen(
     val wordKnowledgeStatus by viewModel.wordKnowledgeStatus.collectAsStateWithLifecycle()
     val speaker = rememberMandarinSpeaker()
     val definitionLanguage = LocalDefinitionLanguage.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val learningSavedMessage = stringResource(R.string.knowledge_learning_saved)
+    val addToCardsAction = stringResource(R.string.card_add)
 
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             title = { Text(stringResource(R.string.entry_title)) },
@@ -152,8 +164,42 @@ fun EntryScreen(
 
                     WordKnowledgeSelector(
                         status = wordKnowledgeStatus,
-                        onSelect = viewModel::setWordKnowledgeStatus,
+                        onSelect = { status ->
+                            viewModel.setWordKnowledgeStatus(status)
+                            if (status == WordKnowledgeStatus.LEARNING && !isFlashcard) {
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = learningSavedMessage,
+                                        actionLabel = addToCardsAction,
+                                        withDismissAction = true,
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.addFlashcard()
+                                    }
+                                }
+                            }
+                        },
                     )
+
+                    Text(
+                        stringResource(R.string.knowledge_cards_independent),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    Button(
+                        onClick = viewModel::toggleFlashcard,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(
+                            if (isFlashcard) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = null,
+                        )
+                        Text(
+                            stringResource(if (isFlashcard) R.string.card_remove else R.string.card_add),
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         entry.sources.split(" · ").forEach { source ->
@@ -231,6 +277,11 @@ fun EntryScreen(
                 }
             }
         }
+    }
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier.align(Alignment.BottomCenter),
+    )
     }
 }
 

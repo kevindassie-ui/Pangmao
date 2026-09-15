@@ -8,6 +8,19 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Ajouté
+
+- Bouton textuel d’ajout/retrait des cartes dans chaque fiche chinoise et
+  proposition facultative d’ajout après le passage à `À apprendre`.
+
+### Modifié
+
+- Les versions privées ciblent uniquement ARM64; la base générée est mise en
+  cache par empreinte de ses sources et scripts afin d’éviter les reconstructions
+  inutiles en CI.
+- Le statut lexical explique désormais explicitement son indépendance vis-à-vis
+  des cartes de répétition espacée.
+
 ## 0.9.0 — 2026-09-15
 
 ### Ajouté

@@ -204,3 +204,28 @@ mais utilisent un curseur sur les écrans étroits. L'essai de voix et les déta
 techniques restent disponibles dans un menu secondaire; les commandes de
 lecture, pause, reprise, recommencement et arrêt restent visibles, car elles
 modifient directement l'état de lecture.
+
+## D-023 — statut lexical et carte restent deux choix
+
+**Décision:** `À apprendre / Connu / Non marqué` décrit la connaissance déclarée
+du mot et alimente la couverture du Reader. Une carte crée séparément un exercice
+planifié. Aucun changement de statut n'ajoute ni ne supprime automatiquement une
+carte; après `À apprendre`, Pangmao peut proposer cette seconde action sans
+l'imposer. Les deux états restent visibles et modifiables dans la fiche.
+
+## D-024 — lecture directe, modification explicite
+
+**Décision:** le Reader distinguera un mode Lecture par défaut et un mode
+Modification activé par une commande visible. En Lecture, toucher une phrase la
+sélectionne comme point de départ TTS et l'appui long ouvre le parcours de
+définition; le double appui caché n'est pas utilisé. En Modification, le champ
+Android conserve curseur et sélection natives avant une nouvelle segmentation.
+
+## D-025 — diffusion ARM64 et validation proportionnée
+
+**Décision:** pendant la phase privée, CI et releases produisent uniquement un
+APK ARM64. La base dictionnaire est reconstruite lorsque ses scripts, sources ou
+compléments changent, sinon un cache vérifié est réutilisé. Les lots emploient
+des tests ciblés puis une validation complète avant publication; un commit de
+métadonnées seul ne déclenche pas une seconde CI complète. Une commercialisation
+réintroduira les architectures nécessaires via un Android App Bundle signé.

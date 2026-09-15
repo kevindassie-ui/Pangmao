@@ -172,6 +172,18 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 
 ## Après v0.9 — apprentissage avancé
 
+### v0.10.0 — Reader et parcours d’apprentissage · en préparation
+
+- Rendre l’ajout aux cartes explicite dans la fiche tout en maintenant
+  l’indépendance entre statut lexical et répétition espacée.
+- Passer le Reader en mode Lecture par défaut avec modification explicite,
+  sélection directe d’une phrase et surlignage du point de départ.
+- Donner davantage de hauteur au contenu grâce à un en-tête compact persistant.
+- Placer la couverture du vocabulaire après la traduction et avant la lecture
+  segmentée.
+- Préparer une aide contextuelle puis une FAQ recherchable; un assistant en
+  ligne ne sera évalué qu’après stabilisation de cette documentation.
+
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.

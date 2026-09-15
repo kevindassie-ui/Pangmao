@@ -100,6 +100,12 @@ class EntryViewModel(
         }
     }
 
+    fun addFlashcard() {
+        viewModelScope.launch {
+            if (!isFlashcard.value) study.addFlashcard(entryId)
+        }
+    }
+
     fun setWordKnowledgeStatus(status: WordKnowledgeStatus) {
         viewModelScope.launch { study.setWordKnowledgeStatus(entryId, status) }
     }

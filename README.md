@@ -68,11 +68,12 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 ## Install
 
 Download [Pangmao v0.9.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.9.0),
-open the APK on Android,
-and allow installation from the browser or GitHub app when Android asks. Use the
-smaller `arm64` APK on recent Android phones; the `universal` APK is the fallback
-for other devices. Both are signed with Pangmao's persistent personal release
-key, so later versions can be installed as updates without the Play Store.
+open the APK on Android, and allow installation from the browser or GitHub app
+when Android asks. Private development releases target recent ARM64 phones. A
+Play-ready Android App Bundle can restore all supported architectures later
+without changing the application ID or signing key. Releases use Pangmao's
+persistent personal key, so later versions can be installed as updates without
+the Play Store.
 
 ## Build
 

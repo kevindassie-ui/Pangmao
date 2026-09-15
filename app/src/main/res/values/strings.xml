@@ -168,6 +168,8 @@
     <string name="favorite_add">Ajouter aux favoris</string><string name="favorite_remove">Retirer des favoris</string>
     <string name="card_add">Ajouter aux cartes</string><string name="card_remove">Retirer des cartes</string>
     <string name="knowledge_progress">Progression</string><string name="knowledge_unmarked">Non marqué</string><string name="knowledge_learning">À apprendre</string><string name="knowledge_known">Connu</string>
+    <string name="knowledge_cards_independent">Le statut classe votre vocabulaire ; les cartes planifient les révisions séparément.</string>
+    <string name="knowledge_learning_saved">Mot classé « À apprendre ».</string>
     <string name="frequent">Fréquent %1$d</string><string name="pronounce_sentence">Prononcer la phrase</string>
     <string name="entry_sources_note">Définitions : %1$s. Exemples : contributeurs Tatoeba (CC BY 2.0 FR) et compléments éditoriaux Pangmao. Informations caractères : Unicode Unihan.</string>
     <string name="strokes">%1$s traits</string><string name="radical_detail">clé %1$s%2$s</string><string name="simplified_short">simpl. %1$s</string><string name="traditional_short">trad. %1$s</string>
