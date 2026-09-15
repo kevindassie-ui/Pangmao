@@ -8,6 +8,8 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.9.0 — 2026-09-15
+
 ### Ajouté
 
 - Fondation locale de la v0.9 pour marquer séparément un mot `À apprendre` ou

@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-13.
+Dernière mise à jour: 2026-09-15.
 
 ## Principes
 
@@ -155,12 +155,25 @@ Plan d'exécution et validation: [V0.7_RELEASE_PLAN.md](V0.7_RELEASE_PLAN.md).
 
 Plan borné et critères d'acceptation: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN.md).
 
-## Après v0.8 — apprentissage avancé
+## v0.8.1 — commandes vocales compactes · publiée
+
+- Remplacer les boutons de vitesse débordants par un curseur discret à quatre
+  crans et déplacer l'essai vocal et les détails dans un menu compact.
+
+## v0.9.0 — vocabulaire maîtrisé · candidate
+
+- Marquer indépendamment les mots `À apprendre`, `Connus` ou non marqués.
+- Afficher une couverture lexicale honnête dans le Reader, sans faux niveau
+  CECR, et proposer un surlignage facultatif des mots à revoir.
+- Retrouver les mots à apprendre, connus et favoris dans l'écran Cartes.
+- Remplacer le carrousel de phrases par une navigation compacte.
+
+Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
+
+## Après v0.9 — apprentissage avancé
 
 - Ordre des traits animé et entraînement manuscrit évalué.
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
-- Liste de mots connus et estimation de difficulté d'un texte: premier axe de
-  la v0.9, avec couverture lexicale honnête plutôt qu'un faux niveau CECR.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.
 - Étendre l’explorateur: favoris, niveau HSK, longueur, ordre alphabétique avancé
   et relations caractère–mot–expression.

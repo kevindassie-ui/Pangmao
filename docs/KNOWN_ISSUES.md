@@ -1,6 +1,6 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-09-14.
+Dernière mise à jour: 2026-09-15.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
@@ -61,16 +61,25 @@ Confirmé:
 - les quatre vitesses et l'essai de voix fonctionnent;
 - les cartes peuvent être ajoutées directement depuis le Reader.
 
-Correctif v0.8.1 préparé:
+Correctif publié dans la v0.8.1, à confirmer sur l'appareil:
 
 - la rangée TTS horizontalement défilable masque alternativement certaines
   vitesses ou les actions `Tester/Détails` sur un écran étroit; elle est
   remplacée par un curseur à quatre crans et un menu d'actions compact.
 
-Amélioration ergonomique reportée au lot Reader de la v0.9:
+Amélioration ergonomique intégrée au candidat v0.9.0:
 
 - remplacer la rangée de phrases tronquées par une navigation compacte
   précédent/suivant avec compteur et extrait de la phrase active.
+
+## Validation appareil du candidat v0.9.0
+
+- mise à jour depuis la v0.8.1 sans perte des cartes, favoris et historiques;
+- persistance des états `À apprendre / Connu / Non marqué` après redémarrage;
+- cohérence des listes Cartes, À apprendre, Connus et Favoris;
+- couverture non évaluée tant que le profil lexical est insuffisamment rempli;
+- surlignage facultatif des mots à revoir;
+- navigation précédente/suivante et choix direct d'une phrase sur écran étroit.
 
 ## Validé sur appareil
 

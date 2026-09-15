@@ -1,6 +1,6 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-14
+Checkpoint date: 2026-09-15
 
 ## Implemented
 
@@ -329,16 +329,33 @@ Checkpoint date: 2026-09-14
 - Device acceptance remains to cover ColorOS range callbacks, the selection
   workflow, all copy targets, sentence navigation and reported voice details.
 
-## Later iteration
+## Reader ergonomics release 0.8.1
 
-## Reader ergonomics candidate 0.8.1
+- Tag: `v0.8.1` at commit `b3024cf`.
+- Implementation CI run `34895404292` and final CI run `34895946814` passed
+  corpus reconstruction, tests, Android lint and debug APK assembly.
+- Release run `34896620819` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.8.1-arm64.apk` (95,294,190 bytes), SHA-256
+  `7bf8e075e88243f5273ece9eb211a0f45dd015669891550835a71a3d8166d6de`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.8.1/Pangmao-v0.8.1-arm64.apk>
+- Universal APK: `Pangmao-v0.8.1-universal.apk` (194,069,844 bytes), SHA-256
+  `48c131fa0244225189dad958e01e2ea2cae2b0ceaac8cacc2cb4570ce9d19e98`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.8.1/Pangmao-v0.8.1-universal.apk>
 
-- Commit `9ac6f38` replaces the horizontally scrolling speech controls with a
-  persistent four-stop slider and a compact voice-actions menu.
-- CI run `34895404292` passed corpus reconstruction, JVM tests, Android lint and
-  debug APK assembly.
-- The future monolingual Chinese-definition mode and the bounded v0.9 known-word
-  and Reader-difficulty plan are recorded without changing dictionary data.
+## Vocabulary mastery candidate 0.9.0
+
+- Local three-state word knowledge and the additive user-database migration
+  passed CI run `34897181176`.
+- Reader coverage modeling passed run `34897902607`; dictionary and Reader
+  status controls passed run `34898627436`.
+- Reader coverage UI and optional review highlighting passed run `34899421460`;
+  compact sentence navigation passed run `34899946543`.
+- Learning, known and favorite vocabulary lists, including 500-entry SQLite
+  batching, passed run `34925963711`.
+- The release candidate still requires its final CI, signed publication and a
+  real update test from v0.8.1.
 
 Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
 tracking and interactive dictionary-source details are intentionally deferred.
