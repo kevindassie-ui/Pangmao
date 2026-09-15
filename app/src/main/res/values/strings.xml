@@ -45,13 +45,16 @@
     <string name="learning_search_help_english">Recherchez un mot anglais ou un sens en chinois.</string>
 
     <string name="reader_title">Lecteur</string>
-    <string name="reader_subtitle">Touchez un mot pour le définir</string>
+    <string name="reader_subtitle">Phrase : toucher · Mot : appui long</string>
     <string name="reader_field">Texte chinois</string>
+    <string name="reader_edit">Modifier</string>
+    <string name="reader_finish_editing">Terminer</string>
+    <string name="reader_finish_editing_hint">Terminez la modification pour actualiser l’analyse.</string>
     <string name="reader_placeholder">Collez, partagez ou ouvrez un fichier texte…</string>
     <string name="reader_segmented">LECTURE SEGMENTÉE</string>
     <string name="reader_empty">Le texte annoté apparaîtra ici.</string>
-    <string name="reader_speak">Lire tout le texte</string>
-    <string name="reader_start_from_sentence">Lire à partir d’une phrase</string>
+    <string name="reader_speak">Lire depuis la phrase sélectionnée</string>
+    <string name="reader_start_from_sentence">Phrase de départ</string>
     <string name="reader_define_selection">Définir la sélection</string>
     <string name="reader_selection_results">Blocs reconnus dans la sélection</string>
     <string name="reader_selection_none">Aucune entrée exacte ni aucun bloc connu n’a été trouvé.</string>

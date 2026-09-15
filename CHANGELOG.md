@@ -12,6 +12,8 @@ numéros suivent le versionnage sémantique.
 
 - Bouton textuel d’ajout/retrait des cartes dans chaque fiche chinoise et
   proposition facultative d’ajout après le passage à `À apprendre`.
+- Mode Lecture du Reader avec sélection et surlignage d’une phrase par toucher;
+  l’appui long sur un mot ouvre directement sa mini-fiche.
 
 ### Modifié
 
@@ -25,6 +27,8 @@ numéros suivent le versionnage sémantique.
   réserver davantage de hauteur à l’analyse.
 - La couverture `Vocabulaire du texte` apparaît après la traduction et avant la
   lecture segmentée; la réactivation du pinyin conserve son recentrage exact.
+- L’édition du texte devient un mode explicite `Modifier / Terminer`; l’analyse
+  et la segmentation sont relancées une seule fois à la fin des modifications.
 
 ## 0.9.0 — 2026-09-15
 

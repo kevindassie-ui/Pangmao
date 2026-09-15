@@ -3,6 +3,8 @@ package fr.kairossolum.pangmao.ui.reader
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
@@ -30,6 +34,7 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Pause
@@ -72,9 +77,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
@@ -91,9 +98,11 @@ import fr.kairossolum.pangmao.data.settings.closestSpeechRate
 import fr.kairossolum.pangmao.domain.model.AnalyzedToken
 import fr.kairossolum.pangmao.domain.ReadingCoverage
 import fr.kairossolum.pangmao.domain.ReadingDifficultyBand
+import fr.kairossolum.pangmao.domain.codePointAtDisplayOffset
 import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
 import fr.kairossolum.pangmao.domain.containsHan
 import fr.kairossolum.pangmao.domain.numberedPinyinReading
+import fr.kairossolum.pangmao.domain.tokenAtDisplayOffset
 import fr.kairossolum.pangmao.domain.speech.SpeechSegment
 import fr.kairossolum.pangmao.domain.speech.SpeechSourceRange
 import fr.kairossolum.pangmao.domain.speech.buildSpeechDocument
@@ -140,6 +149,7 @@ fun ReaderScreen(
     val voiceSample = stringResource(R.string.tts_test_sample)
     val copiedMessage = stringResource(R.string.reader_copied)
     val definitionLanguage = LocalDefinitionLanguage.current
+    var isEditing by rememberSaveable { mutableStateOf(false) }
     var showCoverageDetails by rememberSaveable { mutableStateOf(false) }
     var highlightReviewWords by rememberSaveable { mutableStateOf(false) }
     val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -148,7 +158,10 @@ fun ReaderScreen(
                 val content = withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                 }
-                content?.let(viewModel::setText)
+                content?.let { loaded ->
+                    isEditing = false
+                    viewModel.setText(loaded)
+                }
             }
         }
     }
@@ -162,13 +175,16 @@ fun ReaderScreen(
     }
     val readingListState = rememberLazyListState()
     val speechDocument = remember(text) { buildSpeechDocument(text) }
+    var selectedSentenceIndex by remember(text) { mutableIntStateOf(0) }
     val activePlayback = speaker.playbackModel.takeIf { speaker.playbackSource == text }
     val activeSegmentIndex = activePlayback?.position?.segmentIndex
     val activeSegment = activeSegmentIndex?.let { speechDocument.segments.getOrNull(it) }
-    val showSentenceNavigator = speaker.ready && speechDocument.segments.size > 1
+    val selectedSegment = speechDocument.segments.getOrNull(selectedSentenceIndex)
+    val highlightedSegment = activeSegment ?: selectedSegment
+    val showSentenceNavigator = !isEditing && speaker.ready && speechDocument.segments.size > 1
     val showTtsError = speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE ||
         speaker.status == SpeakerStatus.ERROR
-    val showSpeechRate = speaker.ready && text.isNotBlank()
+    val showSpeechRate = !isEditing && speaker.ready && text.isNotBlank()
     val controlsBeforePinyin = 1 +
         (if (showSentenceNavigator) 1 else 0) +
         (if (error != null) 1 else 0) +
@@ -177,24 +193,45 @@ fun ReaderScreen(
     val sentenceHighlight = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.48f)
     val spokenHighlight = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.78f)
     val speechTransformation = remember(
-        activeSegment?.sourceStart,
-        activeSegment?.sourceEndExclusive,
+        highlightedSegment?.sourceStart,
+        highlightedSegment?.sourceEndExclusive,
         activePlayback?.spokenRange,
         sentenceHighlight,
         spokenHighlight,
     ) {
         SpeechHighlightTransformation(
-            activeSegment = activeSegment,
+            activeSegment = highlightedSegment,
             spokenRange = activePlayback?.spokenRange,
             sentenceColor = sentenceHighlight,
             spokenColor = spokenHighlight,
         )
     }
-    val selectedText = editorValue.selectedTextOrNull()
+    val selectedText = editorValue.selectedTextOrNull().takeIf { isEditing }
     val copyText: (String) -> Unit = { value ->
         if (value.isNotBlank()) {
             clipboard.setText(AnnotatedString(value))
             Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
+        }
+    }
+    val selectSentence: (Int) -> Unit = { index ->
+        if (index in speechDocument.segments.indices) {
+            selectedSentenceIndex = index
+            when (speaker.playbackState) {
+                SpeakerPlaybackState.PLAYING -> speaker.speakFrom(text, index)
+                SpeakerPlaybackState.PAUSED -> speaker.stop()
+                SpeakerPlaybackState.IDLE -> Unit
+            }
+        }
+    }
+    val defineAtOffset: (Int) -> Unit = { offset ->
+        val analyzed = analysis?.tokenAtDisplayOffset(text, offset)
+        if (analyzed?.entry != null) {
+            viewModel.select(analyzed)
+        } else {
+            val candidate = analyzed?.token?.text
+                ?.takeIf { analyzed.token.isChinese && containsHan(it) }
+                ?: text.codePointAtDisplayOffset(offset)?.takeIf(::containsHan)
+            candidate?.let(viewModel::defineSelection)
         }
     }
 
@@ -212,24 +249,38 @@ fun ReaderScreen(
         speaker.stop()
     }
 
+    LaunchedEffect(activeSegmentIndex) {
+        activeSegmentIndex?.let { index ->
+            if (index in speechDocument.segments.indices) selectedSentenceIndex = index
+        }
+    }
+
     Column(Modifier.fillMaxSize()) {
         TopAppBar(
             title = {
                 Column {
                     Text(stringResource(R.string.reader_title), fontWeight = FontWeight.Bold)
-                    Text(stringResource(R.string.reader_subtitle), style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        stringResource(R.string.reader_subtitle),
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             },
             actions = {
                 IconButton(
                     onClick = {
                         when (speaker.playbackState) {
-                            SpeakerPlaybackState.IDLE -> speaker.speak(text)
+                            SpeakerPlaybackState.IDLE -> speaker.speakFrom(
+                                text,
+                                speechDocument.segments.getOrNull(selectedSentenceIndex)?.index ?: 0,
+                            )
                             SpeakerPlaybackState.PLAYING -> speaker.pause()
                             SpeakerPlaybackState.PAUSED -> speaker.resume()
                         }
                     },
-                    enabled = speaker.ready && text.isNotBlank(),
+                    enabled = !isEditing && speaker.ready && text.isNotBlank(),
                 ) {
                     val icon = when (speaker.playbackState) {
                         SpeakerPlaybackState.IDLE -> Icons.Outlined.RecordVoiceOver
@@ -259,32 +310,78 @@ fun ReaderScreen(
                 }
             },
         )
-        OutlinedTextField(
-            value = editorValue,
-            onValueChange = { updated ->
-                editorValue = updated
-                viewModel.setText(updated.text)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 96.dp, max = 135.dp)
-                .padding(horizontal = 12.dp),
-            label = { Text(stringResource(R.string.reader_field)) },
-            placeholder = { Text(stringResource(R.string.reader_placeholder)) },
-            trailingIcon = {
-                if (text.isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            editorValue = TextFieldValue("")
-                            viewModel.setText("")
-                        },
-                    ) {
-                        Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.clear))
-                    }
+        Column(Modifier.padding(horizontal = 12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(R.string.reader_field),
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                TextButton(
+                    onClick = {
+                        if (isEditing) {
+                            isEditing = false
+                            viewModel.setText(editorValue.text)
+                        } else {
+                            speaker.stop()
+                            editorValue = TextFieldValue(
+                                text,
+                                selection = androidx.compose.ui.text.TextRange(text.length),
+                            )
+                            isEditing = true
+                        }
+                    },
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                ) {
+                    Icon(
+                        if (isEditing) Icons.Outlined.Check else Icons.Outlined.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Text(
+                        " ${stringResource(if (isEditing) R.string.reader_finish_editing else R.string.reader_edit)}"
+                    )
                 }
-            },
-            visualTransformation = speechTransformation,
-        )
+            }
+            if (isEditing) {
+                OutlinedTextField(
+                    value = editorValue,
+                    onValueChange = { updated -> editorValue = updated },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 96.dp, max = 135.dp),
+                    placeholder = { Text(stringResource(R.string.reader_placeholder)) },
+                    trailingIcon = {
+                        if (editorValue.text.isNotEmpty()) {
+                            IconButton(onClick = { editorValue = TextFieldValue("") }) {
+                                Icon(
+                                    Icons.Outlined.Clear,
+                                    contentDescription = stringResource(R.string.clear),
+                                )
+                            }
+                        }
+                    },
+                )
+            } else {
+                ReaderTextField(
+                    text = text,
+                    transformedText = speechTransformation.filter(AnnotatedString(text)).text,
+                    highlightedOffset = highlightedSegment?.sourceStart,
+                    placeholder = stringResource(R.string.reader_placeholder),
+                    onSentenceTap = { offset ->
+                        speechDocument.segmentAtSourceOffset(offset)?.let { segment ->
+                            selectSentence(segment.index)
+                        }
+                    },
+                    onWordLongPress = defineAtOffset,
+                    onClear = { viewModel.setText("") },
+                )
+            }
+        }
         HorizontalDivider(Modifier.padding(top = 8.dp))
         LazyColumn(
             state = readingListState,
@@ -302,7 +399,14 @@ fun ReaderScreen(
                             Icon(Icons.Outlined.FolderOpen, contentDescription = null)
                             Text(" ${stringResource(R.string.open)}")
                         }
-                        OutlinedButton(onClick = { clipboard.getText()?.text?.let(viewModel::setText) }) {
+                        OutlinedButton(
+                            onClick = {
+                                clipboard.getText()?.text?.let { pasted ->
+                                    isEditing = false
+                                    viewModel.setText(pasted)
+                                }
+                            },
+                        ) {
                             Icon(Icons.Outlined.ContentPaste, contentDescription = null)
                             Text(" ${stringResource(R.string.paste)}")
                         }
@@ -332,8 +436,9 @@ fun ReaderScreen(
                 item(key = "sentence-navigator") {
                     SentenceNavigator(
                         segments = speechDocument.segments,
+                        selectedSegmentIndex = selectedSentenceIndex,
                         activeSegmentIndex = activeSegmentIndex,
-                        onSelect = { segmentIndex -> speaker.speakFrom(text, segmentIndex) },
+                        onSelect = selectSentence,
                     )
                 }
             }
@@ -387,6 +492,13 @@ fun ReaderScreen(
                 }
             }
             when {
+                isEditing -> item(key = "editing-hint") {
+                    Text(
+                        stringResource(R.string.reader_finish_editing_hint),
+                        modifier = Modifier.padding(4.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 isAnalyzing -> item(key = "analyzing") {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(180.dp),
@@ -618,6 +730,82 @@ fun ReaderScreen(
 }
 
 @Composable
+private fun ReaderTextField(
+    text: String,
+    transformedText: AnnotatedString,
+    highlightedOffset: Int?,
+    placeholder: String,
+    onSentenceTap: (Int) -> Unit,
+    onWordLongPress: (Int) -> Unit,
+    onClear: () -> Unit,
+) {
+    var layoutResult by remember(text) { mutableStateOf<TextLayoutResult?>(null) }
+    val scrollState = rememberScrollState()
+    val displayText = if (text.isEmpty()) AnnotatedString(placeholder) else transformedText
+
+    LaunchedEffect(text) {
+        scrollState.scrollTo(0)
+    }
+    LaunchedEffect(highlightedOffset, layoutResult) {
+        val layout = layoutResult
+        val offset = highlightedOffset
+        if (layout != null && offset != null && offset in text.indices) {
+            val line = layout.getLineForOffset(offset)
+            scrollState.animateScrollTo(layout.getLineTop(line).roundToInt())
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp, max = 135.dp),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        color = Color.Transparent,
+    ) {
+        Box {
+            Text(
+                text = displayText,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+                    .padding(
+                        start = 16.dp,
+                        top = 14.dp,
+                        end = if (text.isEmpty()) 16.dp else 52.dp,
+                        bottom = 14.dp,
+                    )
+                    .pointerInput(text, onSentenceTap, onWordLongPress) {
+                        if (text.isNotEmpty()) {
+                            detectTapGestures(
+                                onTap = { position ->
+                                    layoutResult?.getOffsetForPosition(position)?.let(onSentenceTap)
+                                },
+                                onLongPress = { position ->
+                                    layoutResult?.getOffsetForPosition(position)?.let(onWordLongPress)
+                                },
+                            )
+                        }
+                    },
+                color = if (text.isEmpty()) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 22.sp, lineHeight = 34.sp),
+                onTextLayout = { layoutResult = it },
+            )
+            if (text.isNotEmpty()) {
+                IconButton(
+                    onClick = onClear,
+                    modifier = Modifier.align(Alignment.TopEnd),
+                ) {
+                    Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.clear))
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SpeechRateSelector(
     selected: SpeechRate,
     onSelect: (SpeechRate) -> Unit,
@@ -754,21 +942,12 @@ private fun VoiceDetailRow(label: String, value: String) {
 @Composable
 private fun SentenceNavigator(
     segments: List<SpeechSegment>,
+    selectedSegmentIndex: Int,
     activeSegmentIndex: Int?,
     onSelect: (Int) -> Unit,
 ) {
-    var selectedIndex by remember(segments) { mutableIntStateOf(0) }
     var expanded by remember { mutableStateOf(false) }
-    LaunchedEffect(activeSegmentIndex) {
-        activeSegmentIndex?.let { index ->
-            if (index in segments.indices) selectedIndex = index
-        }
-    }
-    val displayedIndex = (activeSegmentIndex ?: selectedIndex).coerceIn(segments.indices)
-    val selectAndRead: (Int) -> Unit = { index ->
-        selectedIndex = index
-        onSelect(index)
-    }
+    val displayedIndex = (activeSegmentIndex ?: selectedSegmentIndex).coerceIn(segments.indices)
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -783,7 +962,7 @@ private fun SentenceNavigator(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(
-                onClick = { selectAndRead(displayedIndex - 1) },
+                onClick = { onSelect(displayedIndex - 1) },
                 enabled = displayedIndex > 0,
             ) {
                 Icon(
@@ -821,7 +1000,7 @@ private fun SentenceNavigator(
                             },
                             onClick = {
                                 expanded = false
-                                selectAndRead(segment.index)
+                                onSelect(segment.index)
                             },
                             trailingIcon = {
                                 if (segment.index == displayedIndex) {
@@ -833,7 +1012,7 @@ private fun SentenceNavigator(
                 }
             }
             IconButton(
-                onClick = { selectAndRead(displayedIndex + 1) },
+                onClick = { onSelect(displayedIndex + 1) },
                 enabled = displayedIndex < segments.lastIndex,
             ) {
                 Icon(

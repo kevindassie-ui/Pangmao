@@ -215,7 +215,7 @@ l'imposer. Les deux états restent visibles et modifiables dans la fiche.
 
 ## D-024 — lecture directe, modification explicite
 
-**Décision:** le Reader distinguera un mode Lecture par défaut et un mode
+**Décision:** le Reader distingue un mode Lecture par défaut et un mode
 Modification activé par une commande visible. En Lecture, toucher une phrase la
 sélectionne comme point de départ TTS et l'appui long ouvre le parcours de
 définition; le double appui caché n'est pas utilisé. En Modification, le champ
