@@ -368,6 +368,26 @@ Checkpoint date: 2026-09-15
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.9.0/Pangmao-v0.9.0-universal.apk>
 - A real update test from v0.8.1 remains to be recorded.
 
+## Interactive learning-flow release 0.10.0
+
+- Explicit dictionary card actions and their independence from vocabulary status
+  passed CI run `34941032837`.
+- The compact Reader hierarchy and reordered vocabulary coverage passed CI run
+  `34941965884`.
+- Reading/editing modes, sentence touch selection, Unicode-safe word long-press
+  lookup and their 24 JVM tests passed CI run `34942952495`.
+- Tag: `v0.10.0` at commit `c870fc9`.
+- Release run `34943610317` reused the verified dictionary cache, repeated tests
+  and Android lint, restored the persistent signing key, built the ARM64 release
+  and verified its Android signature before publication.
+- ARM64 APK: `Pangmao-v0.10.0-arm64.apk` (95,360,894 bytes), SHA-256
+  `a77adb41c9827b512edefcc5a657a5c0d239d18ad568ac7406104f7b7adced6e`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.10.0/Pangmao-v0.10.0-arm64.apk>
+- No universal APK is produced during private development; a future Android App
+  Bundle will restore store-managed architecture delivery.
+- Device acceptance remains to cover the v0.9.0 → v0.10.0 update, narrow-screen
+  Reader layout, sentence touch selection and long-press dictionary lookup.
+
 Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
 tracking and interactive dictionary-source details are intentionally deferred.
 Collect device feedback, screenshots and reproducible bug reports.
