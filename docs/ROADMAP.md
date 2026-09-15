@@ -160,7 +160,7 @@ Plan borné et critères d'acceptation: [V0.8_RELEASE_PLAN.md](V0.8_RELEASE_PLAN
 - Remplacer les boutons de vitesse débordants par un curseur discret à quatre
   crans et déplacer l'essai vocal et les détails dans un menu compact.
 
-## v0.9.0 — vocabulaire maîtrisé · candidate
+## v0.9.0 — vocabulaire maîtrisé · publiée
 
 - Marquer indépendamment les mots `À apprendre`, `Connus` ou non marqués.
 - Afficher une couverture lexicale honnête dans le Reader, sans faux niveau

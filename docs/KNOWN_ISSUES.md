@@ -67,12 +67,12 @@ Correctif publié dans la v0.8.1, à confirmer sur l'appareil:
   vitesses ou les actions `Tester/Détails` sur un écran étroit; elle est
   remplacée par un curseur à quatre crans et un menu d'actions compact.
 
-Amélioration ergonomique intégrée au candidat v0.9.0:
+Amélioration ergonomique publiée dans la v0.9.0:
 
 - remplacer la rangée de phrases tronquées par une navigation compacte
   précédent/suivant avec compteur et extrait de la phrase active.
 
-## Validation appareil du candidat v0.9.0
+## Validation appareil de la v0.9.0
 
 - mise à jour depuis la v0.8.1 sans perte des cartes, favoris et historiques;
 - persistance des états `À apprendre / Connu / Non marqué` après redémarrage;

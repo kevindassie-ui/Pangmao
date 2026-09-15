@@ -344,7 +344,7 @@ Checkpoint date: 2026-09-15
   `48c131fa0244225189dad958e01e2ea2cae2b0ceaac8cacc2cb4570ce9d19e98`.
 - Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.8.1/Pangmao-v0.8.1-universal.apk>
 
-## Vocabulary mastery candidate 0.9.0
+## Vocabulary mastery release 0.9.0
 
 - Local three-state word knowledge and the additive user-database migration
   passed CI run `34897181176`.
@@ -354,8 +354,19 @@ Checkpoint date: 2026-09-15
   compact sentence navigation passed run `34899946543`.
 - Learning, known and favorite vocabulary lists, including 500-entry SQLite
   batching, passed run `34925963711`.
-- The release candidate still requires its final CI, signed publication and a
-  real update test from v0.8.1.
+- Tag: `v0.9.0` at commit `7f3d8c3`.
+- Final CI run `34926379223` passed corpus reconstruction, migrations, tests,
+  Android lint and debug APK assembly.
+- Release run `34926881772` repeated the complete validation, restored the
+  persistent signing key, built both variants and verified their Android
+  signatures before publication.
+- ARM64 APK: `Pangmao-v0.9.0-arm64.apk` (95,341,810 bytes), SHA-256
+  `cd41400352f9d1d2bbbede9b225c40a41feb5542a1b63df57e93bd6cf9a48f03`.
+- ARM64 download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.9.0/Pangmao-v0.9.0-arm64.apk>
+- Universal APK: `Pangmao-v0.9.0-universal.apk` (194,117,464 bytes), SHA-256
+  `4d8f7549397dbe693244553bc2731bd691e2ecf85d72f6594a0a685568f59aa1`.
+- Universal download: <https://github.com/kevindassie-ui/Pangmao/releases/download/v0.9.0/Pangmao-v0.9.0-universal.apk>
+- A real update test from v0.8.1 remains to be recorded.
 
 Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
 tracking and interactive dictionary-source details are intentionally deferred.
