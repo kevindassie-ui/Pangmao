@@ -172,7 +172,7 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 
 ## Après v0.9 — apprentissage avancé
 
-### v0.10.0 — Reader et parcours d’apprentissage · en préparation
+### v0.10.0 — Reader et parcours d’apprentissage · candidate validée
 
 - Rendre l’ajout aux cartes explicite dans la fiche tout en maintenant
   l’indépendance entre statut lexical et répétition espacée.

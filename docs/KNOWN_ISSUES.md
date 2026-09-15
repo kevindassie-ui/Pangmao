@@ -81,6 +81,17 @@ Amélioration ergonomique publiée dans la v0.9.0:
 - surlignage facultatif des mots à revoir;
 - navigation précédente/suivante et choix direct d'une phrase sur écran étroit.
 
+## Validation appareil de la v0.10.0
+
+- mise à jour directe depuis la v0.9.0 sans perte de données personnelles;
+- espace de lecture utile sur écrans étroits et défilement interne d’un long
+  texte chinois;
+- sélection et surlignage d’une phrase au toucher, à l’arrêt et pendant le TTS;
+- appui long sur un mot vers la bonne mini-fiche, y compris après ponctuation;
+- passage `Modifier / Terminer`, sélection Android native et analyse actualisée;
+- ajout/retrait d’une carte visible dans la fiche sans couplage involontaire au
+  statut lexical.
+
 ## Validé sur appareil
 
 Le TTS sur ColorOS et la séparation des blocs logiques ont été confirmés sur

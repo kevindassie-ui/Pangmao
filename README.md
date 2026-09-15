@@ -4,7 +4,20 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## Version 0.9.0 highlights
+## Version 0.10.0 highlights
+
+- Reader in explicit `Reading` and `Editing` modes: analysis is refreshed once
+  editing is finished, while native cursor and selection remain available.
+- Tap any sentence in the Chinese text to select and highlight the next TTS
+  starting point; tapping during playback jumps there immediately.
+- Long-press a word in the Chinese text to open its dictionary preview directly.
+- The Chinese text stays visible while secondary Reader controls scroll away,
+  leaving substantially more room for pinyin, translations and segmented reading.
+- Text vocabulary coverage now follows the translation it describes.
+- Dictionary entries expose a full-width card action and explain why vocabulary
+  status and spaced-repetition cards remain independent.
+- Private development builds are ARM64-only and reuse a source-keyed dictionary
+  cache; a Play-ready App Bundle can restore other architectures later.
 
 - Independent local statuses `Learning`, `Known` and `Unmarked` for Chinese
   words, without changing favorites or SRS cards.
@@ -67,7 +80,7 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 ## Install
 
-Download [Pangmao v0.9.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.9.0),
+Download [Pangmao v0.10.0](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.10.0),
 open the APK on Android, and allow installation from the browser or GitHub app
 when Android asks. Private development releases target recent ARM64 phones. A
 Play-ready Android App Bundle can restore all supported architectures later
@@ -86,8 +99,8 @@ tools/fetch_and_build_dictionary.sh
 ```
 
 Every push to `main` runs data validation, unit tests, Android lint and a debug
-APK build. A `v*` tag publishes tested ARM64 and universal APKs as a GitHub
-release.
+APK build. During private development, a `v*` tag publishes one tested and
+signed ARM64 APK as a GitHub release.
 
 ## Architecture
 

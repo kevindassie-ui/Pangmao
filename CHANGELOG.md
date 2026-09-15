@@ -8,6 +8,8 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.10.0 — 2026-09-15
+
 ### Ajouté
 
 - Bouton textuel d’ajout/retrait des cartes dans chaque fiche chinoise et
