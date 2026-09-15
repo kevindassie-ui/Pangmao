@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -164,6 +165,15 @@ fun ReaderScreen(
     val activePlayback = speaker.playbackModel.takeIf { speaker.playbackSource == text }
     val activeSegmentIndex = activePlayback?.position?.segmentIndex
     val activeSegment = activeSegmentIndex?.let { speechDocument.segments.getOrNull(it) }
+    val showSentenceNavigator = speaker.ready && speechDocument.segments.size > 1
+    val showTtsError = speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE ||
+        speaker.status == SpeakerStatus.ERROR
+    val showSpeechRate = speaker.ready && text.isNotBlank()
+    val controlsBeforePinyin = 1 +
+        (if (showSentenceNavigator) 1 else 0) +
+        (if (error != null) 1 else 0) +
+        (if (showTtsError) 1 else 0) +
+        (if (showSpeechRate) 1 else 0)
     val sentenceHighlight = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.48f)
     val spokenHighlight = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.78f)
     val speechTransformation = remember(
@@ -188,9 +198,9 @@ fun ReaderScreen(
         }
     }
 
-    LaunchedEffect(revealPinyinAtTop) {
+    LaunchedEffect(revealPinyinAtTop, controlsBeforePinyin) {
         if (revealPinyinAtTop) {
-            readingListState.animateScrollToItem(0)
+            readingListState.animateScrollToItem(controlsBeforePinyin)
             revealPinyinAtTop = false
         }
     }
@@ -249,19 +259,6 @@ fun ReaderScreen(
                 }
             },
         )
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            OutlinedButton(onClick = { filePicker.launch(arrayOf("text/plain", "text/*")) }) {
-                Icon(Icons.Outlined.FolderOpen, contentDescription = null)
-                Text(" ${stringResource(R.string.open)}")
-            }
-            OutlinedButton(onClick = { clipboard.getText()?.text?.let(viewModel::setText) }) {
-                Icon(Icons.Outlined.ContentPaste, contentDescription = null)
-                Text(" ${stringResource(R.string.paste)}")
-            }
-        }
         OutlinedTextField(
             value = editorValue,
             onValueChange = { updated ->
@@ -270,7 +267,7 @@ fun ReaderScreen(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 110.dp, max = 175.dp)
+                .heightIn(min = 96.dp, max = 135.dp)
                 .padding(horizontal = 12.dp),
             label = { Text(stringResource(R.string.reader_field)) },
             placeholder = { Text(stringResource(R.string.reader_placeholder)) },
@@ -288,92 +285,125 @@ fun ReaderScreen(
             },
             visualTransformation = speechTransformation,
         )
-        if (text.isNotBlank() || (selectedText != null && containsHan(selectedText))) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                if (text.isNotBlank()) {
-                    TextButton(onClick = { copyText(text) }) {
-                        Icon(Icons.Outlined.ContentCopy, contentDescription = null)
-                        Text(" ${stringResource(R.string.reader_copy_all)}")
+        HorizontalDivider(Modifier.padding(top = 8.dp))
+        LazyColumn(
+            state = readingListState,
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            item(key = "input-actions") {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        OutlinedButton(onClick = { filePicker.launch(arrayOf("text/plain", "text/*")) }) {
+                            Icon(Icons.Outlined.FolderOpen, contentDescription = null)
+                            Text(" ${stringResource(R.string.open)}")
+                        }
+                        OutlinedButton(onClick = { clipboard.getText()?.text?.let(viewModel::setText) }) {
+                            Icon(Icons.Outlined.ContentPaste, contentDescription = null)
+                            Text(" ${stringResource(R.string.paste)}")
+                        }
                     }
-                }
-                if (selectedText != null && containsHan(selectedText)) {
-                    TextButton(onClick = { viewModel.defineSelection(selectedText) }) {
-                        Icon(Icons.Outlined.Search, contentDescription = null)
-                        Text(" ${stringResource(R.string.reader_define_selection)}")
-                    }
-                }
-            }
-        }
-        if (speaker.ready && speechDocument.segments.size > 1) {
-            SentenceNavigator(
-                segments = speechDocument.segments,
-                activeSegmentIndex = activeSegmentIndex,
-                onSelect = { segmentIndex -> speaker.speakFrom(text, segmentIndex) },
-            )
-        }
-        error?.let {
-            Text(
-                it,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-        if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE || speaker.status == SpeakerStatus.ERROR) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-            ) {
-                Text(
-                    stringResource(
-                        if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE) R.string.tts_voice_missing
-                        else R.string.tts_unavailable
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                )
-                Row(
-                    modifier = Modifier.align(Alignment.End),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    TextButton(onClick = { speaker.retry(context) }) {
-                        Text(stringResource(R.string.tts_retry))
-                    }
-                    TextButton(onClick = { speaker.openVoiceSettings(context) }) {
-                        Text(stringResource(R.string.tts_open_settings))
+                    if (text.isNotBlank() || (selectedText != null && containsHan(selectedText))) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            if (text.isNotBlank()) {
+                                TextButton(onClick = { copyText(text) }) {
+                                    Icon(Icons.Outlined.ContentCopy, contentDescription = null)
+                                    Text(" ${stringResource(R.string.reader_copy_all)}")
+                                }
+                            }
+                            if (selectedText != null && containsHan(selectedText)) {
+                                TextButton(onClick = { viewModel.defineSelection(selectedText) }) {
+                                    Icon(Icons.Outlined.Search, contentDescription = null)
+                                    Text(" ${stringResource(R.string.reader_define_selection)}")
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
-        if (speaker.ready && text.isNotBlank()) {
-            SpeechRateSelector(
-                selected = speechRate,
-                onSelect = viewModel::setSpeechRate,
-                onTestVoice = { speaker.previewVoice(voiceSample) },
-                onShowVoiceDetails = { showVoiceDetails = true },
-                voiceDetailsAvailable = speaker.voiceInfo != null,
-            )
-        }
-        HorizontalDivider(Modifier.padding(top = 10.dp))
-        when {
-            isAnalyzing -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            if (showSentenceNavigator) {
+                item(key = "sentence-navigator") {
+                    SentenceNavigator(
+                        segments = speechDocument.segments,
+                        activeSegmentIndex = activeSegmentIndex,
+                        onSelect = { segmentIndex -> speaker.speakFrom(text, segmentIndex) },
+                    )
+                }
             }
-            analysis == null -> Text(
-                stringResource(R.string.reader_empty),
-                modifier = Modifier.padding(18.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            else -> {
-                val currentAnalysis = checkNotNull(analysis)
-                LazyColumn(
-                    state = readingListState,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
+            error?.let { message ->
+                item(key = "reader-error") {
+                    Text(
+                        message,
+                        modifier = Modifier.padding(horizontal = 2.dp, vertical = 4.dp),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+            if (showTtsError) {
+                item(key = "tts-error") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            stringResource(
+                                if (speaker.status == SpeakerStatus.MISSING_CHINESE_VOICE) {
+                                    R.string.tts_voice_missing
+                                } else {
+                                    R.string.tts_unavailable
+                                }
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                        Row(
+                            modifier = Modifier.align(Alignment.End),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            TextButton(onClick = { speaker.retry(context) }) {
+                                Text(stringResource(R.string.tts_retry))
+                            }
+                            TextButton(onClick = { speaker.openVoiceSettings(context) }) {
+                                Text(stringResource(R.string.tts_open_settings))
+                            }
+                        }
+                    }
+                }
+            }
+            if (showSpeechRate) {
+                item(key = "speech-rate") {
+                    SpeechRateSelector(
+                        selected = speechRate,
+                        onSelect = viewModel::setSpeechRate,
+                        onTestVoice = { speaker.previewVoice(voiceSample) },
+                        onShowVoiceDetails = { showVoiceDetails = true },
+                        voiceDetailsAvailable = speaker.voiceInfo != null,
+                    )
+                }
+            }
+            when {
+                isAnalyzing -> item(key = "analyzing") {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(180.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                analysis == null -> item(key = "empty") {
+                    Text(
+                        stringResource(R.string.reader_empty),
+                        modifier = Modifier.padding(4.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                else -> {
+                    val currentAnalysis = checkNotNull(analysis)
                     if (showPinyin) {
                         item(key = "continuous-pinyin") {
                             ContinuousPinyin(
@@ -410,20 +440,20 @@ fun ReaderScreen(
                             }
                         }
                     }
-                    readingCoverage?.let { coverage ->
-                        item(key = "reading-coverage") {
-                            ReadingCoverageSummary(
-                                coverage = coverage,
-                                onClick = { showCoverageDetails = true },
-                            )
-                        }
-                    }
                     if (showTranslation) {
                         item(key = "translation") {
                             ReaderTranslationCard(
                                 translation = translation,
                                 onDownload = viewModel::downloadTranslationModels,
                                 onCopy = copyText,
+                            )
+                        }
+                    }
+                    readingCoverage?.let { coverage ->
+                        item(key = "reading-coverage") {
+                            ReadingCoverageSummary(
+                                coverage = coverage,
+                                onClick = { showCoverageDetails = true },
                             )
                         }
                     }

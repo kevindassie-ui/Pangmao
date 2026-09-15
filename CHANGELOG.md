@@ -20,6 +20,11 @@ numéros suivent le versionnage sémantique.
   inutiles en CI.
 - Le statut lexical explique désormais explicitement son indépendance vis-à-vis
   des cartes de répétition espacée.
+- Dans le Reader, seule la zone de texte chinois reste fixe; l’import, la copie,
+  la navigation vocale et la vitesse rejoignent le contenu défilant afin de
+  réserver davantage de hauteur à l’analyse.
+- La couverture `Vocabulaire du texte` apparaît après la traduction et avant la
+  lecture segmentée; la réactivation du pinyin conserve son recentrage exact.
 
 ## 0.9.0 — 2026-09-15
 
