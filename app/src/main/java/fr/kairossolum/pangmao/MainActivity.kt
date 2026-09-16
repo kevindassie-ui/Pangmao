@@ -227,7 +227,12 @@ private fun PangmaoApp(
                     val model: EntryViewModel = viewModel(
                         key = "entry-$identifier",
                         factory = viewModelFactory {
-                            EntryViewModel(identifier, container.dictionary, container.study)
+                            EntryViewModel(
+                                identifier,
+                                container.dictionary,
+                                container.study,
+                                container.strokeOrders,
+                            )
                         },
                     )
                     EntryScreen(
@@ -261,7 +266,9 @@ private fun PangmaoApp(
                 }
                 composable("about") {
                     val model: AboutViewModel = viewModel(
-                        factory = viewModelFactory { AboutViewModel(container.dictionary) }
+                        factory = viewModelFactory {
+                            AboutViewModel(container.dictionary, container.strokeOrders)
+                        }
                     )
                     AboutScreen(model, onBack = navController::navigateUp)
                 }

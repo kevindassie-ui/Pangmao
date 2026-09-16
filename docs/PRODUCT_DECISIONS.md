@@ -229,3 +229,17 @@ compléments changent, sinon un cache vérifié est réutilisé. Les lots emploi
 des tests ciblés puis une validation complète avant publication; un commit de
 métadonnées seul ne déclenche pas une seconde CI complète. Une commercialisation
 réintroduira les architectures nécessaires via un Android App Bundle signé.
+
+## D-026 — tracés locaux, évaluation pédagogique honnête
+
+**Décision:** les tracés PRC de Hanzi Writer Data sont embarqués dans une base
+séparée, compressée et attribuée sous licence Arphic. Le rendu est natif Compose:
+aucune WebView ni requête distante n’est nécessaire pour animer ou pratiquer un
+caractère. La base dictionnaire reste inchangée et la source graphique peut être
+reconstruite indépendamment.
+
+L’entraînement compare le prochain geste à la médiane attendue avec des seuils
+volontairement tolérants. Il distingue ordre, direction et proximité générale,
+mais n’affiche pas de score pseudo-précis et ne modifie ni la connaissance du
+mot ni sa planification SRS. Cette évaluation est une aide au geste, pas une
+certification calligraphique.

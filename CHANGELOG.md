@@ -8,6 +8,23 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.11.0 — 2026-09-16
+
+### Ajouté
+
+- Base hors ligne séparée de 9 574 caractères avec chemins vectoriels et
+  médianes Make Me a Hanzi, épinglée, compressée et attribuée sous licence
+  publique Arphic.
+- Onglet `Tracé` dans les fiches à un caractère, avec animation automatique,
+  pause, pas précédent/suivant et recommencement.
+- Entraînement guidé trait par trait distinguant geste correct, sens inversé,
+  ordre incorrect et tracé à reprendre, sans modifier le statut ni les cartes.
+
+### Qualité
+
+- Reconstruction et contrôle dédiés de la base de tracés en CI, avec témoins
+  simplifiés et traditionnels et tests purs du codec et de l’évaluation.
+
 ## 0.10.0 — 2026-09-15
 
 ### Ajouté
@@ -318,6 +335,11 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.11.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.11.0
+[0.10.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.10.0
+[0.9.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.9.0
+[0.8.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.8.1
+[0.8.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.8.0
 [0.7.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.7.0
 [0.6.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.6.0
 [0.5.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.5.1

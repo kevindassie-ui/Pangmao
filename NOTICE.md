@@ -13,3 +13,9 @@ is used for on-device OCR under the applicable Google ML Kit terms. Android and
 Jetpack components retain their respective notices. Optional Google ML Kit
 Digital Ink and Translation models are downloaded only after an explicit user
 action and then run on-device under the applicable Google ML Kit terms.
+
+Stroke-order vector paths and medians come from Hanzi Writer Data / Make Me a
+Hanzi, derived from fonts © 1999 Arphic Technology Co., Ltd. and redistributed
+under the Arphic Public License. Pangmao converts the pinned source JSON into a
+per-character zlib-compressed SQLite database; the source, transformation tools
+and full unaltered licence are included with the project and application.

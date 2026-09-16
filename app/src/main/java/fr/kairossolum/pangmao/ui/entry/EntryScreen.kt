@@ -122,11 +122,17 @@ fun EntryScreen(
             state.entry != null -> {
                 val entry = checkNotNull(state.entry)
                 val isSingleCharacter = entry.simplified.codePointCount(0, entry.simplified.length) == 1
-                val tabLabels = listOf(
-                    stringResource(R.string.entry_tab_definitions),
-                    stringResource(R.string.entry_tab_examples),
-                    stringResource(if (isSingleCharacter) R.string.entry_tab_words else R.string.entry_tab_characters),
-                )
+                val tabLabels = buildList {
+                    add(stringResource(R.string.entry_tab_definitions))
+                    add(stringResource(R.string.entry_tab_examples))
+                    if (isSingleCharacter) add(stringResource(R.string.entry_tab_stroke_order))
+                    add(
+                        stringResource(
+                            if (isSingleCharacter) R.string.entry_tab_words
+                            else R.string.entry_tab_characters,
+                        )
+                    )
+                }
                 var selectedTab by remember(entry.id) { mutableIntStateOf(0) }
                 Column(
                     modifier = Modifier
@@ -257,9 +263,12 @@ fun EntryScreen(
                                 }
                             }
                         }
-                        else -> {
+                        2 -> {
                             if (isSingleCharacter) {
-                                RelatedWordsSection(state, viewModel, onOpenEntry)
+                                StrokeOrderSection(
+                                    strokeOrder = state.strokeOrder,
+                                    loadError = state.strokeOrderError,
+                                )
                             } else if (state.characters.isEmpty()) {
                                 EmptyEntrySection(R.string.entry_no_characters)
                             } else {
@@ -272,6 +281,7 @@ fun EntryScreen(
                                 }
                             }
                         }
+                        else -> RelatedWordsSection(state, viewModel, onOpenEntry)
                     }
                     Spacer(Modifier.height(24.dp))
                 }

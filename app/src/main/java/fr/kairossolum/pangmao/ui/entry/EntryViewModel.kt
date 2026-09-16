@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import fr.kairossolum.pangmao.data.dictionary.DictionaryRepository
 import fr.kairossolum.pangmao.data.user.StudyRepository
+import fr.kairossolum.pangmao.data.strokes.StrokeOrderRepository
 import fr.kairossolum.pangmao.domain.model.CharacterInfo
 import fr.kairossolum.pangmao.domain.model.DictionaryEntry
 import fr.kairossolum.pangmao.domain.model.ExampleSentence
 import fr.kairossolum.pangmao.domain.model.RelatedWordPosition
 import fr.kairossolum.pangmao.domain.model.RelatedWordSort
 import fr.kairossolum.pangmao.domain.model.WordKnowledgeStatus
+import fr.kairossolum.pangmao.domain.model.StrokeOrder
 import kotlinx.coroutines.async
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
@@ -32,6 +34,9 @@ data class EntryUiState(
     val frequentWordsOnly: Boolean = true,
     val isWordsLoading: Boolean = false,
     val wordsError: String? = null,
+    val strokeOrder: StrokeOrder? = null,
+    val isStrokeOrderLoading: Boolean = false,
+    val strokeOrderError: String? = null,
     val isLoading: Boolean = true,
     val error: String? = null,
 )
@@ -40,6 +45,7 @@ class EntryViewModel(
     private val entryId: Long,
     private val dictionary: DictionaryRepository,
     private val study: StudyRepository,
+    private val strokeOrders: StrokeOrderRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(EntryUiState())
     val uiState: StateFlow<EntryUiState> = _uiState.asStateFlow()
@@ -68,8 +74,16 @@ class EntryViewModel(
                         emptyList()
                     }
                 }
+                val strokeOrder = async {
+                    runCatching {
+                        entry.simplified
+                            .takeIf { it.codePointCount(0, it.length) == 1 }
+                            ?.let { strokeOrders.get(it) }
+                    }
+                }
                 study.recordHistory(entryId)
                 val loadedCharacters = characters.await()
+                val loadedStrokeOrder = strokeOrder.await()
                 EntryUiState(
                     entry = entry,
                     examples = examples.await(),
@@ -78,6 +92,8 @@ class EntryViewModel(
                         dictionary.lookupExact(info.character)?.id?.let { info.character to it }
                     }.toMap(),
                     relatedWords = relatedWords.await(),
+                    strokeOrder = loadedStrokeOrder.getOrNull(),
+                    strokeOrderError = loadedStrokeOrder.exceptionOrNull()?.message,
                     isLoading = false,
                 )
             }.onSuccess { _uiState.value = it }

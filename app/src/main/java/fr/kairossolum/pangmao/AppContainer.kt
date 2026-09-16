@@ -7,6 +7,8 @@ import fr.kairossolum.pangmao.data.dictionary.OfflineDictionaryRepository
 import fr.kairossolum.pangmao.data.user.PangmaoUserDatabase
 import fr.kairossolum.pangmao.data.user.StudyRepository
 import fr.kairossolum.pangmao.data.settings.SettingsRepository
+import fr.kairossolum.pangmao.data.strokes.OfflineStrokeOrderRepository
+import fr.kairossolum.pangmao.data.strokes.StrokeOrderRepository
 import fr.kairossolum.pangmao.data.translation.OnDeviceTranslationRepository
 import fr.kairossolum.pangmao.data.translation.TranslationRepository
 
@@ -15,5 +17,6 @@ class AppContainer(context: Context) {
     private val userDatabase = PangmaoUserDatabase.create(context)
     val study = StudyRepository(userDatabase.userDao(), dictionary)
     val settings = SettingsRepository(context)
+    val strokeOrders: StrokeOrderRepository = OfflineStrokeOrderRepository(context)
     val translation: TranslationRepository = OnDeviceTranslationRepository()
 }

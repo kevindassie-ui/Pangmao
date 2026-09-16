@@ -9,6 +9,7 @@ The generated `pangmao.db` is an aggregation of independently licensed sources.
 | CFDICT | Chinese–French definitions | Downloaded 2026-09-11 | © CFDICT / Chine Informations contributors, [CC BY-SA](https://creativecommons.org/licenses/by-sa/3.0/), source: [CFDICT](https://chine.in/mandarin/dictionnaire/CFDICT/) |
 | Tatoeba | Authentic Mandarin–English pairs and reviewed direct French relations | English export 2026-05-20; French subset 2026-09-12 | © Tatoeba contributors, [CC BY 2.0 FR](https://creativecommons.org/licenses/by/2.0/fr/), source: [Tatoeba](https://tatoeba.org/) |
 | Unicode Unihan | Character readings, radicals, stroke counts, variants and definitions | Unicode 17.0.0 | © 1991–2026 Unicode, Inc., [Unicode License v3](https://www.unicode.org/license.txt) |
+| Hanzi Writer Data / Make Me a Hanzi | PRC stroke-order paths and medians for animation and guided practice | Revision `68d10a4b21150cae5e1ebbd223eed289cf32d90c` | © Arphic Technology Co., Ltd.; [Arphic Public License](https://github.com/chanind/hanzi-writer-data/blob/68d10a4b21150cae5e1ebbd223eed289cf32d90c/ARPHICPL.TXT), [source](https://github.com/chanind/hanzi-writer-data) |
 | Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.5.0 | Original project content; source files in `tools/data/` |
 | FreeDict / WikDict `fra-zho` | French headwords, IPA, grammar and Chinese equivalents for the v0.6 French profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/fra-zho/2025.11.23/) |
 | FreeDict / WikDict `eng-zho` | English headwords, pronunciation, grammar and Chinese equivalents for the v0.6 English profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/eng-zho/2025.11.23/) |
@@ -38,6 +39,14 @@ downloaded from their official download endpoints.
 
 The database builder preserves attribution metadata inside the database and the
 application exposes the same notices from its About screen.
+
+The separate `strokes.db` builder checks the pinned GitHub archive by SHA-256,
+then converts the individual Hanzi Writer JSON files into per-character,
+zlib-compressed SQLite records. This September 2026 transformation and its
+source revision are recorded inside the generated database. The complete,
+unaltered Arphic Public License is shipped at
+`app/src/main/assets/licenses/ARPHICPL.TXT`; the public builder keeps the
+transformation freely reproducible.
 
 Dictionary schema 4 records `CC-CEDICT` as the default source for English and
 `CFDICT` as the default source for French. Only reviewed or secondary-source
