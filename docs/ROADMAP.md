@@ -184,7 +184,7 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 - Préparer une aide contextuelle puis une FAQ recherchable; un assistant en
   ligne ne sera évalué qu’après stabilisation de cette documentation.
 
-### v0.11.0 — tracé des caractères · en cours
+### v0.11.0 — tracé des caractères · publiée
 
 - Ajouter l’ordre des traits animé, contrôlable et entièrement hors ligne dans
   les fiches à un caractère.
