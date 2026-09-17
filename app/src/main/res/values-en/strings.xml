@@ -24,4 +24,34 @@
     <string name="tts_pause">Pause reading</string><string name="tts_resume">Resume reading</string><string name="tts_restart">Restart from the beginning</string><string name="tts_stop">Stop reading</string><string name="tts_speed">Speed</string><string name="tts_more_actions">More voice actions</string><string name="tts_test_voice">Test voice</string><string name="tts_test_sample">你好，欢迎使用胖猫。</string><string name="tts_voice_details">Details</string><string name="tts_voice_details_title">Chinese voice in use</string><string name="tts_voice_details_unavailable">Voice information is not available yet.</string><string name="tts_voice_engine">Android engine</string><string name="tts_voice_name">Voice</string><string name="tts_voice_locale">Locale</string><string name="tts_voice_connection">Operation</string><string name="tts_voice_offline">Available offline</string><string name="tts_voice_network">This voice requires a connection</string><string name="tts_voice_unknown">Not reported by Android</string><string name="tts_voice_details_notice">This information is reported by the TTS engine installed on this device.</string>
     <string name="reader_previous_sentence">Previous sentence</string><string name="reader_next_sentence">Next sentence</string>
     <string name="study_tab_cards">Cards · %1$d</string><string name="study_tab_learning">Learning · %1$d</string><string name="study_tab_known">Known · %1$d</string><string name="study_tab_favorites">Favorites · %1$d</string><string name="study_collection_empty">No words in this list.</string>
+    <string name="input_speech">Voice</string>
+    <string name="speech_title">Voice input</string>
+    <string name="speech_engine_on_device">On-device recognition</string>
+    <string name="speech_engine_system">System recognition</string>
+    <string name="speech_engine_unavailable">Recognition unavailable</string>
+    <string name="speech_engine_on_device_detail">Android reports that a local engine is available. Offline operation still depends on the installed speech data.</string>
+    <string name="speech_engine_system_detail">Your voice may be processed by the recognition provider configured on this device and may require Internet access.</string>
+    <string name="speech_engine_unavailable_detail">Install or enable an Android speech recognition service to use this feature.</string>
+    <string name="speech_privacy_notice">Pangmao does not retain audio recordings. Processing is handled by the Android speech recognition service selected on this device.</string>
+    <string name="speech_status_idle">Ready to listen for Chinese</string>
+    <string name="speech_status_listening">Listening…</string>
+    <string name="speech_status_processing">Transcribing…</string>
+    <string name="speech_status_ready">Transcript ready</string>
+    <string name="speech_status_error">Recognition did not complete</string>
+    <string name="speech_start">Start listening</string>
+    <string name="speech_stop">Stop and transcribe</string>
+    <string name="speech_transcript_label">Recognized text (editable)</string>
+    <string name="speech_candidates_title">Other suggestions</string>
+    <string name="speech_search_action">Search the dictionary</string>
+    <string name="speech_reader_action">Open in Reader</string>
+    <string name="speech_clear">Clear</string>
+    <string name="speech_error_permission">Microphone permission is required. You can enable it again in Android settings.</string>
+    <string name="speech_error_no_match">No speech was recognized. Try again in a quieter place.</string>
+    <string name="speech_error_network">The recognition service could not access the network.</string>
+    <string name="speech_error_busy">The recognition service is already busy. Wait, then try again.</string>
+    <string name="speech_error_unavailable">No compatible recognition service is available.</string>
+    <string name="speech_error_audio">The microphone could not be used.</string>
+    <string name="speech_error_timeout">No speech was detected in time.</string>
+    <string name="speech_error_client">Recognition was interrupted. Try again.</string>
+    <string name="speech_error_unknown">An unexpected recognition error occurred.</string>
 </resources>

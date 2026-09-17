@@ -32,7 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -216,16 +217,23 @@ fun EntryScreen(
                         }
                     }
 
-                    ScrollableTabRow(
+                    TabRow(
                         selectedTabIndex = selectedTab,
-                        edgePadding = 0.dp,
+                        modifier = Modifier.fillMaxWidth(),
                         divider = {},
                     ) {
                         tabLabels.forEachIndexed { index, label ->
                             Tab(
                                 selected = selectedTab == index,
                                 onClick = { selectedTab = index },
-                                text = { Text(label) },
+                                text = {
+                                    Text(
+                                        text = label,
+                                        maxLines = 2,
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.labelMedium,
+                                    )
+                                },
                             )
                         }
                     }

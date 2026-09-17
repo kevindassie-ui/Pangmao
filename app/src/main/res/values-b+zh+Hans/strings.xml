@@ -24,4 +24,34 @@
     <string name="tts_pause">暂停朗读</string><string name="tts_resume">继续朗读</string><string name="tts_restart">从头重新朗读</string><string name="tts_stop">停止朗读</string><string name="tts_speed">语速</string><string name="tts_more_actions">更多语音操作</string><string name="tts_test_voice">试听语音</string><string name="tts_test_sample">你好，欢迎使用胖猫。</string><string name="tts_voice_details">详情</string><string name="tts_voice_details_title">当前使用的中文语音</string><string name="tts_voice_details_unavailable">语音信息暂不可用。</string><string name="tts_voice_engine">Android 引擎</string><string name="tts_voice_name">语音</string><string name="tts_voice_locale">语言区域</string><string name="tts_voice_connection">运行方式</string><string name="tts_voice_offline">可离线使用</string><string name="tts_voice_network">此语音需要网络连接</string><string name="tts_voice_unknown">Android 未提供</string><string name="tts_voice_details_notice">这些信息由本设备安装的 TTS 引擎提供。</string>
     <string name="reader_previous_sentence">上一句</string><string name="reader_next_sentence">下一句</string>
     <string name="study_tab_cards">卡片 · %1$d</string><string name="study_tab_learning">学习中 · %1$d</string><string name="study_tab_known">已掌握 · %1$d</string><string name="study_tab_favorites">收藏 · %1$d</string><string name="study_collection_empty">此列表中暂无词语。</string>
+    <string name="input_speech">语音</string>
+    <string name="speech_title">语音输入</string>
+    <string name="speech_engine_on_device">设备端识别</string>
+    <string name="speech_engine_system">系统语音识别</string>
+    <string name="speech_engine_unavailable">语音识别不可用</string>
+    <string name="speech_engine_on_device_detail">Android 显示本地识别引擎可用。离线使用仍取决于设备上已安装的语音数据。</string>
+    <string name="speech_engine_system_detail">语音可能由此设备配置的识别服务处理，并且可能需要联网。</string>
+    <string name="speech_engine_unavailable_detail">请安装或启用 Android 语音识别服务以使用此功能。</string>
+    <string name="speech_privacy_notice">Pangmao 不会保存录音。语音处理由此设备所选的 Android 语音识别服务完成。</string>
+    <string name="speech_status_idle">可以开始说中文</string>
+    <string name="speech_status_listening">正在聆听…</string>
+    <string name="speech_status_processing">正在转写…</string>
+    <string name="speech_status_ready">转写已完成</string>
+    <string name="speech_status_error">语音识别未完成</string>
+    <string name="speech_start">开始聆听</string>
+    <string name="speech_stop">停止并转写</string>
+    <string name="speech_transcript_label">识别文本（可编辑）</string>
+    <string name="speech_candidates_title">其他结果</string>
+    <string name="speech_search_action">在词典中搜索</string>
+    <string name="speech_reader_action">在阅读器中打开</string>
+    <string name="speech_clear">清除</string>
+    <string name="speech_error_permission">需要麦克风权限。您可以在 Android 设置中重新启用。</string>
+    <string name="speech_error_no_match">未识别到语音。请在更安静的环境中重试。</string>
+    <string name="speech_error_network">语音识别服务无法连接网络。</string>
+    <string name="speech_error_busy">语音识别服务正忙。请稍后重试。</string>
+    <string name="speech_error_unavailable">没有可用的兼容语音识别服务。</string>
+    <string name="speech_error_audio">无法使用麦克风。</string>
+    <string name="speech_error_timeout">未及时检测到语音。</string>
+    <string name="speech_error_client">语音识别已中断。请重试。</string>
+    <string name="speech_error_unknown">发生了意外的语音识别错误。</string>
 </resources>

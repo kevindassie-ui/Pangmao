@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-15.
+Dernière mise à jour: 2026-09-17.
 
 ## Principes
 
@@ -195,12 +195,14 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 
 Plan et critères d’acceptation: [V0.11_RELEASE_PLAN.md](V0.11_RELEASE_PLAN.md).
 
-### v0.12.0 — première saisie vocale
+### v0.12.0 — première saisie vocale · en cours
 
 - Commencer le STT court comme quatrième saisie de l’accueil, avec microphone
   toujours explicite et correction avant recherche ou Reader.
 - Séparer les contrats de moteur et de capture du parcours UI afin de pouvoir
   réutiliser ces briques dans l’application de transcription longue.
+
+Plan et matrice de validation: [V0.12_RELEASE_PLAN.md](V0.12_RELEASE_PLAN.md).
 
 - Cartes par sens, modes reconnaissance/écoute/écriture et statistiques utiles.
 - Radicaux, composants et vue arborescente caractère → mots → expressions.

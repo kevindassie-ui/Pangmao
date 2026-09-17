@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Draw
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.ExpandLess
 import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material.icons.outlined.MicNone
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Close
@@ -48,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
@@ -84,6 +86,7 @@ fun SearchScreen(
     onOpenSettings: () -> Unit,
     onOpenHandwriting: () -> Unit,
     onOpenOcr: () -> Unit,
+    onOpenSpeech: () -> Unit,
 ) {
     val query by viewModel.query.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -150,36 +153,57 @@ fun SearchScreen(
             keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            FilledTonalButton(
-                onClick = { focusRequester.requestFocus() },
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(horizontal = 8.dp),
+        if (learningLanguage == LearningLanguage.CHINESE) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Icon(Icons.Outlined.Search, contentDescription = null)
-                Text(" ${stringResource(R.string.input_keyboard)}", maxLines = 1)
-            }
-            if (learningLanguage == LearningLanguage.CHINESE) {
-                FilledTonalButton(
-                    onClick = onOpenHandwriting,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Icon(Icons.Outlined.Draw, contentDescription = null)
-                    Text(" ${stringResource(R.string.input_handwriting)}", maxLines = 1)
+                    QuickInputButton(
+                        icon = Icons.Outlined.Search,
+                        label = stringResource(R.string.input_keyboard),
+                        onClick = { focusRequester.requestFocus() },
+                        modifier = Modifier.weight(1f),
+                    )
+                    QuickInputButton(
+                        icon = Icons.Outlined.Draw,
+                        label = stringResource(R.string.input_handwriting),
+                        onClick = onOpenHandwriting,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
-                FilledTonalButton(
-                    onClick = onOpenOcr,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Icon(Icons.Outlined.CameraAlt, contentDescription = null)
-                    Text(" ${stringResource(R.string.input_ocr)}", maxLines = 1)
+                    QuickInputButton(
+                        icon = Icons.Outlined.CameraAlt,
+                        label = stringResource(R.string.input_ocr),
+                        onClick = onOpenOcr,
+                        modifier = Modifier.weight(1f),
+                    )
+                    QuickInputButton(
+                        icon = Icons.Outlined.MicNone,
+                        label = stringResource(R.string.input_speech),
+                        onClick = onOpenSpeech,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
+        } else {
+            QuickInputButton(
+                icon = Icons.Outlined.Search,
+                label = stringResource(R.string.input_keyboard),
+                onClick = { focusRequester.requestFocus() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            )
         }
 
         when {
@@ -281,6 +305,23 @@ fun SearchScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun QuickInputButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+        Icon(icon, contentDescription = null)
+        Text(" $label", maxLines = 1)
     }
 }
 
