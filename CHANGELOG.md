@@ -8,6 +8,16 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Corrigé
+
+- Les quatre onglets des fiches mono-caractère adaptent la taille de leur
+  libellé avant tout repli et ne coupent plus les mots ; seuls `Mots associés`
+  et `Related words` peuvent, en dernier recours, passer sur deux lignes entre
+  les deux mots.
+- La reconnaissance vocale système n’impose plus un moteur hors ligne absent
+  et n’envoie plus au fournisseur Android un paramètre réservé aux préférences
+  du service, ce qui évite l’interruption immédiate observée sur ColorOS.
+
 ## 0.12.0 — 2026-09-17
 
 ### Ajouté

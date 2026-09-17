@@ -71,10 +71,8 @@ class AndroidShortSpeechRecognitionEngine private constructor(
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, request.languageTag)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, request.languageTag)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, request.maxResults)
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
         }
         try {
             activeRecognizer.startListening(intent)
