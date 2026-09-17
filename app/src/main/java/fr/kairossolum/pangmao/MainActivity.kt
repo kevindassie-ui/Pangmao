@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import fr.kairossolum.pangmao.data.speech.AndroidShortSpeechRecognitionEngine
 import fr.kairossolum.pangmao.domain.model.presentation
 import fr.kairossolum.pangmao.domain.model.LearningLanguage
 import fr.kairossolum.pangmao.ui.about.AboutScreen
@@ -57,11 +59,15 @@ import fr.kairossolum.pangmao.ui.search.SearchScreen
 import fr.kairossolum.pangmao.ui.search.SearchViewModel
 import fr.kairossolum.pangmao.ui.settings.SettingsScreen
 import fr.kairossolum.pangmao.ui.settings.SettingsViewModel
+import fr.kairossolum.pangmao.ui.speech.SpeechInputScreen
+import fr.kairossolum.pangmao.ui.speech.SpeechInputViewModel
 import fr.kairossolum.pangmao.ui.study.StudyScreen
 import fr.kairossolum.pangmao.ui.study.StudyViewModel
 import fr.kairossolum.pangmao.ui.theme.PangmaoTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+private const val SPEECH_TEXT_RESULT = "speechText"
 
 class MainActivity : AppCompatActivity() {
     private val _sharedText = MutableStateFlow<String?>(null)
@@ -166,10 +172,19 @@ private fun PangmaoApp(
                     val handwritten by entry.savedStateHandle
                         .getStateFlow("handwritten", "")
                         .collectAsStateWithLifecycle()
+                    val speechText by entry.savedStateHandle
+                        .getStateFlow(SPEECH_TEXT_RESULT, "")
+                        .collectAsStateWithLifecycle()
                     LaunchedEffect(handwritten) {
                         if (handwritten.isNotBlank()) {
                             model.setQuery(handwritten)
                             entry.savedStateHandle["handwritten"] = ""
+                        }
+                    }
+                    LaunchedEffect(speechText) {
+                        if (speechText.isNotBlank()) {
+                            model.setQuery(speechText)
+                            entry.savedStateHandle[SPEECH_TEXT_RESULT] = ""
                         }
                     }
                     SearchScreen(
@@ -182,9 +197,10 @@ private fun PangmaoApp(
                         onOpenSettings = { navController.navigate("settings") },
                         onOpenHandwriting = { navController.navigate("handwriting") },
                         onOpenOcr = { navController.navigate("ocr") },
+                        onOpenSpeech = { navController.navigate("speech-input") },
                     )
                 }
-                composable("reader") {
+                composable("reader") { entry ->
                     val model: ReaderViewModel = viewModel(
                         factory = viewModelFactory {
                             ReaderViewModel(
@@ -199,6 +215,15 @@ private fun PangmaoApp(
                         incomingText?.takeIf(String::isNotBlank)?.let {
                             model.setText(it)
                             consumeSharedText()
+                        }
+                    }
+                    val speechText by entry.savedStateHandle
+                        .getStateFlow(SPEECH_TEXT_RESULT, "")
+                        .collectAsStateWithLifecycle()
+                    LaunchedEffect(speechText) {
+                        if (speechText.isNotBlank()) {
+                            model.setText(speechText)
+                            entry.savedStateHandle[SPEECH_TEXT_RESULT] = ""
                         }
                     }
                     ReaderScreen(model, onOpenEntry = { navController.navigate("entry/$it") })
@@ -286,6 +311,32 @@ private fun PangmaoApp(
                         onSelectCharacter = { character ->
                             navController.previousBackStackEntry?.savedStateHandle?.set("handwritten", character)
                             navController.popBackStack()
+                        },
+                    )
+                }
+                composable("speech-input") {
+                    val context = LocalContext.current
+                    val model: SpeechInputViewModel = viewModel(
+                        factory = viewModelFactory {
+                            SpeechInputViewModel(
+                                AndroidShortSpeechRecognitionEngine.create(context),
+                            )
+                        },
+                    )
+                    SpeechInputScreen(
+                        viewModel = model,
+                        onBack = navController::navigateUp,
+                        onSearch = { text ->
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set(SPEECH_TEXT_RESULT, text)
+                            navController.popBackStack()
+                        },
+                        onOpenReader = { text ->
+                            navController.navigateMain("reader")
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set(SPEECH_TEXT_RESULT, text)
                         },
                     )
                 }
