@@ -195,7 +195,7 @@ Plan et critères d'acceptation: [V0.9_RELEASE_PLAN.md](V0.9_RELEASE_PLAN.md).
 
 Plan et critères d’acceptation: [V0.11_RELEASE_PLAN.md](V0.11_RELEASE_PLAN.md).
 
-### v0.12.0 — première saisie vocale · en cours
+### v0.12.0 — première saisie vocale · publiée
 
 - Commencer le STT court comme quatrième saisie de l’accueil, avec microphone
   toujours explicite et correction avant recherche ou Reader.

@@ -8,6 +8,30 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.12.0 — 2026-09-17
+
+### Ajouté
+
+- Saisie vocale chinoise courte comme quatrième mode d’entrée, avec démarrage
+  explicite, résultats partiels, texte final corrigeable et jusqu’à deux
+  variantes sélectionnables.
+- Envoi du texte reconnu vers la recherche ou le Reader uniquement après
+  validation de l’utilisateur.
+- Préférence pour la reconnaissance Android sur l’appareil lorsqu’elle est
+  disponible, avec repli explicite vers le service système et sans conservation
+  d’un enregistrement audio par Pangmao.
+
+### Modifié
+
+- Les quatre modes de saisie de l’accueil chinois sont présentés en grille 2 × 2.
+- Les quatre sections d’une fiche mono-caractère restent simultanément visibles
+  sans défilement horizontal.
+
+### Qualité
+
+- Annulation de l’écoute à la sortie de l’écran et couverture unitaire des
+  transitions, variantes, erreurs et préférences de reconnaissance courte.
+
 ## 0.11.0 — 2026-09-16
 
 ### Ajouté
@@ -335,6 +359,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.12.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.0
 [0.11.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.11.0
 [0.10.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.10.0
 [0.9.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.9.0
