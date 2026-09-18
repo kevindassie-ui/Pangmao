@@ -30,7 +30,7 @@
     <string name="speech_engine_system">系统语音识别</string>
     <string name="speech_engine_unavailable">语音识别不可用</string>
     <string name="speech_engine_on_device_detail">Android 显示本地识别引擎可用。离线使用仍取决于设备上已安装的语音数据。</string>
-    <string name="speech_engine_system_detail">语音可能由此设备配置的识别服务处理，并且可能需要联网。</string>
+    <string name="speech_engine_system_detail">胖猫会打开 Android 提供的语音输入。语音可能由设备上配置的服务处理，并且可能需要联网。</string>
     <string name="speech_engine_unavailable_detail">请安装或启用 Android 语音识别服务以使用此功能。</string>
     <string name="speech_privacy_notice">Pangmao 不会保存录音。语音处理由此设备所选的 Android 语音识别服务完成。</string>
     <string name="speech_status_idle">可以开始说中文</string>
@@ -40,6 +40,7 @@
     <string name="speech_status_error">语音识别未完成</string>
     <string name="speech_start">开始聆听</string>
     <string name="speech_stop">停止并转写</string>
+    <string name="speech_system_prompt">请说中文</string>
     <string name="speech_transcript_label">识别文本（可编辑）</string>
     <string name="speech_candidates_title">其他结果</string>
     <string name="speech_search_action">在词典中搜索</string>

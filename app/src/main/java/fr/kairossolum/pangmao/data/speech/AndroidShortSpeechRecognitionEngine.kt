@@ -61,7 +61,11 @@ class AndroidShortSpeechRecognitionEngine private constructor(
         callback: ShortSpeechRecognitionCallback,
     ) {
         val activeRecognizer = recognizer
-        if (isClosed || activeRecognizer == null || mode == SpeechRecognitionEngineMode.UNAVAILABLE) {
+        if (
+            isClosed ||
+            activeRecognizer == null ||
+            mode != SpeechRecognitionEngineMode.ON_DEVICE
+        ) {
             callback.onFailure(SpeechRecognitionFailure.UNAVAILABLE)
             return
         }
@@ -119,14 +123,19 @@ class AndroidShortSpeechRecognitionEngine private constructor(
             }
 
             if (SpeechRecognizer.isRecognitionAvailable(applicationContext)) {
-                runCatching {
-                    SpeechRecognizer.createSpeechRecognizer(applicationContext)
-                }.getOrNull()?.let { recognizer ->
-                    return AndroidShortSpeechRecognitionEngine(
-                        mode = SpeechRecognitionEngineMode.SYSTEM,
-                        recognizer = recognizer,
-                    )
-                }
+                return AndroidShortSpeechRecognitionEngine(
+                    mode = SpeechRecognitionEngineMode.SYSTEM,
+                    recognizer = null,
+                )
+            }
+
+            val recognitionActivity = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                .resolveActivity(applicationContext.packageManager)
+            if (recognitionActivity != null) {
+                return AndroidShortSpeechRecognitionEngine(
+                    mode = SpeechRecognitionEngineMode.SYSTEM,
+                    recognizer = null,
+                )
             }
 
             return AndroidShortSpeechRecognitionEngine(

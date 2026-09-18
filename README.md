@@ -4,8 +4,13 @@ Pangmao is a private, offline-first Android Chinese dictionary and learning
 companion. It combines a large bilingual dictionary, a tappable text reader,
 on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
-## Version 0.12.1 highlights
+## Version 0.12.2 highlights
 
+- System recognition now uses Android’s provider-owned voice-input activity,
+  avoiding the immediate `ERROR_CLIENT` returned by ColorOS’s embedded service.
+- Pangmao keeps the embedded flow only for a genuinely available on-device
+  recognizer; system voice input returns editable results without Pangmao
+  opening the microphone itself.
 - System speech recognition no longer forces unavailable offline data or sends
   an incompatible provider preference, fixing immediate interruption on ColorOS.
 - Dictionary-entry tabs keep words intact and fit all four sections in one row;
@@ -105,7 +110,7 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 
 ## Install
 
-Download [Pangmao v0.12.1](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.1),
+Download [Pangmao v0.12.2](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.2),
 open the APK on Android, and allow installation from the browser or GitHub app
 when Android asks. Private development releases target recent ARM64 phones. A
 Play-ready Android App Bundle can restore all supported architectures later
