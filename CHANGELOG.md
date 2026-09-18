@@ -8,6 +8,17 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.12.2 — 2026-09-18
+
+### Corrigé
+
+- Sur les appareils dont le service vocal refuse l’API intégrée avec l’erreur
+  Android `ERROR_CLIENT`, notamment l’Oppo/ColorOS testé, la reconnaissance
+  système passe désormais par l’interface vocale officielle du fournisseur et
+  renvoie son résultat à Pangmao.
+- Seul le moteur réellement disponible sur l’appareil reste intégré directement;
+  le repli système n’exige plus que Pangmao ouvre lui-même le microphone.
+
 ## 0.12.1 — 2026-09-18
 
 ### Corrigé
@@ -371,6 +382,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.12.2]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.2
 [0.12.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.1
 [0.12.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.0
 [0.11.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.11.0

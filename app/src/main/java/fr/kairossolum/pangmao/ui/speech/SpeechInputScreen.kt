@@ -1,7 +1,10 @@
 package fr.kairossolum.pangmao.ui.speech
 
 import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -70,16 +73,59 @@ fun SpeechInputScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
-        if (granted) viewModel.startCapture() else viewModel.reportPermissionDenied()
+        if (granted) viewModel.startOnDeviceCapture() else viewModel.reportPermissionDenied()
+    }
+    val systemRecognitionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.completeSystemCapture(
+                result.data
+                    ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    .orEmpty(),
+            )
+        } else {
+            viewModel.cancelSystemCapture()
+        }
     }
     val startCapture = {
-        if (
-            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            viewModel.startCapture()
-        } else {
-            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        when (state.engineMode) {
+            SpeechRecognitionEngineMode.SYSTEM -> {
+                if (viewModel.beginSystemCapture()) {
+                    val recognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                        putExtra(
+                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
+                        )
+                        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "zh-CN")
+                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
+                        putExtra(
+                            RecognizerIntent.EXTRA_PROMPT,
+                            context.getString(R.string.speech_system_prompt),
+                        )
+                    }
+                    runCatching {
+                        systemRecognitionLauncher.launch(recognitionIntent)
+                    }.onFailure {
+                        viewModel.reportSystemCaptureUnavailable()
+                    }
+                }
+            }
+
+            SpeechRecognitionEngineMode.ON_DEVICE -> {
+                if (
+                    ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    viewModel.startOnDeviceCapture()
+                } else {
+                    permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                }
+            }
+
+            SpeechRecognitionEngineMode.UNAVAILABLE -> {
+                viewModel.reportSystemCaptureUnavailable()
+            }
         }
     }
 

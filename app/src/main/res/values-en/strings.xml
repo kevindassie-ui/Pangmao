@@ -30,7 +30,7 @@
     <string name="speech_engine_system">System recognition</string>
     <string name="speech_engine_unavailable">Recognition unavailable</string>
     <string name="speech_engine_on_device_detail">Android reports that a local engine is available. Offline operation still depends on the installed speech data.</string>
-    <string name="speech_engine_system_detail">Your voice may be processed by the recognition provider configured on this device and may require Internet access.</string>
+    <string name="speech_engine_system_detail">Pangmao opens Android’s voice input. Your voice may be processed by the provider configured on this device and may require Internet access.</string>
     <string name="speech_engine_unavailable_detail">Install or enable an Android speech recognition service to use this feature.</string>
     <string name="speech_privacy_notice">Pangmao does not retain audio recordings. Processing is handled by the Android speech recognition service selected on this device.</string>
     <string name="speech_status_idle">Ready to listen for Chinese</string>
@@ -40,6 +40,7 @@
     <string name="speech_status_error">Recognition did not complete</string>
     <string name="speech_start">Start listening</string>
     <string name="speech_stop">Stop and transcribe</string>
+    <string name="speech_system_prompt">Speak Chinese</string>
     <string name="speech_transcript_label">Recognized text (editable)</string>
     <string name="speech_candidates_title">Other suggestions</string>
     <string name="speech_search_action">Search the dictionary</string>

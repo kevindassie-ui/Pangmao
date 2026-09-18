@@ -41,9 +41,9 @@ class SpeechInputViewModel(
         }
     }
 
-    fun startCapture() {
+    fun startOnDeviceCapture() {
         if (_state.value.isBusy) return
-        if (engine.mode == SpeechRecognitionEngineMode.UNAVAILABLE) {
+        if (engine.mode != SpeechRecognitionEngineMode.ON_DEVICE) {
             _state.update { it.failed(SpeechRecognitionFailure.UNAVAILABLE) }
             return
         }
@@ -53,6 +53,37 @@ class SpeechInputViewModel(
         }.onFailure {
             _state.update { it.failed(SpeechRecognitionFailure.CLIENT) }
         }
+    }
+
+    fun beginSystemCapture(): Boolean {
+        val current = _state.value
+        if (current.isBusy || engine.mode != SpeechRecognitionEngineMode.SYSTEM) return false
+        _state.value = current.beginListening(engine.mode)
+        return true
+    }
+
+    fun completeSystemCapture(candidates: List<String>) {
+        _state.update { current ->
+            if (current.engineMode == SpeechRecognitionEngineMode.SYSTEM && current.isBusy) {
+                current.withFinalResults(candidates)
+            } else {
+                current
+            }
+        }
+    }
+
+    fun cancelSystemCapture() {
+        _state.update { current ->
+            if (current.engineMode == SpeechRecognitionEngineMode.SYSTEM && current.isBusy) {
+                current.cancelled()
+            } else {
+                current
+            }
+        }
+    }
+
+    fun reportSystemCaptureUnavailable() {
+        _state.update { it.failed(SpeechRecognitionFailure.UNAVAILABLE) }
     }
 
     fun stopCapture() {
