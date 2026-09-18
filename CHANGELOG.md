@@ -8,6 +8,18 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+## 0.12.1 — 2026-09-18
+
+### Corrigé
+
+- Les quatre onglets des fiches mono-caractère adaptent la taille de leur
+  libellé avant tout repli et ne coupent plus les mots ; seuls `Mots associés`
+  et `Related words` peuvent, en dernier recours, passer sur deux lignes entre
+  les deux mots.
+- La reconnaissance vocale système n’impose plus un moteur hors ligne absent
+  et n’envoie plus au fournisseur Android un paramètre réservé aux préférences
+  du service, ce qui évite l’interruption immédiate observée sur ColorOS.
+
 ## 0.12.0 — 2026-09-17
 
 ### Ajouté
@@ -359,6 +371,7 @@ numéros suivent le versionnage sémantique.
   fiches consultées et cartes SRS.
 - CI GitHub, tests, lint et publication d'un APK signé installable.
 
+[0.12.1]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.1
 [0.12.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.0
 [0.11.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.11.0
 [0.10.0]: https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.10.0

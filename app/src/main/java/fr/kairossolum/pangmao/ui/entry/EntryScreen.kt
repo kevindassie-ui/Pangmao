@@ -41,15 +41,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -226,14 +229,7 @@ fun EntryScreen(
                             Tab(
                                 selected = selectedTab == index,
                                 onClick = { selectedTab = index },
-                                text = {
-                                    Text(
-                                        text = label,
-                                        maxLines = 2,
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.labelMedium,
-                                    )
-                                },
+                                text = { EntryTabLabel(label) },
                             )
                         }
                     }
@@ -302,6 +298,46 @@ fun EntryScreen(
     )
     }
 }
+
+@Composable
+private fun EntryTabLabel(label: String) {
+    val canWrapAtWhitespace = label.any(Char::isWhitespace)
+    val minimumSingleLineFontSize = if (canWrapAtWhitespace) 9f else 8f
+    var fontSize by remember(label) { mutableFloatStateOf(12f) }
+    var wrapAtWhitespace by remember(label) { mutableStateOf(false) }
+    val displayedLabel = remember(label, wrapAtWhitespace) {
+        if (wrapAtWhitespace) entryTabFallbackLabel(label) else label
+    }
+
+    Text(
+        text = displayedLabel,
+        maxLines = if (wrapAtWhitespace) 2 else 1,
+        softWrap = false,
+        overflow = TextOverflow.Clip,
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontSize = fontSize.sp,
+            lineHeight = (fontSize + 2f).sp,
+            letterSpacing = 0.sp,
+        ),
+        onTextLayout = { layoutResult ->
+            if (layoutResult.didOverflowWidth) {
+                when {
+                    fontSize > minimumSingleLineFontSize -> {
+                        fontSize = (fontSize - 0.5f).coerceAtLeast(minimumSingleLineFontSize)
+                    }
+                    canWrapAtWhitespace && !wrapAtWhitespace -> {
+                        wrapAtWhitespace = true
+                        fontSize = 11f
+                    }
+                }
+            }
+        },
+    )
+}
+
+internal fun entryTabFallbackLabel(label: String): String =
+    label.trim().split(Regex("\\s+")).joinToString(separator = "\n")
 
 @Composable
 private fun ExampleCard(
