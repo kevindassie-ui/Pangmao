@@ -82,8 +82,9 @@ class ExportWebDictionaryTest(unittest.TestCase):
     def test_exports_bidirectional_entries_without_merging_senses(self) -> None:
         pack = export_french_pack(self.database)
 
-        self.assertEqual(1, pack["schemaVersion"])
+        self.assertEqual(2, pack["schemaVersion"])
         self.assertEqual(1, pack["entryCount"])
+        self.assertEqual(0, pack["enrichedEntryCount"])
         self.assertEqual("fr:FreeDict-fra-zho:42", pack["entries"][0]["id"])
         self.assertEqual(["avocat", "avocate"], pack["entries"][0]["forms"])
         self.assertEqual(["律师", "律師"], pack["entries"][0]["senses"][0]["chinese"])
@@ -100,6 +101,47 @@ class ExportWebDictionaryTest(unittest.TestCase):
         restored = json.loads(output.read_text(encoding="utf-8"))
         self.assertEqual("律师", restored["entries"][0]["senses"][0]["chinese"][0])
         self.assertNotIn("\\u5f8b", output.read_text(encoding="utf-8"))
+
+    def test_adds_attributed_chinese_glosses_without_replacing_senses(self) -> None:
+        enrichment = Path(self.temporary_directory.name) / "glosses.json"
+        enrichment.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "source": {
+                        "code": "zhwiktionary-french",
+                        "name": "中文维基词典法语词条",
+                        "license": "CC BY-SA 4.0",
+                    },
+                    "entryCount": 1,
+                    "entries": [
+                        {
+                            "id": "fr:FreeDict-fra-zho:42",
+                            "headword": "avocat",
+                            "groups": [
+                                {
+                                    "partOfSpeech": "noun",
+                                    "label": "名词",
+                                    "glosses": ["律师", "牛油果"],
+                                }
+                            ],
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+        pack = export_french_pack(self.database, enrichment)
+
+        self.assertEqual(1, pack["enrichedEntryCount"])
+        self.assertEqual("CC BY-SA 4.0", pack["enrichmentSources"][0]["license"])
+        self.assertEqual(
+            ["律师", "牛油果"],
+            pack["entries"][0]["chineseGlosses"][0]["glosses"],
+        )
+        self.assertEqual("律师", pack["entries"][0]["senses"][0]["chinese"][0])
 
 
 if __name__ == "__main__":

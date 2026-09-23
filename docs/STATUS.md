@@ -23,10 +23,28 @@ Checkpoint date: 2026-09-23
 - Scope and acceptance gates: [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
 
 The first Web build is available at
-<https://kevindassie-ui.github.io/Pangmao-Web/>. It has not yet been accepted as
-a stable release: product approval, a successful automated build and a public
-HTTP response are not substitutes for installation and sustained usage on the
-pilot iPhone.
+<https://kevindassie-ui.github.io/Pangmao-Web/>. Its initial technical trial
+passed on both Android and iOS on 2026-09-23. This validates cross-device
+opening and the core dictionary loop, not yet stability: sustained daily use,
+accessibility checks and the enriched 0.2 build still require device acceptance.
+
+## Web French pilot 0.2 — current implementation
+
+- Chinese meanings now dominate the entry sheet; the original French source
+  paragraph is retained behind an explicit disclosure.
+- 2,393 exact French headwords receive attributed Chinese explanations from
+  Chinese Wiktionary. Existing FreeDict Chinese equivalents remain available
+  on all 10,923 entries.
+- An additional Chinese dictionary is split into 32 lazy shards. It exposes
+  direct French meanings first and only 3,480 conservative semantic bridges;
+  each inferred result is visibly labelled and names its dictionary basis.
+  `臭屁` is a required regression witness.
+- The canonical application keeps its green Pangmao identity. A separate
+  build-only pilot variant uses a warm red palette and a cute `鹿` mascot for
+  the first user, without turning that personal treatment into the global brand.
+- Authentic/contextual examples and on-demand AI examples remain in W4. This
+  feedback confirms their priority but does not duplicate or pull that release
+  into the present corrective lot.
 
 ## Implemented on Android
 

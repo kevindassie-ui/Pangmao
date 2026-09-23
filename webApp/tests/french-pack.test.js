@@ -26,7 +26,8 @@ function firstHeadword(query) {
 }
 
 test("complete French pack has deterministic metadata and identifiers", () => {
-  assert.equal(pack.schemaVersion, 1);
+  assert.equal(pack.schemaVersion, 2);
+  assert.equal(pack.enrichedEntryCount, 2_393);
   assert.equal(pack.language, "fr");
   assert.equal(pack.entryCount, 10_923);
   assert.equal(pack.entries.length, pack.entryCount);
@@ -42,6 +43,14 @@ test("complete French pack has deterministic metadata and identifiers", () => {
     .update(JSON.stringify(canonicalize(pack.entries)), "utf8")
     .digest("hex");
   assert.equal(digest, pack.entriesSha256);
+});
+
+test("real pack exposes attributed Chinese explanations", () => {
+  assert.equal(pack.enrichmentSources[0].code, "zhwiktionary-french");
+  assert.equal(pack.enrichmentSources[0].license, "CC BY-SA 4.0");
+  const medecin = pack.entries.find((entry) => entry.headword === "médecin");
+  assert.ok(medecin?.chineseGlosses?.length);
+  assert.ok(medecin.chineseGlosses.some((group) => group.glosses.includes("医生，大夫")));
 });
 
 test("real pack resolves bidirectional avocat senses without merging them", () => {

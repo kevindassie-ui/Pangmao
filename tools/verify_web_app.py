@@ -19,7 +19,13 @@ EXPECTED_EQUIVALENT_COUNT = 15_168
 EXPECTED_SOURCE_CODE = "FreeDict-fra-zho"
 EXPECTED_SOURCE_REVISION = "2025.11.23"
 EXPECTED_SOURCE_LICENSE = "CC BY-SA 3.0"
+EXPECTED_ENRICHED_ENTRY_COUNT = 2_393
+EXPECTED_FALLBACK_KEY_COUNT = 92_475
+EXPECTED_FALLBACK_RECORD_COUNT = 94_560
+EXPECTED_FALLBACK_DIRECT_COUNT = 56_327
+EXPECTED_FALLBACK_INFERRED_COUNT = 3_480
 MAX_PACK_BYTES = 5 * 1024 * 1024
+MAX_FALLBACK_SHARD_BYTES = 600 * 1024
 HAN_RANGES = (
     (0x3400, 0x4DBF),
     (0x4E00, 0x9FFF),
@@ -28,6 +34,7 @@ HAN_RANGES = (
 )
 REQUIRED_FILES = (
     ".nojekyll",
+    "brand.json",
     "index.html",
     "manifest.webmanifest",
     "package.json",
@@ -35,6 +42,7 @@ REQUIRED_FILES = (
     "sw.js",
     "data/french-pack.json",
     "src/app.js",
+    "src/chinese-fallback.js",
     "src/search-engine.js",
     "src/storage.js",
 )
@@ -108,7 +116,7 @@ def canonical_entries_digest(entries: list[dict[str, Any]]) -> str:
 def validate_pack(path: Path) -> dict[str, int]:
     require(path.stat().st_size <= MAX_PACK_BYTES, f"Web dictionary exceeds {MAX_PACK_BYTES} bytes")
     pack = read_json(path)
-    require(pack.get("schemaVersion") == 1, "Unsupported web dictionary schema")
+    require(pack.get("schemaVersion") == 2, "Unsupported web dictionary schema")
     require(pack.get("language") == "fr", "Web dictionary language must be 'fr'")
 
     entries = pack.get("entries")
@@ -133,11 +141,30 @@ def validate_pack(path: Path) -> dict[str, int]:
         isinstance(source.get("url"), str) and source["url"].startswith("https://"),
         "Dictionary source URL must use HTTPS",
     )
+    require(
+        pack.get("enrichedEntryCount") == EXPECTED_ENRICHED_ENTRY_COUNT,
+        f"Expected {EXPECTED_ENRICHED_ENTRY_COUNT} Chinese-enriched French entries",
+    )
+    enrichment_sources = pack.get("enrichmentSources")
+    require(
+        isinstance(enrichment_sources, list) and len(enrichment_sources) == 1,
+        "Exactly one Chinese glossary source is required",
+    )
+    enrichment_source = enrichment_sources[0]
+    require(
+        enrichment_source.get("code") == "zhwiktionary-french",
+        "Unexpected Chinese glossary source",
+    )
+    require(
+        enrichment_source.get("license") == "CC BY-SA 4.0",
+        "Unexpected Chinese glossary licence",
+    )
 
     identifiers: set[str] = set()
     by_headword: dict[str, list[dict[str, Any]]] = {}
     sense_count = 0
     equivalent_count = 0
+    enriched_entry_count = 0
     expected_prefix = f"fr:{EXPECTED_SOURCE_CODE}:"
 
     for entry_index, entry in enumerate(entries):
@@ -157,6 +184,23 @@ def validate_pack(path: Path) -> dict[str, int]:
         string_list(entry.get("pronunciations"), f"{label}.pronunciations")
         string_list(entry.get("partsOfSpeech"), f"{label}.partsOfSpeech")
         string_list(entry.get("genders"), f"{label}.genders")
+
+        if "chineseGlosses" in entry:
+            groups = entry["chineseGlosses"]
+            require(isinstance(groups, list) and groups, f"{label}.chineseGlosses must not be empty")
+            for group_index, group in enumerate(groups):
+                group_label = f"{label}.chineseGlosses[{group_index}]"
+                require(isinstance(group, dict), f"{group_label} must be an object")
+                require(
+                    isinstance(group.get("partOfSpeech"), str) and group["partOfSpeech"].strip(),
+                    f"{group_label}.partOfSpeech is missing",
+                )
+                glosses = string_list(group.get("glosses"), f"{group_label}.glosses", allow_empty=False)
+                require(
+                    all(contains_han(gloss) for gloss in glosses),
+                    f"{group_label}.glosses contains no Chinese text",
+                )
+            enriched_entry_count += 1
 
         senses = entry.get("senses")
         require(isinstance(senses, list) and bool(senses), f"{label}.senses must not be empty")
@@ -182,13 +226,100 @@ def validate_pack(path: Path) -> dict[str, int]:
         equivalent_count == EXPECTED_EQUIVALENT_COUNT,
         f"Expected {EXPECTED_EQUIVALENT_COUNT} Chinese equivalents",
     )
+    require(
+        enriched_entry_count == EXPECTED_ENRICHED_ENTRY_COUNT,
+        "enrichedEntryCount does not match the enriched entries",
+    )
     validate_witnesses(by_headword)
     return {
         "bytes": path.stat().st_size,
         "entries": len(entries),
         "senses": sense_count,
         "chineseEquivalents": equivalent_count,
+        "chineseExplanations": enriched_entry_count,
     }
+
+
+def fallback_shard_index(value: str, shard_count: int) -> int:
+    value_hash = 2_166_136_261
+    for character in value:
+        value_hash ^= ord(character)
+        value_hash = (value_hash * 16_777_619) & 0xFFFFFFFF
+    return value_hash % shard_count
+
+
+def validate_fallback(web_root: Path) -> dict[str, int]:
+    fallback_root = web_root / "data/chinese-fallback"
+    manifest = read_json(fallback_root / "manifest.json")
+    require(manifest.get("schemaVersion") == 1, "Unsupported fallback schema")
+    require(manifest.get("keyCount") == EXPECTED_FALLBACK_KEY_COUNT, "Unexpected fallback key count")
+    require(
+        manifest.get("recordCount") == EXPECTED_FALLBACK_RECORD_COUNT,
+        "Unexpected fallback record count",
+    )
+    require(
+        manifest.get("directEntryCount") == EXPECTED_FALLBACK_DIRECT_COUNT,
+        "Unexpected direct fallback entry count",
+    )
+    require(
+        manifest.get("inferredEntryCount") == EXPECTED_FALLBACK_INFERRED_COUNT,
+        "Unexpected inferred fallback entry count",
+    )
+    shards = manifest.get("shards")
+    shard_count = manifest.get("shardCount")
+    require(isinstance(shard_count, int) and shard_count == 32, "Fallback must use 32 shards")
+    require(isinstance(shards, list) and len(shards) == shard_count, "Fallback shard list is incomplete")
+
+    key_count = 0
+    record_count = 0
+    witness = None
+    for index, metadata in enumerate(shards):
+        require(isinstance(metadata, dict), f"Fallback shard metadata {index} is invalid")
+        expected_name = f"{index:02x}.json"
+        require(metadata.get("file") == expected_name, f"Unexpected fallback shard name: {metadata}")
+        path = fallback_root / expected_name
+        require(path.is_file(), f"Missing fallback shard: {expected_name}")
+        encoded = path.read_bytes()
+        require(len(encoded) <= MAX_FALLBACK_SHARD_BYTES, f"Fallback shard too large: {expected_name}")
+        require(metadata.get("bytes") == len(encoded), f"Fallback shard byte mismatch: {expected_name}")
+        require(
+            metadata.get("sha256") == hashlib.sha256(encoded).hexdigest(),
+            f"Fallback shard hash mismatch: {expected_name}",
+        )
+        payload = read_json(path)
+        require(payload.get("schemaVersion") == 1, f"Unsupported shard schema: {expected_name}")
+        entries = payload.get("entries")
+        require(isinstance(entries, dict), f"Fallback entries missing: {expected_name}")
+        local_records = sum(len(records) for records in entries.values())
+        require(metadata.get("keyCount") == len(entries), f"Fallback key mismatch: {expected_name}")
+        require(metadata.get("recordCount") == local_records, f"Fallback record mismatch: {expected_name}")
+        for query, records in entries.items():
+            require(
+                fallback_shard_index(query, shard_count) == index,
+                f"Fallback key in wrong shard: {query}",
+            )
+            require(isinstance(records, list) and records, f"Fallback result is empty: {query}")
+            for record in records:
+                require(record.get("kind") in {"direct", "inferred"}, f"Invalid fallback kind: {query}")
+                if record.get("kind") == "inferred":
+                    require(record.get("confidence") == "strong", f"Weak inference shipped: {query}")
+                    string_list(record.get("possibleFrench"), f"fallback[{query}].possibleFrench", allow_empty=False)
+                    require(record.get("inferredFrom"), f"Inference basis missing: {query}")
+                else:
+                    string_list(record.get("french"), f"fallback[{query}].french", allow_empty=False)
+        if "臭屁" in entries:
+            witness = entries["臭屁"]
+        key_count += len(entries)
+        record_count += local_records
+
+    require(key_count == EXPECTED_FALLBACK_KEY_COUNT, "Fallback total key count mismatch")
+    require(record_count == EXPECTED_FALLBACK_RECORD_COUNT, "Fallback total record count mismatch")
+    require(isinstance(witness, list) and witness, "臭屁 fallback witness is missing")
+    inferred = next((record for record in witness if record.get("kind") == "inferred"), None)
+    require(inferred is not None, "臭屁 must be a labelled inference")
+    require(inferred.get("inferredFrom") == "拿大", "臭屁 inference basis changed")
+    require("arrogant" in inferred.get("possibleFrench", []), "臭屁 inference is incomplete")
+    return {"fallbackKeys": key_count, "fallbackRecords": record_count}
 
 
 def validate_witnesses(by_headword: dict[str, list[dict[str, Any]]]) -> None:
@@ -274,9 +405,48 @@ def validate_static_app(web_root: Path) -> None:
         path = local_path(web_root, source)
         require(path is not None and path.is_file(), f"Manifest icon is missing: {source}")
 
+    brand = read_json(web_root / "brand.json")
+    for key in (
+        "id",
+        "theme",
+        "title",
+        "subtitle",
+        "icon",
+        "iconAlt",
+        "themeColor",
+        "welcomeEyebrow",
+        "welcomeTitle",
+        "welcomeBody",
+    ):
+        require(isinstance(brand.get(key), str) and brand[key].strip(), f"Brand {key} is missing")
+    require(
+        brand["themeColor"].startswith("#") and len(brand["themeColor"]) == 7,
+        "Brand themeColor must be a hex colour",
+    )
+    for key in ("icon", "mascot"):
+        reference = brand.get(key)
+        if not reference:
+            continue
+        path = local_path(web_root, reference)
+        require(path is not None and path.is_file(), f"Brand asset is missing: {reference}")
+
     service_worker = (web_root / "sw.js").read_text(encoding="utf-8")
-    for asset in ("index.html", "styles.css", "src/app.js", "data/french-pack.json"):
+    for asset in (
+        "index.html",
+        "brand.json",
+        "styles.css",
+        "src/app.js",
+        "src/chinese-fallback.js",
+        "data/french-pack.json",
+        "data/chinese-fallback/manifest.json",
+    ):
         require(asset in service_worker, f"Service worker does not mention required offline asset: {asset}")
+    if brand.get("mascot"):
+        mascot_asset = str(brand["mascot"]).removeprefix("./")
+        require(
+            mascot_asset in service_worker,
+            f"Service worker does not precache the brand mascot: {mascot_asset}",
+        )
 
 
 def main() -> int:
@@ -289,6 +459,7 @@ def main() -> int:
         require(web_root.is_dir(), f"Web application directory not found: {web_root}")
         validate_static_app(web_root)
         metrics = validate_pack(web_root / "data/french-pack.json")
+        metrics.update(validate_fallback(web_root))
     except (OSError, UnicodeError, ValidationError) as error:
         print(f"Web application validation failed: {error}", file=sys.stderr)
         return 1

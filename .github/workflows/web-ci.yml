@@ -5,8 +5,12 @@ on:
     branches: [main]
     paths:
       - "webApp/**"
+      - "tools/build_web_variant.py"
+      - "tools/export_web_chinese_fallback.py"
       - "tools/export_web_dictionary.py"
-      - "tools/tests/test_export_web_dictionary.py"
+      - "tools/filter_zhwiktionary_french.py"
+      - "tools/web_data/zhwiktionary_french_glosses.json"
+      - "tools/tests/**"
       - "tools/verify_web_app.py"
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/web-pages.yml"
@@ -42,7 +46,15 @@ jobs:
         run: npm --prefix webApp test
 
       - name: Run web pack exporter tests
-        run: python3 -m unittest discover -s tools/tests -p "test_export_web_dictionary.py"
+        run: python3 -m unittest discover -s tools/tests -p "test_web*.py"
+
+      - name: Run web dictionary exporter tests
+        run: python3 -m unittest tools.tests.test_export_web_dictionary
 
       - name: Verify deployable web application
         run: python3 tools/verify_web_app.py
+
+      - name: Build and verify the private deer pilot
+        run: |
+          python3 tools/build_web_variant.py --brand wife --output build/web-wife
+          python3 tools/verify_web_app.py build/web-wife

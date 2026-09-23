@@ -9,7 +9,7 @@ import {
 } from "../src/search-engine.js";
 
 const pack = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   entries: [
     {
       id: "fr:freedict:1",

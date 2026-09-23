@@ -5,8 +5,12 @@ on:
     branches: [main]
     paths:
       - "webApp/**"
+      - "tools/build_web_variant.py"
+      - "tools/export_web_chinese_fallback.py"
       - "tools/export_web_dictionary.py"
-      - "tools/tests/test_export_web_dictionary.py"
+      - "tools/filter_zhwiktionary_french.py"
+      - "tools/web_data/zhwiktionary_french_glosses.json"
+      - "tools/tests/**"
       - "tools/verify_web_app.py"
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/web-pages.yml"
@@ -31,11 +35,23 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Upload validated static site
+      - name: Build private deer pilot
+        run: python3 tools/build_web_variant.py --brand wife --output build/web-wife
+
+      - name: Upload validated global static site
         uses: actions/upload-artifact@v4
         with:
-          name: pangmao-web-static-site
+          name: pangmao-web-global-static-site
           path: webApp
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
+
+      - name: Upload validated private deer pilot
+        uses: actions/upload-artifact@v4
+        with:
+          name: pangmao-web-wife-static-site
+          path: build/web-wife
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 14

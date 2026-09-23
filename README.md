@@ -28,8 +28,14 @@ acceptance criteria.
 
 Open [Pangmao Web](https://kevindassie-ui.github.io/Pangmao-Web/) in Safari on
 the iPhone. To install the prototype, use **Share → Add to Home Screen**. The
-first opening downloads the approximately 2.7 MB dictionary pack; subsequent
-openings can reuse it offline.
+first opening downloads the approximately 3.2 MB core dictionary pack;
+subsequent openings can reuse it offline. An unknown Chinese word downloads
+only one additional dictionary fragment (at most about 0.55 MB), not the full
+supplement.
+
+The public family pilot intentionally uses a warm red deer identity. The
+canonical `webApp/` keeps the global green Pangmao theme; the personal treatment
+is applied only by the reproducible `wife` build variant.
 
 The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
 is a deployment-only mirror. Product code, Android code, tests and development
