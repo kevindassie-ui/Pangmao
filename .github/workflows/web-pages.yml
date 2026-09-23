@@ -1,4 +1,4 @@
-name: Deploy Pangmao Web to Pages
+name: Package Pangmao Web
 
 on:
   push:
@@ -14,38 +14,28 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: web-package-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
     uses: ./.github/workflows/web-ci.yml
 
-  deploy:
+  package:
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - name: Upload validated static site
+        uses: actions/upload-artifact@v4
         with:
-          enablement: true
-
-      - name: Upload static webApp directory
-        uses: actions/upload-pages-artifact@v3
-        with:
+          name: pangmao-web-static-site
           path: webApp
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14

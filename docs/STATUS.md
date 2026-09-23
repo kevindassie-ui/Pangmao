@@ -4,9 +4,10 @@ Checkpoint date: 2026-09-23
 
 ## Current direction
 
-- Android `v0.12.2` is the stable checkpoint for the « J'apprends le chinois »
-  client. Its feature development is paused and the signed release remains the
-  recovery baseline.
+- Android `v0.12.2` is the frozen, signed checkpoint for the « J'apprends le
+  chinois » client. Its feature development is paused, but the release is not
+  considered fully stable because automatic handwriting recognition has a
+  confirmed blocking regression on the reference device.
 - The active product target is Pangmao Web « 我学法语 », a Safari-installable
   PWA for real-life testing by a Chinese-speaking French learner.
 - The Web dictionary is bidirectional: French and Chinese queries reach the
@@ -15,14 +16,17 @@ Checkpoint date: 2026-09-23
 - Android « J'apprends le français » follows only after Web feedback and
   stabilization. Native iOS and App Store distribution follow revenues or
   sufficient usage validation.
-- Both clients remain in one repository, but `webApp/` has an isolated build;
-  no Android 0.12.2 code, application identifier or signing material is changed
-  for the Web prototype.
+- Both canonical clients remain in one private repository, but `webApp/` has an
+  isolated build; no Android 0.12.2 code, application identifier or signing
+  material is changed for the Web prototype. The deployable static files are
+  mirrored separately in the public `Pangmao-Web` repository.
 - Scope and acceptance gates: [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
 
-No Web build has yet been accepted as a stable release. Product approval or a
-successful automated build is not a substitute for installation and sustained
-usage on the pilot iPhone.
+The first Web build is available at
+<https://kevindassie-ui.github.io/Pangmao-Web/>. It has not yet been accepted as
+a stable release: product approval, a successful automated build and a public
+HTTP response are not substitutes for installation and sustained usage on the
+pilot iPhone.
 
 ## Implemented on Android
 
@@ -434,6 +438,11 @@ usage on the pilot iPhone.
   provider-owned voice activity when ColorOS rejects embedded recognition.
 - Scope and validation history are recorded in
   [V0.12_RELEASE_PLAN.md](V0.12_RELEASE_PLAN.md).
+- Device evidence received on 2026-09-23 shows a systematic failure of
+  automatic handwriting recognition across six drawings, including simple
+  characters. The release therefore remains signed and reproducible, but not
+  fully stable. The blocking regression is tracked in
+  [KNOWN_ISSUES.md](KNOWN_ISSUES.md#régression-bloquante-confirmée--v0122).
 
 Exhaustive corpus alignment, richer authentic examples, visual audio tracking
 and interactive source details remain incomplete. The Web MVP must not present

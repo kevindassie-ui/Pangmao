@@ -15,9 +15,12 @@ Dernière mise à jour: 2026-09-23.
 
 ## Priorité actuelle — Pangmao Web « 我学法语 »
 
-La version Android 0.12.2 « J'apprends le chinois » est figée comme base stable.
-Son développement fonctionnel est mis en pause, sans abandon ni migration
-risquée, pendant la validation du versant « J'apprends le français ».
+La version Android 0.12.2 « J'apprends le chinois » est figée comme checkpoint
+signé, mais elle n'est plus qualifiée de stable depuis la confirmation d'une
+régression bloquante de la reconnaissance manuscrite. Son développement
+fonctionnel est mis en pause, sans abandon ni migration risquée, pendant la
+validation du versant « J'apprends le français ». Le défaut manuscrit devra être
+corrigé avant toute nouvelle diffusion Android issue de cette base.
 
 Le premier client de ce nouveau versant est une PWA installable depuis Safari.
 Elle répond d'abord au besoin réel d'une utilisatrice sinophone vivant en France
@@ -29,6 +32,8 @@ d'acceptation sont détaillés dans [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
 - conserver le tag et la release Android `v0.12.2` comme point de reprise;
 - créer `webApp/` dans le même dépôt, avec build et tests indépendants;
 - ne pas ajouter la PWA au build Gradle ni refactoriser Android pour la lancer;
+- publier uniquement les fichiers statiques validés dans le miroir public
+  `Pangmao-Web`, sans code Android ni historique privé;
 - produire un pack Web français–chinois compact, versionné, attribué et
   reproductible à partir des sources validées;
 - utiliser des identifiants namespacés stables avant d'ajouter favoris et cartes.
