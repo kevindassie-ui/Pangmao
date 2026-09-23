@@ -1,8 +1,25 @@
 # Pangmao · 胖猫
 
-Pangmao is a private, offline-first Android Chinese dictionary and learning
-companion. It combines a large bilingual dictionary, a tappable text reader,
-on-device Chinese OCR and lightweight spaced repetition in one independent app.
+Pangmao is an independent, offline-first language-learning project. Its stable
+client is the Android Chinese dictionary and learning companion described below.
+Current development targets a separate Safari-installable Web client for a
+Chinese-speaking learner of French.
+
+## Current product direction
+
+- Android `v0.12.2` remains the stable « J'apprends le chinois » checkpoint.
+- Pangmao Web « 我学法语 » is the current priority for real-life testing on an
+  iPhone before any Apple Developer Program expense.
+- Search is bilingual in both directions: French and Chinese queries reach the
+  same entries, while the selected profile determines the language taught.
+- After Web validation, the French-learning client is planned for Android;
+  native iOS and App Store distribution follow revenues or sufficient usage
+  validation.
+- Android and Web remain in this repository with isolated builds and a shared,
+  source-attributed data pipeline.
+
+See the [Web French MVP plan](docs/WEB_FRENCH_MVP.md) for scope, sequencing and
+acceptance criteria.
 
 ## Version 0.12.2 highlights
 
@@ -108,7 +125,7 @@ on-device Chinese OCR and lightweight spaced repetition in one independent app.
 - No account, ads, analytics, server or subscription. Internet is used only to
   download optional handwriting and translation models; processing then stays local.
 
-## Install
+## Install the current Android release
 
 Download [Pangmao v0.12.2](https://github.com/kevindassie-ui/Pangmao/releases/tag/v0.12.2),
 open the APK on Android, and allow installation from the browser or GitHub app
@@ -133,7 +150,7 @@ Every push to `main` runs data validation, unit tests, Android lint and a debug
 APK build. During private development, a `v*` tag publishes one tested and
 signed ARM64 APK as a GitHub release.
 
-## Architecture
+## Current Android architecture
 
 - Kotlin, Jetpack Compose and Material 3.
 - MVVM with `StateFlow` and repositories.
@@ -146,6 +163,7 @@ signed ARM64 APK as a GitHub release.
 
 See the [changelog](CHANGELOG.md), [product roadmap](docs/ROADMAP.md),
 [product decisions](docs/PRODUCT_DECISIONS.md), [MVP scope](docs/MVP_SCOPE.md),
+[Web French MVP plan](docs/WEB_FRENCH_MVP.md),
 [source data and licenses](tools/SOURCES.md), and [notices](NOTICE.md).
 
 Pangmao is independent and unaffiliated with Pleco Software. It contains no

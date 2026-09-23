@@ -1,6 +1,6 @@
 # Décisions produit
 
-Dernière mise à jour: 2026-09-14.
+Dernière mise à jour: 2026-09-23.
 
 ## D-001 — séparer interface et apprentissage
 
@@ -243,3 +243,91 @@ volontairement tolérants. Il distingue ordre, direction et proximité général
 mais n’affiche pas de score pseudo-précis et ne modifie ni la connaissance du
 mot ni sa planification SRS. Cette évaluation est une aide au geste, pas une
 certification calligraphique.
+
+## D-027 — validation Web avant investissement iOS
+
+**Décision:** le prochain produit testable est une PWA « 我学法语 » installable
+depuis Safari. Elle sert à vérifier l'utilité quotidienne auprès de
+l'utilisatrice pilote avant de souscrire à l'Apple Developer Program.
+
+Après stabilisation, le même versant sera porté sur Android pour une bêta plus
+large en France puis, si elle est justifiée, en Chine. L'application iOS native
+et l'App Store viennent seulement après revenus ou validation d'usage suffisante.
+La PWA n'est jamais présentée comme une application iOS native.
+
+## D-028 — recherche bilingue, pédagogie orientée
+
+**Décision:** chaque profil accepte la recherche dans les deux langues sans
+sélecteur de direction. Dans « J'apprends le français », `avocat` peut mener à
+`律师` ou `牛油果`, et `律师` peut mener à `avocat`.
+
+Le profil étudié règle la hiérarchie pédagogique, pas le sens de recherche. Le
+français conserve donc la priorité pour la prononciation, la grammaire, les
+formes, les exemples et les exercices. Le futur profil « J'apprends le chinois »
+appliquera le même principe en mettant hanzi, pinyin, tons et caractères au
+premier plan.
+
+## D-029 — dépôt unique, clients isolés
+
+**Décision:** Android, Web puis iOS restent dans le même dépôt afin de partager
+les données, décisions et tests fonctionnels. `webApp/` possède néanmoins son
+propre build et ne devient pas un module du build Android.
+
+La première PWA ne déclenche aucune extraction multiplateforme risquée. Un
+socle de code commun ne sera créé que lorsqu'un cas concret démontre un gain
+supérieur au coût de migration. La version Android 0.12.2, sa signature et son
+identifiant d'application restent inchangés.
+
+## D-030 — packs légers, traçables et adressables
+
+**Décision:** un client ne télécharge que les données nécessaires à son profil.
+La PWA française n'embarque donc pas la base Android complète ni les tracés
+chinois. Son pack est reconstruit depuis les sources contrôlées et comprend un
+index français ainsi qu'un index inverse chinois.
+
+Chaque entrée utilisateur emploie un identifiant stable et namespacé afin que
+les favoris, historiques et cartes survivent aux reconstructions sans collision
+avec le dictionnaire chinois. Le manifeste du pack expose version, empreinte,
+source, révision et licence. Une source ne peut entrer dans une diffusion
+publique ou commerciale avant validation de ses droits et attributions.
+
+## D-031 — capacité Web annoncée avec honnêteté
+
+**Décision:** le prototype privilégie les parcours réellement fiables dans
+Safari: saisie, collage, import, recherche, Reader, stockage local et TTS exposé
+par l'appareil. L'installation sur l'écran d'accueil n'est pas décrite comme une
+installation App Store.
+
+Le partage depuis une autre application et l'action `Traduire avec Pangmao`
+sont utilisés dans la PWA seulement après validation sur l'appareil ciblé. À
+défaut, le collage et l'import restent visibles. L'intégration système complète
+est réservée aux clients natifs Android et iOS.
+
+## D-032 — image et texte OCR deviennent une sélection stable
+
+**Décision:** l'import OCR accepte une photo ou une capture d'écran, distingue
+les zones reconnues et permet de recadrer ou choisir la zone utile. Une fois
+« figée », cette zone devient le seul texte analysé jusqu'à une action explicite
+de retour; toucher son contenu ouvre traduction, découpage et fiches.
+
+L'image n'est pas conservée par défaut. Un traitement distant éventuel respecte
+D-016 et ne peut pas être activé silencieusement.
+
+## D-033 — provenance visible des générations IA
+
+**Décision:** Pangmao pourra générer à la demande des exemples, expressions ou
+images mnémotechniques lorsqu'aucune ressource humaine adaptée n'est disponible.
+Chaque résultat porte une indication visible `Généré par IA` et reste séparé des
+définitions et exemples humains attribués.
+
+Une sortie IA n'est jamais ajoutée automatiquement au corpus de référence. Elle
+peut être conservée comme contenu personnel après action explicite et doit
+pouvoir être régénérée ou supprimée.
+
+## D-034 — reprise TTS au niveau utile
+
+**Décision:** après la reprise par phrase déjà livrée sur Android, le Reader
+français doit permettre de lancer ou reprendre la lecture depuis le mot touché.
+Si la plateforme ne fournit pas de suivi suffisamment précis, Pangmao revient
+explicitement au début du mot ou de la phrase disponible et n'annonce pas une
+précision inexistante.

@@ -1,0 +1,106 @@
+import json
+import sqlite3
+import tempfile
+import unittest
+from pathlib import Path
+
+from tools.export_web_dictionary import export_french_pack, write_pack
+
+
+class ExportWebDictionaryTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary_directory = tempfile.TemporaryDirectory()
+        self.database = Path(self.temporary_directory.name) / "dictionary.db"
+        connection = sqlite3.connect(self.database)
+        connection.executescript(
+            """
+            PRAGMA user_version = 4;
+            CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+            CREATE TABLE learning_sources (
+                code TEXT PRIMARY KEY,
+                language TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                url TEXT NOT NULL,
+                revision TEXT NOT NULL,
+                license TEXT NOT NULL
+            );
+            CREATE TABLE learning_entries (
+                id INTEGER PRIMARY KEY,
+                language TEXT NOT NULL,
+                primary_form TEXT NOT NULL,
+                primary_form_search TEXT NOT NULL,
+                parts_of_speech TEXT NOT NULL,
+                genders TEXT NOT NULL,
+                source_code TEXT NOT NULL,
+                source_entry_index INTEGER NOT NULL
+            );
+            CREATE TABLE learning_forms (
+                entry_id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                form TEXT NOT NULL
+            );
+            CREATE TABLE learning_pronunciations (
+                entry_id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                pronunciation TEXT NOT NULL
+            );
+            CREATE TABLE learning_senses (
+                id INTEGER PRIMARY KEY,
+                entry_id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                definitions TEXT NOT NULL
+            );
+            CREATE TABLE learning_equivalents (
+                sense_id INTEGER NOT NULL,
+                position INTEGER NOT NULL,
+                chinese TEXT NOT NULL
+            );
+            INSERT INTO metadata VALUES ('learning_entry_count_fr', '1');
+            INSERT INTO learning_sources VALUES (
+                'FreeDict-fra-zho', 'fr', 'FreeDict / WikDict',
+                'https://example.test', '2025.11.23', 'CC BY-SA 3.0'
+            );
+            INSERT INTO learning_entries VALUES (
+                7, 'fr', 'avocat', 'avocat', 'n', 'masc', 'FreeDict-fra-zho', 42
+            );
+            INSERT INTO learning_forms VALUES (7, 0, 'avocat');
+            INSERT INTO learning_forms VALUES (7, 1, 'avocate');
+            INSERT INTO learning_pronunciations VALUES (7, 0, 'a.vɔ.ka');
+            INSERT INTO learning_senses VALUES (70, 7, 0, 'profession juridique');
+            INSERT INTO learning_senses VALUES (71, 7, 1, 'fruit');
+            INSERT INTO learning_equivalents VALUES (70, 0, '律师');
+            INSERT INTO learning_equivalents VALUES (70, 1, '律師');
+            INSERT INTO learning_equivalents VALUES (71, 0, '牛油果');
+            """
+        )
+        connection.commit()
+        connection.close()
+
+    def tearDown(self) -> None:
+        self.temporary_directory.cleanup()
+
+    def test_exports_bidirectional_entries_without_merging_senses(self) -> None:
+        pack = export_french_pack(self.database)
+
+        self.assertEqual(1, pack["schemaVersion"])
+        self.assertEqual(1, pack["entryCount"])
+        self.assertEqual("fr:FreeDict-fra-zho:42", pack["entries"][0]["id"])
+        self.assertEqual(["avocat", "avocate"], pack["entries"][0]["forms"])
+        self.assertEqual(["律师", "律師"], pack["entries"][0]["senses"][0]["chinese"])
+        self.assertEqual(["牛油果"], pack["entries"][0]["senses"][1]["chinese"])
+        self.assertEqual("CC BY-SA 3.0", pack["source"]["license"])
+
+    def test_output_is_deterministic_and_utf8(self) -> None:
+        first = export_french_pack(self.database)
+        second = export_french_pack(self.database)
+        self.assertEqual(first["entriesSha256"], second["entriesSha256"])
+
+        output = Path(self.temporary_directory.name) / "pack.json"
+        write_pack(first, output)
+        restored = json.loads(output.read_text(encoding="utf-8"))
+        self.assertEqual("律师", restored["entries"][0]["senses"][0]["chinese"][0])
+        self.assertNotIn("\\u5f8b", output.read_text(encoding="utf-8"))
+
+
+if __name__ == "__main__":
+    unittest.main()
