@@ -7,7 +7,9 @@ Chinese-speaking learner of French.
 
 ## Current product direction
 
-- Android `v0.12.2` remains the stable « J'apprends le chinois » checkpoint.
+- Android `v0.12.2` remains the frozen, signed « J'apprends le chinois »
+  checkpoint. It is not considered fully stable: automatic handwriting
+  recognition has a confirmed blocking regression on the reference device.
 - Pangmao Web « 我学法语 » is the current priority for real-life testing on an
   iPhone before any Apple Developer Program expense.
 - Search is bilingual in both directions: French and Chinese queries reach the
@@ -15,11 +17,23 @@ Chinese-speaking learner of French.
 - After Web validation, the French-learning client is planned for Android;
   native iOS and App Store distribution follow revenues or sufficient usage
   validation.
-- Android and Web remain in this repository with isolated builds and a shared,
-  source-attributed data pipeline.
+- Android and the canonical Web source remain in this repository with isolated
+  builds and a shared, source-attributed data pipeline. A public static mirror
+  contains only the files needed to serve the PWA.
 
 See the [Web French MVP plan](docs/WEB_FRENCH_MVP.md) for scope, sequencing and
 acceptance criteria.
+
+## Try Pangmao Web
+
+Open [Pangmao Web](https://kevindassie-ui.github.io/Pangmao-Web/) in Safari on
+the iPhone. To install the prototype, use **Share → Add to Home Screen**. The
+first opening downloads the approximately 2.7 MB dictionary pack; subsequent
+openings can reuse it offline.
+
+The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
+is a deployment-only mirror. Product code, Android code, tests and development
+history remain in the private canonical repository.
 
 ## Version 0.12.2 highlights
 
@@ -133,7 +147,9 @@ when Android asks. Private development releases target recent ARM64 phones. A
 Play-ready Android App Bundle can restore all supported architectures later
 without changing the application ID or signing key. Releases use Pangmao's
 persistent personal key, so later versions can be installed as updates without
-the Play Store.
+the Play Store. Automatic handwriting recognition is currently unusable in
+this release on the reference device; see
+[known issues](docs/KNOWN_ISSUES.md#régression-bloquante-confirmée--v0122).
 
 ## Build
 

@@ -2,8 +2,9 @@
 
 Dernière mise à jour: 2026-09-23.
 
-Statut: orientation validée; développement prioritaire. La version Android
-0.12.2 « J'apprends le chinois » est conservée comme point de reprise stable.
+Statut: première tranche publiée pour recette pilote; développement prioritaire.
+La version Android 0.12.2 « J'apprends le chinois » est conservée comme
+checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
 ## Finalité
 
@@ -16,6 +17,11 @@ La première livraison est une Progressive Web App installable depuis Safari sur
 l'iPhone de l'utilisatrice pilote. Elle permet de tester l'utilité du produit
 sans Apple Developer Program. Elle ne doit être présentée ni comme une
 application iOS native, ni comme une publication App Store.
+
+La tranche actuelle est servie à l'adresse
+<https://kevindassie-ui.github.io/Pangmao-Web/>. Elle doit encore être installée
+et utilisée plusieurs jours sur l'iPhone pilote avant d'être qualifiée de
+stable.
 
 ## Promesse produit
 
@@ -200,6 +206,12 @@ réduit réellement le coût sans mettre en danger Android.
 
 La version Android 0.12.2, son identifiant d'application, sa signature et ses
 bases personnelles ne sont pas modifiés pour construire le prototype Web.
+
+Le dépôt public `kevindassie-ui/Pangmao-Web` est uniquement un miroir de
+publication des fichiers statiques validés de `webApp/`. Il ne contient ni code
+Android, ni outillage interne, ni historique privé et ne devient pas une seconde
+source de vérité. Le code canonique, les tests et la construction du pack
+restent dans le dépôt privé Pangmao.
 
 ## Stockage, confidentialité et limites
 

@@ -331,3 +331,14 @@ français doit permettre de lancer ou reprendre la lecture depuis le mot touché
 Si la plateforme ne fournit pas de suivi suffisamment précis, Pangmao revient
 explicitement au début du mot ou de la phrase disponible et n'annonce pas une
 précision inexistante.
+
+## D-035 — miroir public de déploiement Web
+
+**Décision:** le code canonique Android et Web reste dans le dépôt privé
+Pangmao conformément à D-029. Le dépôt public `Pangmao-Web` contient uniquement
+une copie des fichiers statiques validés nécessaires à GitHub Pages.
+
+Ce miroir permet une publication HTTPS gratuite sans exposer le code Android,
+l'outillage ou l'historique privé. Il n'est pas une seconde branche de produit:
+toute modification fonctionnelle est d'abord développée et testée dans
+`webApp/`, puis son artefact validé remplace le contenu du miroir public.

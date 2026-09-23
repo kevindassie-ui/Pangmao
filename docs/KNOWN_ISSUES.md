@@ -1,10 +1,39 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-09-15.
+Dernière mise à jour: 2026-09-23.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
 fois le correctif publié puis confirmé.
+
+## Régression bloquante confirmée — v0.12.2
+
+### Reconnaissance automatique de l'écriture manuscrite
+
+**Statut:** reproduite sur l'appareil de référence; aucun correctif publié.
+
+Le 2026-09-23, six essais successifs ont tous conservé le dessin puis affiché
+`Recognition failed. Your drawing was kept: try again or clear it.` sans aucune
+suggestion. Le lot comprend notamment des caractères très simples comme `人`,
+`日` et `水`; l'échec ne peut donc pas être attribué à un seul caractère
+complexe ou à un tracé isolé.
+
+**Impact:** le mode de saisie manuscrite de la v0.12.2 est inutilisable sur cet
+appareil. L'application ne se ferme pas et le dessin reste récupérable, mais le
+parcours ne produit aucun caractère à envoyer à la recherche.
+
+Cette régression Android ne bloque pas la validation prioritaire de Pangmao Web.
+Elle devient en revanche une porte bloquante avant toute nouvelle diffusion
+Android issue de cette base. À la reprise du client Android, il faudra:
+
+- reproduire avec et sans réseau, après vérification explicite de l'état du
+  modèle Digital Ink;
+- relever le diagnostic applicatif et `logcat` au moment de l'échec afin de
+  distinguer modèle absent, initialisation, téléchargement et reconnaissance;
+- vérifier au minimum dix caractères successifs, dont `人`, `日`, `水`, annuler
+  et effacer, sans échec systémique;
+- ajouter une couverture de non-régression au niveau le plus bas permettant de
+  simuler les états du modèle et les retours du moteur.
 
 ## Validation restante après la v0.5.1
 
