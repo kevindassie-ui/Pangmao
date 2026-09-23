@@ -52,6 +52,12 @@ d'acceptation sont détaillés dans [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
 - recette sur l'iPhone de l'utilisatrice pilote avec `avocat`, `律师`, `être` et
   `etre` comme requêtes témoins.
 
+État au 23 septembre 2026: le premier essai fonctionne sur Android et iOS. Le
+lot correctif 0.2 ajoute une hiérarchie chinoise dans les fiches, 2 393
+explications chinoises attribuées, un repli chinois fragmenté avec hypothèses
+explicitement signalées, et une variante visuelle rouge au `鹿` réservée à
+l'utilisatrice pilote. La marque globale verte reste inchangée.
+
 ### W2 — Reader français
 
 - saisie, collage et import `.txt`;
@@ -79,6 +85,10 @@ d'acceptation sont détaillés dans [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
 - images mnémotechniques générées par IA, facultatives et signalées;
 - conjugaisons, flexions, collocations, cartes et répétition espacée seulement
   après mesure de la qualité des sources et validation des parcours principaux.
+
+Le retour demandant des phrases d'exemple confirme W4 mais ne crée pas un lot
+parallèle: exemples humains authentifiés et générations IA étiquetées restent
+traités ensemble à cette étape.
 
 ### Après validation du MVP Web
 

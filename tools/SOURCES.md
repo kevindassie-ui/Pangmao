@@ -13,8 +13,16 @@ The generated `pangmao.db` is an aggregation of independently licensed sources.
 | Pangmao editorial supplement | Reviewed definitions and bilingual examples for documented gaps | 0.5.0 | Original project content; source files in `tools/data/` |
 | FreeDict / WikDict `fra-zho` | French headwords, IPA, grammar and Chinese equivalents for the v0.6 French profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/fra-zho/2025.11.23/) |
 | FreeDict / WikDict `eng-zho` | English headwords, pronunciation, grammar and Chinese equivalents for the v0.6 English profile | 2025.11.23 | WikDict/Wiktionary/DBnary contributors, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), [source archive](https://download.freedict.org/dictionaries/eng-zho/2025.11.23/) |
+| Chinese Wiktionary French entries via Kaikki / Wiktextract | Chinese explanations for exactly matched French Web headwords | zhwiktionary dump 2026-09-01, extraction 2026-09-22 | Chinese Wiktionary contributors, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), [Kaikki French extract](https://kaikki.org/zhwiktionary/%E6%B3%95%E8%AA%9E/) |
 
 ## Source candidate under editorial review
+
+The Chinese-Wiktionary French extract is used only by the Web 0.2 enrichment
+pipeline. `tools/filter_zhwiktionary_french.py` keeps 2,393 exact, unique
+FreeDict headwords with non-empty Chinese text; it discards examples and the
+full 73 MB upstream file. The committed filtered artifact records the upstream
+SHA-256, dump date, extraction date, attribution and licence. This is separate
+from the French-Wiktionary Chinese candidate discussed below.
 
 Kaikki's French-Wiktionary Chinese extract is not part of the generated
 database. Snapshot `847718c8d03743b5f29b9c16263a67efa6c468bdf3b2ad666d5896f85cb9139e`

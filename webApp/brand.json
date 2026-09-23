@@ -1,0 +1,13 @@
+{
+  "id": "global",
+  "theme": "global",
+  "title": "胖猫",
+  "subtitle": "我学法语",
+  "icon": "./icons/icon-192.png",
+  "iconAlt": "胖猫图标",
+  "mascot": "",
+  "themeColor": "#0f6b4f",
+  "welcomeEyebrow": "法语 ⇄ 中文",
+  "welcomeTitle": "两种语言，都可以直接搜索",
+  "welcomeBody": "输入法语，查看中文含义；输入中文，找到对应的法语词。词典首次载入后可离线使用。"
+}

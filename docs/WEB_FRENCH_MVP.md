@@ -2,7 +2,8 @@
 
 Dernière mise à jour: 2026-09-23.
 
-Statut: première tranche publiée pour recette pilote; développement prioritaire.
+Statut: premier test technique réussi sur Android et iOS; enrichissement 0.2 en
+cours de recette, puis observation d'usage prioritaire.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
 checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
@@ -19,8 +20,9 @@ sans Apple Developer Program. Elle ne doit être présentée ni comme une
 application iOS native, ni comme une publication App Store.
 
 La tranche actuelle est servie à l'adresse
-<https://kevindassie-ui.github.io/Pangmao-Web/>. Elle doit encore être installée
-et utilisée plusieurs jours sur l'iPhone pilote avant d'être qualifiée de
+<https://kevindassie-ui.github.io/Pangmao-Web/>. L'ouverture et la boucle
+dictionnaire ont fonctionné sur Android et iOS le 23 septembre 2026. Plusieurs
+jours d'usage sur l'iPhone pilote restent nécessaires avant de la qualifier de
 stable.
 
 ## Promesse produit
@@ -104,6 +106,14 @@ Le premier livrable doit couvrir une boucle complète et fiable:
 6. écouter le mot français par une action explicite;
 7. réutiliser le dictionnaire hors ligne après le premier chargement automatique.
 
+La fiche affiche d'abord les équivalents et explications chinoises. Une
+explication humaine chinoise enrichie est montrée lorsqu'elle existe; la
+définition française d'origine reste consultable mais repliée. Un mot chinois
+absent du pack principal déclenche au besoin un seul fragment du dictionnaire
+complémentaire. Une correspondance indirecte est toujours intitulée « sens
+possible », accompagnée de sa base de rapprochement, et ne devient jamais une
+définition attestée par simple effet d'interface.
+
 Requêtes témoins minimales: `avocat`, `律师`, `être`, `etre` et un mot absent.
 Une erreur de chargement ou un manque d'espace doit produire un message
 compréhensible et une reprise possible, jamais un écran vide.
@@ -170,6 +180,12 @@ sens et 15 168 équivalents chinois. Un export dédié ne doit contenir que les
 données nécessaires au profil français, au lieu de distribuer la base Android
 complète de 92,34 Mio.
 
+Le pack 0.2 ajoute 2 393 fiches avec une explication chinoise issue d'entrées
+françaises exactement appariées du Wiktionnaire chinois. Le fichier amont
+complet n'est pas livré. Le repli chinois–français est découpé en 32 fragments:
+le téléphone n'en télécharge qu'un, d'environ 0,5 Mio au maximum, lorsqu'une
+recherche absente l'exige.
+
 Le pack doit:
 
 - préserver les sens, homonymes, formes, prononciations et informations
@@ -194,6 +210,7 @@ Pangmao reste dans un dépôt unique:
 Pangmao/
 ├── app/       application Android 0.12.2 conservée
 ├── webApp/    PWA Safari isolée
+│   └── brands/wife/  identité rouge au cerf, appliquée uniquement au build pilote
 ├── tools/     construction et contrôles des données
 └── docs/      décisions, état et feuilles de route
 ```
@@ -208,7 +225,9 @@ La version Android 0.12.2, son identifiant d'application, sa signature et ses
 bases personnelles ne sont pas modifiés pour construire le prototype Web.
 
 Le dépôt public `kevindassie-ui/Pangmao-Web` est uniquement un miroir de
-publication des fichiers statiques validés de `webApp/`. Il ne contient ni code
+publication des fichiers statiques validés. Pendant le test familial, il reçoit
+la variante construite `wife`; `webApp/` conserve la marque globale verte. Le
+miroir ne contient ni code
 Android, ni outillage interne, ni historique privé et ne devient pas une seconde
 source de vérité. Le code canonique, les tests et la construction du pack
 restent dans le dépôt privé Pangmao.

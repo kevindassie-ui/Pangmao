@@ -342,3 +342,30 @@ Ce miroir permet une publication HTTPS gratuite sans exposer le code Android,
 l'outillage ou l'historique privé. Il n'est pas une seconde branche de produit:
 toute modification fonctionnelle est d'abord développée et testée dans
 `webApp/`, puis son artefact validé remplace le contenu du miroir public.
+
+## D-036 — identité personnelle construite, marque globale préservée
+
+**Décision:** `webApp/` conserve l'identité Pangmao verte par défaut. La palette
+rouge chaleureuse, l'icône au petit cerf lisant et le `鹿` d'accueil sont une
+variante déclarative et reproductible destinée à l'utilisatrice pilote. Seul
+l'artefact familial reçoit cette surcouche; elle ne redéfinit pas encore la
+marque commerciale globale.
+
+## D-037 — explications chinoises d'abord, texte source conservé
+
+**Décision:** dans « J'apprends le français », les équivalents chinois et les
+explications chinoises humaines disponibles occupent le premier niveau de la
+fiche. La définition française issue de la source n'est ni supprimée ni
+retraduite silencieusement: elle reste repliée sous « définition française
+d'origine ». Les enrichissements du Wiktionnaire chinois exigent un appariement
+exact, une attribution visible et une validation déterministe du pack.
+
+## D-038 — sens possible distinct d'une traduction attestée
+
+**Décision:** lorsqu'un mot chinois est absent du pack Web principal, Pangmao
+interroge un fragment local complémentaire. Les traductions françaises déjà
+recensées restent des résultats directs. Une proposition obtenue par identité
+stricte d'une glose sémantique n'est admise que sous un seuil conservateur et
+porte `Sens possible`, sa base lexicale et une note expliquant qu'il ne s'agit
+pas d'une traduction directe. Une absence fiable vaut mieux qu'une hypothèse
+faiblement étayée.

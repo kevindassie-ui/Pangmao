@@ -11,11 +11,14 @@ learning dictionaries are distributed under CC BY-SA 3.0. Full provenance and
 license links are in `tools/SOURCES.md` and in the About/Licences surface of
 each client that distributes the corresponding data.
 
-The initial French-learning Web pack is derived only from sources explicitly
-listed in its own versioned manifest. It must preserve source, revision, licence
-and attribution metadata and must not silently inherit every source present in
-the larger Android database. No new source may enter a public or commercial Web
-pack before its redistribution and attribution requirements are checked.
+The French-learning Web pack is derived only from sources explicitly listed in
+its own versioned manifest. Its core FreeDict data is complemented by an exact,
+filtered subset of French entries from Chinese Wiktionary, extracted through
+Kaikki/Wiktextract and distributed under CC BY-SA 4.0. Chinese fallback results
+derive from the already attributed CC-CEDICT and CFDICT data; indirect semantic
+bridges are visibly labelled as possible meanings. The Web client preserves
+source, revision, licence and attribution metadata and does not silently inherit
+every source present in the larger Android database.
 
 Google ML Kit's bundled Chinese text recognition model is used by the Android
 application for on-device OCR under the applicable Google ML Kit terms. Android
