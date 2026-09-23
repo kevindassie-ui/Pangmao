@@ -1,0 +1,48 @@
+name: Web CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "webApp/**"
+      - "tools/export_web_dictionary.py"
+      - "tools/tests/test_export_web_dictionary.py"
+      - "tools/verify_web_app.py"
+      - ".github/workflows/web-ci.yml"
+      - ".github/workflows/web-pages.yml"
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run web unit and corpus tests
+        run: npm --prefix webApp test
+
+      - name: Run web pack exporter tests
+        run: python3 -m unittest discover -s tools/tests -p "test_export_web_dictionary.py"
+
+      - name: Verify deployable web application
+        run: python3 tools/verify_web_app.py

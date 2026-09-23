@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-17.
+Dernière mise à jour: 2026-09-23.
 
 ## Principes
 
@@ -12,6 +12,82 @@ Dernière mise à jour: 2026-09-17.
 - Données humaines conservées avec leur source; tout enrichissement automatique
   est identifié comme tel.
 - Langue de l'interface et langue étudiée sont deux réglages indépendants.
+
+## Priorité actuelle — Pangmao Web « 我学法语 »
+
+La version Android 0.12.2 « J'apprends le chinois » est figée comme base stable.
+Son développement fonctionnel est mis en pause, sans abandon ni migration
+risquée, pendant la validation du versant « J'apprends le français ».
+
+Le premier client de ce nouveau versant est une PWA installable depuis Safari.
+Elle répond d'abord au besoin réel d'une utilisatrice sinophone vivant en France
+et évite une dépense Apple avant preuve d'utilité. Le cadrage et les critères
+d'acceptation sont détaillés dans [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
+
+### W0 — fondation sans régression Android
+
+- conserver le tag et la release Android `v0.12.2` comme point de reprise;
+- créer `webApp/` dans le même dépôt, avec build et tests indépendants;
+- ne pas ajouter la PWA au build Gradle ni refactoriser Android pour la lancer;
+- produire un pack Web français–chinois compact, versionné, attribué et
+  reproductible à partir des sources validées;
+- utiliser des identifiants namespacés stables avant d'ajouter favoris et cartes.
+
+### W1 — boucle dictionnaire familiale
+
+- interface chinoise simplifiée et installation depuis Safari;
+- champ unique avec détection de la requête et recherche bidirectionnelle
+  français ↔ chinois;
+- recherche exacte, par préfixe et insensible aux accents côté français;
+- fiches conservant homonymes et sens distincts, avec IPA, genre, catégorie et
+  formes lorsqu'ils sont disponibles;
+- TTS français d'un mot par action explicite;
+- chargement automatique du pack au premier démarrage, annoncé avec sa taille,
+  puis réutilisation hors ligne;
+- recette sur l'iPhone de l'utilisatrice pilote avec `avocat`, `律师`, `être` et
+  `etre` comme requêtes témoins.
+
+### W2 — Reader français
+
+- saisie, collage et import `.txt`;
+- découpage en phrases et mots français, avec fiche contextuelle au toucher;
+- traduction de phrase séparée de la définition lexicale;
+- lecture depuis une phrase puis reprise depuis le mot précisément touché;
+- historique local, favoris et statut lexical après stabilisation des
+  identifiants.
+
+### W3 — images, OCR et continuité entre applications
+
+- import d'une photo ou d'une capture d'écran;
+- sélection, recadrage et gel d'une zone de texte avant analyse;
+- passage de la zone choisie vers traduction, découpage et fiches;
+- partage vers Pangmao lorsque le navigateur ou la plateforme le permet;
+- solution de repli claire par collage ou import;
+- extension native ultérieure `Traduire avec Pangmao` pour une sélection de
+  texte ou une capture d'écran.
+
+### W4 — profondeur pédagogique
+
+- exemples humains plus longs, naturels, contextualisés et attribués;
+- génération à la demande d'exemples ou d'expressions, toujours marquée
+  `Généré par IA` lorsqu'elle ne provient pas d'un corpus validé;
+- images mnémotechniques générées par IA, facultatives et signalées;
+- conjugaisons, flexions, collocations, cartes et répétition espacée seulement
+  après mesure de la qualité des sources et validation des parcours principaux.
+
+### Après validation du MVP Web
+
+1. Stabiliser le produit à partir des retours d'usage de l'épouse du porteur du
+   projet, puis élargir à quelques bêta-testeurs chinois en France.
+2. Développer le versant « J'apprends le français » sur Android et le distribuer
+   via Google Play en France/international, avec des canaux compatibles avec la
+   Chine continentale lorsque le marché le justifie.
+3. Développer l'application iOS native et la publier sur l'App Store après
+   revenus ou validation d'usage suffisante pour justifier l'Apple Developer
+   Program.
+4. Reprendre « J'apprends le chinois » sur la structure existante, puis
+   rapprocher les deux versants autour des mêmes contrats de données et règles
+   produit.
 
 ## v0.2.1 — stabiliser · publiée
 
@@ -216,8 +292,6 @@ Plan et matrice de validation: [V0.12_RELEASE_PLAN.md](V0.12_RELEASE_PLAN.md).
   visible et reformulation pédagogique optionnelle graduée de B1 à C2.
 - Bascule simplifié/traditionnel et zhuyin.
 - Recherche floue pour pinyin fautif et variantes orthographiques.
-- Reprise rapide via partage Android, presse-papiers ou raccourci système.
-- OCR avec traduction superposée et conservation facultative du texte reconnu.
 - Grammaire contextuelle et patrons de phrase.
 - Cantonais et jyutping.
 

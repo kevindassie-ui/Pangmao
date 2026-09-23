@@ -1,8 +1,30 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-15
+Checkpoint date: 2026-09-23
 
-## Implemented
+## Current direction
+
+- Android `v0.12.2` is the stable checkpoint for the « J'apprends le chinois »
+  client. Its feature development is paused and the signed release remains the
+  recovery baseline.
+- The active product target is Pangmao Web « 我学法语 », a Safari-installable
+  PWA for real-life testing by a Chinese-speaking French learner.
+- The Web dictionary is bidirectional: French and Chinese queries reach the
+  same French-learning entries, while French pronunciation, grammar and usage
+  remain pedagogically primary.
+- Android « J'apprends le français » follows only after Web feedback and
+  stabilization. Native iOS and App Store distribution follow revenues or
+  sufficient usage validation.
+- Both clients remain in one repository, but `webApp/` has an isolated build;
+  no Android 0.12.2 code, application identifier or signing material is changed
+  for the Web prototype.
+- Scope and acceptance gates: [WEB_FRENCH_MVP.md](WEB_FRENCH_MVP.md).
+
+No Web build has yet been accepted as a stable release. Product approval or a
+successful automated build is not a substitute for installation and sustained
+usage on the pilot iPhone.
+
+## Implemented on Android
 
 - Offline Chinese dictionary search in Hanzi, pinyin, French and English.
 - Simplified/traditional forms, tone-coloured hanzi and tone-marked pinyin.
@@ -388,23 +410,45 @@ Checkpoint date: 2026-09-15
 - Device acceptance remains to cover the v0.9.0 → v0.10.0 update, narrow-screen
   Reader layout, sentence touch selection and long-press dictionary lookup.
 
-Exhaustive bilingual corpus alignment, richer authentic examples, visual audio
-tracking and interactive dictionary-source details are intentionally deferred.
-Collect device feedback, screenshots and reproducible bug reports.
-Keep the same application ID and GitHub signing secrets so future signed APKs
-update this install.
+## Stroke-order release 0.11.0
 
-The v0.8 interactive Reader release is complete. Offline/online services,
-short-form STT, reusable meeting-transcription components, commercialization
-and iOS remain recorded for later work rather than mixed into that release.
+- Tag: `v0.11.0` at commit `b705f50`.
+- Release run `35142476420` rebuilt and verified the dictionary and separate
+  stroke database, passed tests and Android lint, restored the persistent
+  signing key, built the ARM64 release and verified its signature.
+- The release adds local animated stroke order and guided practice for 9,574
+  simplified and traditional characters without changing vocabulary or SRS
+  state.
+- Detailed implementation and remaining device checks are recorded in
+  [V0.11_RELEASE_PLAN.md](V0.11_RELEASE_PLAN.md).
 
-The v0.2.1 corrective scope and remaining device acceptance are recorded in
-[NEXT_RELEASE.md](NEXT_RELEASE.md). Longer-term product work is tracked in
-[ROADMAP.md](ROADMAP.md), with accepted trade-offs recorded in
-[PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md). The next isolated data-quality
-milestones are specified in [V0.5_RELEASE_PLAN.md](V0.5_RELEASE_PLAN.md).
-Confirmed device regressions awaiting a later corrective release are kept in
-[KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+## Short speech-input release 0.12.2
+
+- `v0.12.0` was published from commit `00fafc2` by signed release run
+  `35249765429`.
+- Corrective release `v0.12.2` was published from commit `162c300` by signed
+  release run `35319016439`; tests, lint, offline databases, APK signature and
+  SHA-256 artifact verification passed.
+- The release adds explicit short Chinese speech input and keeps four
+  single-character entry tabs visible. The corrective flow delegates to the
+  provider-owned voice activity when ColorOS rejects embedded recognition.
+- Scope and validation history are recorded in
+  [V0.12_RELEASE_PLAN.md](V0.12_RELEASE_PLAN.md).
+
+Exhaustive corpus alignment, richer authentic examples, visual audio tracking
+and interactive source details remain incomplete. The Web MVP must not present
+generated examples as authentic or silently inherit data whose redistribution
+conditions have not been checked.
+
+Keep the Android application ID, GitHub signing secrets and `v0.12.2` release
+unchanged so a later native version can update the existing installation. Web
+versions use an independent lifecycle and must not use Android's `v*` tag
+namespace.
+
+Longer-term work is tracked in [ROADMAP.md](ROADMAP.md), accepted trade-offs in
+[PRODUCT_DECISIONS.md](PRODUCT_DECISIONS.md), and confirmed regressions in
+[KNOWN_ISSUES.md](KNOWN_ISSUES.md). Older release plans remain historical
+records rather than the current priority.
 
 The generated 92.34 MiB SQLite database is intentionally not committed. CI
 rebuilds it from pinned, hash-verified CC-CEDICT, CFDICT, Tatoeba, Unihan and
