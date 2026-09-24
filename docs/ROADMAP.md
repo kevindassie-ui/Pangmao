@@ -80,6 +80,47 @@ remplace le sens `香蕉人` de `banane` par l'insulte légère réellement util
 France. La variante épouse reçoit des motifs intérieurs `桂花` et `月饼`, sans
 modifier les icônes ni le thème global.
 
+Retour appareil du 24 septembre: la PWA installée sur l'iPhone produit bien du
+son, mais la voix française automatiquement retenue donne une prononciation
+perçue comme fortement non native. Sur le téléphone Android testé dans le
+navigateur Web, aucune voix n'est exposée. Le premier cas devient le défaut
+prioritaire: une locale `fr-FR` ne suffit pas à garantir une voix pédagogique
+acceptable. Le choix doit être qualifié sur l'iPhone réel et partagé par le
+dictionnaire et le Reader.
+
+### Ordre d'implémentation après Web 0.3.2
+
+| Priorité | Lot | Résultat attendu |
+| --- | --- | --- |
+| 1 | **W1.6 — voix et stabilisation appareil** | Comparer toutes les voix françaises exposées sur l'iPhone, mémoriser la voix approuvée, afficher son identité technique, utiliser exactement ce choix dans les fiches et le Reader, puis valider mise à jour, cache et hors-ligne sur plusieurs jours. La recette porte sur des phrases entièrement françaises; un nom chinois prononcé à la française n'est pas un critère suffisant pour juger l'accent français. |
+| 2 | **W1.5 — profondeur lexicale** | Journal local exportable des recherches manquées, extension par lots du français courant, oral, familier, argotique et des locutions, formes fléchies, registres, traductions chinoises revues et premiers exemples authentiques attribués. |
+| 3 | **W2 — Reader avancé** | Traduction ou explication de phrase, reprise TTS depuis le mot choisi, historique de plusieurs textes et amélioration progressive des imports. |
+| 4 | **W3 — image et OCR** | Import de photo ou capture, sélection et gel d'une zone, OCR puis envoi vers traduction, segmentation et dictionnaire. |
+| 5 | **W4 — apprentissage** | Conjugaisons, collocations, statuts lexicaux, cartes/SRS, exemples IA à la demande clairement marqués, puis images mnémotechniques facultatives et STT/prononciation. |
+| 6 | **Validation élargie et clients natifs** | Bêta sinophone en France, portage Android léger avec packs téléchargeables, Google Play, puis iOS natif/App Store lorsque l'usage ou les revenus le justifient. |
+
+Cet ordre reste piloté par les retours d'usage. Un défaut bloquant de la boucle
+actuelle passe avant une nouvelle fonction; les lots 2 à 5 ne doivent pas être
+ouverts simultanément.
+
+### W1.6 — voix française et stabilisation appareil
+
+- inventorier sur l'iPhone pilote le nom, l'identifiant, la locale et le type
+  local ou distant de chaque voix déclarée française;
+- permettre d'écouter une même phrase témoin avec chaque voix, puis conserver
+  explicitement le choix approuvé sur cet appareil;
+- ne plus choisir une voix par la seule étiquette `fr-FR`: utiliser le choix
+  validé lorsqu'il existe et laisser l'utilisatrice le remplacer;
+- appliquer la même voix, le même débit et les mêmes règles au mot isolé et au
+  Reader;
+- conserver un diagnostic local exportable pour pouvoir distinguer un défaut
+  Pangmao d'une limite Safari/iOS, sans télémétrie implicite;
+- valider sur l'iPhone installé: ouverture depuis l'icône, dictionnaire, Reader,
+  redémarrage, mise à jour, fonctionnement hors ligne et persistance du choix;
+- traiter l'absence de voix dans un navigateur Android comme une capacité
+  système distincte: elle ne doit ni provoquer une voix chinoise de repli ni
+  masquer la réussite du parcours iPhone.
+
 ### W1.5 — profondeur lexicale et registres
 
 - mesurer les recherches sans résultat à partir d'une liste exportable locale,
@@ -91,6 +132,8 @@ modifier les icônes ni le thème global.
   marquée et ne devient jamais silencieusement une entrée directe;
 - contrôler la recherche bidirectionnelle, les faux positifs de sous-chaîne et
   les sens socioculturels peu pertinents pour une apprenante vivant en France;
+- ajouter un premier lot d'exemples authentiques attribués aux entrées
+  prioritaires, sans attendre l'ensemble des outils pédagogiques;
 - intégrer par lots mesurés plutôt que corriger uniquement les mots signalés.
 
 Plan de sources et portes qualité:
@@ -131,9 +174,9 @@ aucune traduction de phrase factice n'est affichée pour remplir l'interface.
 - conjugaisons, flexions, collocations, cartes et répétition espacée seulement
   après mesure de la qualité des sources et validation des parcours principaux.
 
-Le retour demandant des phrases d'exemple confirme W4 mais ne crée pas un lot
-parallèle: exemples humains authentifiés et générations IA étiquetées restent
-traités ensemble à cette étape.
+W1.5 livre les premiers exemples authentiques nécessaires pour comprendre les
+nouveaux sens. W4 étend ensuite cette couverture à un parcours pédagogique plus
+large et ajoute les générations IA facultatives, toujours étiquetées.
 
 ### Après validation du MVP Web
 

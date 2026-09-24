@@ -2,8 +2,9 @@
 
 Dernière mise à jour: 2026-09-24.
 
-Statut: premier test technique réussi sur Android et iOS; correctif Web 0.3.1
-de cohérence PWA, qualité lexicale et TTS français en cours de validation.
+Statut: Web 0.3.2 publié; boucle dictionnaire et Reader testée sur Android et
+iOS. Le prochain jalon est la qualification de la voix française réellement
+utilisée par la PWA installée sur l'iPhone pilote.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
 checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
@@ -188,8 +189,9 @@ de manière fiable.
 ## Données, provenance et licences
 
 La première base Web s'appuie sur le corpus français–chinois filtré de
-FreeDict/WikDict `fra-zho`, complété par une entrée CFDICT revue, actuellement
-constitué de 10 924 entrées, 11 558 sens et 15 176 équivalents chinois. Un
+FreeDict/WikDict `fra-zho`, complété par CFDICT et la couche éditoriale Pangmao,
+actuellement constitué de 10 926 entrées, 11 562 sens et 15 187 équivalents
+chinois. Un
 export dédié ne doit contenir que les données nécessaires au profil français,
 au lieu de distribuer la base Android complète de 92,34 Mio.
 
@@ -199,12 +201,13 @@ complet n'est pas livré. Le repli chinois–français est découpé en 32 fragm
 le téléphone n'en télécharge qu'un, d'environ 0,5 Mio au maximum, lorsqu'une
 recherche absente l'exige.
 
-Le complément `affiche` est isolé, versionné et attribué à CFDICT. Il constitue
-un correctif éditorial traçable, pas une autorisation d'inverser automatiquement
-toutes les phrases d'un dictionnaire chinois–français.
+Les compléments `affiche`, `banane`, `bananer` et `péter` sont isolés,
+versionnés et attribués à leur source ou à la révision Pangmao. Ils constituent
+des correctifs éditoriaux traçables, pas une autorisation d'inverser
+automatiquement toutes les phrases d'un dictionnaire chinois–français.
 
-Un audit de livraison parcourt les 10 924 entrées, 11 558 sens et 15 176
-équivalents, protège 23 mots témoins revus et compare chaque couple aux
+Un audit de livraison parcourt les 10 926 entrées, 11 562 sens et 15 187
+équivalents, protège 26 mots témoins revus et compare chaque couple aux
 définitions inverses disponibles. Les désaccords restent une file de revue et
 ne provoquent aucune correction automatique. La méthode et la référence
 chiffrée sont décrites dans
@@ -277,6 +280,31 @@ qu'un essai dans « À propos ». Si le navigateur n'expose aucune voix françai
 les chemins d'installation Android/iPhone et la limite des navigateurs intégrés
 sont affichés. Une voix chinoise n'est jamais utilisée comme repli silencieux
 pour lire du français.
+
+Le test appareil du 24 septembre précise cette limite: l'iPhone installé produit
+du son, contrairement au navigateur Web Android testé, mais la voix
+automatiquement sélectionnée est perçue comme fortement non native. Le prochain
+lot doit donc qualifier la **qualité** et non plus seulement la disponibilité:
+comparaison des voix françaises sur une phrase entièrement française,
+persistance du choix approuvé, identité technique visible et utilisation
+identique dans les fiches et le Reader. La prononciation d'un nom chinois par
+une voix française reste un test séparé et ne doit pas servir seule à déterminer
+l'accent de la voix.
+
+## Ordre des prochaines tranches
+
+1. voix française et stabilisation réelle de la PWA installée;
+2. profondeur lexicale, expressions et exemples authentiques;
+3. Reader: traduction de phrase, reprise au mot et historique;
+4. import d'images, sélection de zone et OCR;
+5. apprentissage: conjugaisons, collocations, statuts, cartes/SRS, contenus IA
+   marqués et STT ultérieur;
+6. bêta élargie, Android avec packs légers, puis iOS natif si l'usage ou les
+   revenus le justifient.
+
+La description exécutable et les portes de validation de ces lots vivent dans
+[ROADMAP.md](ROADMAP.md); le plan de données lexicales reste dans
+[WEB_LEXICAL_DEPTH_PLAN.md](WEB_LEXICAL_DEPTH_PLAN.md).
 
 ## Portes de validation
 
