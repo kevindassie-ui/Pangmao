@@ -15,6 +15,7 @@ class WebDictionaryQualityAuditTest(unittest.TestCase):
         root = Path(self.temporary_directory.name)
         self.pack = root / "pack.json"
         self.database = root / "dictionary.db"
+        self.fallback_root = root / "fallback"
         self.witnesses = root / "witnesses.json"
         self.pack.write_text(
             json.dumps(
@@ -82,6 +83,26 @@ class WebDictionaryQualityAuditTest(unittest.TestCase):
         connection.commit()
         connection.close()
 
+        self.fallback_root.mkdir()
+        (self.fallback_root / "manifest.json").write_text(
+            json.dumps({"schemaVersion": 1, "shards": [{"file": "00.json"}]}),
+            encoding="utf-8",
+        )
+        (self.fallback_root / "00.json").write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "entries": {
+                        "海报": [{"kind": "direct", "simplified": "海报", "traditional": "海報", "french": ["affiche"]}],
+                        "律师": [{"kind": "direct", "simplified": "律师", "traditional": "律師", "french": ["avocat (métier)"]}],
+                        "牛油果": [{"kind": "direct", "simplified": "牛油果", "traditional": "牛油果", "french": ["avocat"]}],
+                    },
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
     def tearDown(self) -> None:
         self.temporary_directory.cleanup()
 
@@ -111,6 +132,17 @@ class WebDictionaryQualityAuditTest(unittest.TestCase):
         self.assertEqual(1, report["crossCheck"]["reviewCandidates"])
         self.assertEqual("affiche", report["crossCheck"]["candidateSamples"][0]["headword"])
         self.assertEqual(before, self.pack.read_bytes())
+
+    def test_can_cross_check_the_shipped_fallback_without_the_android_database(self) -> None:
+        report = audit_web_dictionary(
+            self.pack,
+            None,
+            self.witnesses,
+            fallback_root=self.fallback_root,
+        )
+
+        self.assertEqual(3, report["crossCheck"]["exactlyCorroborated"])
+        self.assertIn("shipped direct", report["methodology"]["corroboration"])
 
     def test_reviewed_witnesses_fail_when_meanings_are_merged(self) -> None:
         value = json.loads(self.pack.read_text(encoding="utf-8"))

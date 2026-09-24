@@ -24,8 +24,8 @@ Le lot passe les 23 témoins sans échec. Parmi les 15 176 couples:
 | Résultat du contrôle croisé | Couples |
 |---|---:|
 | Définition inverse disponible | 7 119 |
-| Accord lexical exact après normalisation | 4 962 |
-| Candidats à une revue humaine | 2 157 |
+| Accord lexical exact après normalisation | 4 957 |
+| Candidats à une revue humaine | 2 162 |
 | Pas de donnée inverse exploitable | 8 057 |
 
 Ces catégories ne constituent pas une note de justesse. Une absence d'accord

@@ -15,7 +15,7 @@ from typing import Any
 
 REPORT_SCHEMA_VERSION = 1
 DEFAULT_PACK = Path("webApp/data/french-pack.json")
-DEFAULT_DATABASE = Path("app/src/main/assets/databases/pangmao.db")
+DEFAULT_FALLBACK_ROOT = Path("webApp/data/chinese-fallback")
 DEFAULT_WITNESSES = Path("tools/web_data/french_translation_witnesses.json")
 PARENTHETICAL = re.compile(r"\([^)]*\)")
 FRENCH_SEPARATOR = re.compile(r"\s*(?:[;,/]|\bou\b|\bet\b)\s*", re.IGNORECASE)
@@ -84,6 +84,48 @@ def reverse_index(connection: sqlite3.Connection) -> dict[str, list[dict[str, An
     return values
 
 
+def fallback_reverse_index(root: Path) -> dict[str, list[dict[str, Any]]]:
+    manifest = read_object(root / "manifest.json")
+    shards = manifest.get("shards")
+    if manifest.get("schemaVersion") != 1 or not isinstance(shards, list) or not shards:
+        raise ValueError("Unsupported shipped Chinese fallback manifest")
+
+    values: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for shard_metadata in shards:
+        filename = shard_metadata.get("file") if isinstance(shard_metadata, dict) else None
+        if not isinstance(filename, str) or not filename:
+            raise ValueError("A shipped Chinese fallback shard has no filename")
+        payload = read_object(root / filename)
+        entries = payload.get("entries")
+        if payload.get("schemaVersion") != 1 or not isinstance(entries, dict):
+            raise ValueError(f"Unsupported shipped Chinese fallback shard: {filename}")
+        for query, records in entries.items():
+            if not isinstance(records, list):
+                raise ValueError(f"Invalid fallback records for {query}")
+            for source_record in records:
+                if not isinstance(source_record, dict) or source_record.get("kind") != "direct":
+                    continue
+                definitions = source_record.get("french")
+                if not isinstance(definitions, list) or not all(
+                    isinstance(definition, str) and definition.strip()
+                    for definition in definitions
+                ):
+                    raise ValueError(f"Invalid direct French fallback for {query}")
+                record = {
+                    "forms": reverse_definition_forms("\n".join(definitions)),
+                    "definitions": list(dict.fromkeys(definition.strip() for definition in definitions)),
+                    "frequency": 0,
+                }
+                for chinese in {
+                    str(query),
+                    str(source_record.get("simplified", "")),
+                    str(source_record.get("traditional", "")),
+                }:
+                    if chinese:
+                        values[chinese].append(record)
+    return values
+
+
 def audit_witnesses(
     entries: list[dict[str, Any]],
     witness_payload: dict[str, Any],
@@ -148,9 +190,10 @@ def audit_witnesses(
 
 def audit_web_dictionary(
     pack_path: Path,
-    database_path: Path,
+    database_path: Path | None,
     witnesses_path: Path,
     sample_limit: int = 20,
+    fallback_root: Path = DEFAULT_FALLBACK_ROOT,
 ) -> dict[str, Any]:
     if sample_limit < 0:
         raise ValueError("sample_limit must be non-negative")
@@ -160,11 +203,16 @@ def audit_web_dictionary(
         raise ValueError("Unsupported Pangmao Web dictionary pack")
     witnesses = read_object(witnesses_path)
 
-    connection = sqlite3.connect(f"file:{database_path}?mode=ro", uri=True)
-    try:
-        reverse = reverse_index(connection)
-    finally:
-        connection.close()
+    if database_path is None:
+        reverse = fallback_reverse_index(fallback_root)
+        reverse_source = "shipped direct Chinese-to-French fallback shards"
+    else:
+        connection = sqlite3.connect(f"file:{database_path}?mode=ro", uri=True)
+        try:
+            reverse = reverse_index(connection)
+        finally:
+            connection.close()
+        reverse_source = "local Pangmao SQLite database"
 
     pair_count = 0
     reverse_available = 0
@@ -227,7 +275,7 @@ def audit_web_dictionary(
             "scope": "every shipped French sense and Chinese equivalent",
             "corroboration": (
                 "exact normalized French lexical agreement with an independently indexed "
-                "Chinese-to-French definition already bundled in Pangmao"
+                f"Chinese-to-French definition from the {reverse_source}"
             ),
             "limitation": (
                 "absence of exact agreement is a review candidate, not proof of an error; "
@@ -280,7 +328,12 @@ def human_summary(report: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pack", type=Path, default=DEFAULT_PACK)
-    parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
+    parser.add_argument(
+        "--database",
+        type=Path,
+        help="Optional local SQLite source; the shipped fallback shards are audited by default",
+    )
+    parser.add_argument("--fallback-root", type=Path, default=DEFAULT_FALLBACK_ROOT)
     parser.add_argument("--witnesses", type=Path, default=DEFAULT_WITNESSES)
     parser.add_argument("--json-out", type=Path)
     parser.add_argument("--sample-limit", type=int, default=20)
@@ -292,6 +345,7 @@ def main() -> int:
         arguments.database,
         arguments.witnesses,
         arguments.sample_limit,
+        arguments.fallback_root,
     )
     if arguments.json_out:
         arguments.json_out.parent.mkdir(parents=True, exist_ok=True)
