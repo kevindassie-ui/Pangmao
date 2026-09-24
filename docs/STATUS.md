@@ -26,7 +26,7 @@ The first Web build is available at
 <https://kevindassie-ui.github.io/Pangmao-Web/>. Its initial technical trial
 passed on both Android and iOS on 2026-09-23. This validates cross-device
 opening and the core dictionary loop, not yet stability: sustained daily use,
-accessibility checks and the enriched 0.2 build still require device acceptance.
+accessibility checks and French voice quality still require device acceptance.
 
 ## Web French pilot 0.3.2 — current implementation
 
@@ -44,9 +44,9 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
   the first user, without turning that personal treatment into the global brand.
   The same private variant now includes transparent, cute `桂花` and `月饼`
   ornaments inside the application only; neither app icon is changed.
-- Authentic/contextual examples and on-demand AI examples remain in W4. This
-  feedback confirms their priority but does not duplicate or pull that release
-  into the present corrective lot.
+- A first attributed authentic-example batch now belongs to lexical depth W1.5.
+  Broader contextual coverage and on-demand AI examples remain in W4; generated
+  text will always be labelled separately from a validated corpus example.
 - French search now indexes lexical forms only. The pilot regression
   `affiche → gigue / punaise`, caused by incidental prose in source definitions,
   is covered by tests; `affiche` returns reviewed equivalents including `海报`,
@@ -68,6 +68,11 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
   after the user action and after returning to the app, leaves the detection
   action enabled when the first inventory is empty, and shows Android/iPhone
   installation paths plus the limitation of embedded browsers.
+- Device feedback on 2026-09-24 confirms audible speech from the installed
+  iPhone PWA, but the automatically selected French-labelled voice sounds
+  strongly non-native. The Android Web browser tested still exposes no voice.
+  Voice quality and explicit approval on the real iPhone are therefore the
+  next acceptance gate; locale matching alone is no longer considered enough.
 - Exact Chinese fallback results outrank substring-only base matches. `放屁`
   reaches `péter` / `lâcher un pet` instead of stopping at `coussin péteur`.
   The editorial review layer also adds `bananer` and replaces the obscure

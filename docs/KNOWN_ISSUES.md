@@ -1,10 +1,38 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-09-23.
+Dernière mise à jour: 2026-09-24.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
 fois le correctif publié puis confirmé.
+
+## Priorité Web confirmée — qualité de la voix française
+
+**Statut:** son disponible dans la PWA installée sur l'iPhone pilote, mais voix
+non acceptée; aucune voix exposée dans le navigateur Web Android testé.
+
+Le 2026-09-24, la lecture du dictionnaire et du Reader fonctionne depuis
+l'application ajoutée à l'écran d'accueil de l'iPhone. La voix retenue est
+toutefois perçue comme celle d'un sinophone parlant français plutôt que comme
+une voix française native. Le nom chinois de l'utilisatrice est, lui, prononcé
+à la française; ce comportement sur un nom propre ne permet pas de conclure sur
+la qualité des phonèmes français.
+
+La version 0.3.2 filtre correctement les locales françaises, mais une étiquette
+`fr-FR` fournie par le système ne certifie ni le moteur ni la qualité de la
+voix. Avant de poursuivre les fonctions suivantes, il faut:
+
+- relever toutes les voix françaises réellement exposées par l'iPhone, avec
+  nom, identifiant, locale et caractère local/distant;
+- comparer la même phrase entièrement française avec chacune d'elles;
+- mémoriser la voix explicitement approuvée et l'appliquer au dictionnaire comme
+  au Reader;
+- vérifier que le choix persiste après fermeture, redémarrage et mise à jour;
+- conserver l'absence de repli vers une voix chinoise;
+- fournir un diagnostic exportable localement, sans collecte automatique.
+
+Ce défaut est la première porte de la section W1.6 de
+[ROADMAP.md](ROADMAP.md).
 
 ## Régression bloquante confirmée — v0.12.2
 

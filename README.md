@@ -37,7 +37,7 @@ The public family pilot intentionally uses a warm red deer identity. The
 canonical `webApp/` keeps the global green Pangmao theme; the personal treatment
 is applied only by the reproducible `wife` build variant.
 
-The Web 0.3.2 candidate contains 10,926 French entries. It keeps the reviewed
+The published Web 0.3.2 pilot contains 10,926 French entries. It keeps the reviewed
 `affiche` correction, adds `péter`/`lâcher une caisse` and `bananer`, and replaces
 the unsuitable third `banane` sense with its light, playful French insult use.
 Exact Chinese fallback entries now outrank incidental substring matches, so
@@ -50,7 +50,9 @@ device-specific installation guidance while still refusing Chinese voices. A
 release audit scans all 15,187 shipped French/Chinese pairs and protects 26
 reviewed regression headwords. The private `wife` variant also gains subtle
 Mid-Autumn osmanthus and mooncake motifs; the global theme and icons stay
-unchanged.
+unchanged. Real-device feedback confirms audible speech in the installed iPhone
+PWA, but the automatically chosen French-labelled voice still requires quality
+qualification before the speech path is accepted.
 
 The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
 is a deployment-only mirror. Product code, Android code, tests and development
