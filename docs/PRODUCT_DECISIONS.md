@@ -369,3 +369,27 @@ stricte d'une glose sémantique n'est admise que sous un seuil conservateur et
 porte `Sens possible`, sa base lexicale et une note expliquant qu'il ne s'agit
 pas d'une traduction directe. Une absence fiable vaut mieux qu'une hypothèse
 faiblement étayée.
+
+## D-039 — la recherche lexicale n'indexe pas la prose des définitions
+
+**Décision:** une requête française du dictionnaire Web correspond à une forme
+exacte, une flexion explicitement gérée ou un préfixe. Elle ne correspond ni à
+une sous-chaîne au milieu d'un mot ni à un mot rencontré fortuitement dans le
+texte explicatif d'une autre entrée. Ainsi, « des affiches » dans la définition
+de `punaise` ne fait jamais de `punaise` une traduction de `affiche`.
+
+Une lacune observée en situation réelle reçoit, si une source autorisée la
+permet, un complément minimal revu, versionné et attribué. Le premier témoin est
+`affiche`, relié à ses équivalents CFDICT. Cette voie éditoriale privilégie une
+absence honnête à une recherche plein texte trompeuse.
+
+## D-040 — Reader Web utile avant traduction non sourcée
+
+**Décision:** le premier Reader Web livre d'abord les opérations locales et
+vérifiables: saisie ou collage, import `.txt`, découpage, TTS de phrase et accès
+au dictionnaire depuis un mot touché. Le brouillon est local et la limite de
+format est annoncée.
+
+La traduction ou l'explication d'une phrase reste un bloc séparé et ne sera
+affichée qu'avec une source ou un moteur identifié. Pangmao ne génère pas une
+traduction décorative pour donner l'impression que W2 est déjà complet.

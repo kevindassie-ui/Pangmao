@@ -41,6 +41,15 @@ const pack = {
       genders: [],
       senses: [{ definitions: ["Se déplacer"], chinese: ["去"] }],
     },
+    {
+      id: "fr:freedict:4",
+      headword: "gigue",
+      forms: ["gigue"],
+      pronunciations: [],
+      partsOfSpeech: ["n"],
+      genders: ["fem"],
+      senses: [{ definitions: ["Impossible d'afficher le signe musical"], chinese: ["吉格舞"] }],
+    },
   ],
 };
 
@@ -77,4 +86,10 @@ test("accent and common inflection fallbacks resolve to a lemma", () => {
 test("unknown and punctuation-only queries return an empty state", () => {
   assert.deepEqual(searchDictionary(index, "%_\"'"), []);
   assert.deepEqual(searchDictionary(index, "mot-totalement-inexistant"), []);
+});
+
+test("French search only matches lexical forms, never incidental definition prose", () => {
+  assert.deepEqual(searchDictionary(index, "affiche"), []);
+  assert.deepEqual(searchDictionary(index, "igue"), []);
+  assert.equal(searchDictionary(index, "gig")[0].entry.headword, "gigue");
 });

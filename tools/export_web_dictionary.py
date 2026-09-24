@@ -67,9 +67,102 @@ def load_chinese_glosses(path: Path | None) -> tuple[dict[str, list[dict[str, An
     return by_identifier, source
 
 
+def load_reviewed_supplements(path: Path | None) -> tuple[list[dict[str, Any]], dict | None]:
+    if path is None:
+        return [], None
+    if not path.is_file():
+        raise FileNotFoundError(f"Reviewed French supplements not found: {path}")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schemaVersion") != 1 or not isinstance(value.get("entries"), list):
+        raise ValueError("Unsupported reviewed French supplement schema")
+    source = value.get("source")
+    if not isinstance(source, dict) or not all(
+        source.get(key) for key in ("code", "name", "url", "revision", "license")
+    ):
+        raise ValueError("Reviewed French supplement source metadata is incomplete")
+
+    entries: list[dict[str, Any]] = []
+    identifiers: set[str] = set()
+    for item in value["entries"]:
+        if not isinstance(item, dict):
+            raise ValueError("Reviewed French supplement entry must be an object")
+        identifier = item.get("id")
+        headword = item.get("headword")
+        forms = item.get("forms")
+        senses = item.get("senses")
+        if (
+            not isinstance(identifier, str)
+            or not identifier.startswith(f'fr:{source["code"]}:')
+            or identifier in identifiers
+            or not isinstance(headword, str)
+            or not headword.strip()
+            or not isinstance(forms, list)
+            or headword not in forms
+            or not all(isinstance(form, str) and form.strip() for form in forms)
+            or not isinstance(senses, list)
+            or not senses
+        ):
+            raise ValueError(f"Invalid reviewed French supplement entry: {identifier}")
+        clean_senses = []
+        for sense in senses:
+            definitions = sense.get("definitions") if isinstance(sense, dict) else None
+            chinese = sense.get("chinese") if isinstance(sense, dict) else None
+            if (
+                not isinstance(definitions, list)
+                or not all(
+                    isinstance(definition, str) and definition.strip()
+                    for definition in definitions
+                )
+                or not isinstance(chinese, list)
+                or not chinese
+                or not all(isinstance(equivalent, str) and equivalent.strip() for equivalent in chinese)
+            ):
+                raise ValueError(f"Invalid reviewed French supplement sense: {identifier}")
+            clean_senses.append(
+                {
+                    "definitions": list(dict.fromkeys(definitions)),
+                    "chinese": list(dict.fromkeys(chinese)),
+                }
+            )
+        entries.append(
+            {
+                "id": identifier,
+                "headword": headword.strip(),
+                "forms": list(dict.fromkeys(form.strip() for form in forms)),
+                "pronunciations": list(
+                    dict.fromkeys(
+                        str(candidate).strip()
+                        for candidate in item.get("pronunciations", [])
+                        if str(candidate).strip()
+                    )
+                ),
+                "partsOfSpeech": list(
+                    dict.fromkeys(
+                        str(candidate).strip()
+                        for candidate in item.get("partsOfSpeech", [])
+                        if str(candidate).strip()
+                    )
+                ),
+                "genders": list(
+                    dict.fromkeys(
+                        str(candidate).strip()
+                        for candidate in item.get("genders", [])
+                        if str(candidate).strip()
+                    )
+                ),
+                "senses": clean_senses,
+            }
+        )
+        identifiers.add(identifier)
+    if value.get("entryCount") != len(entries):
+        raise ValueError("Reviewed French supplement entryCount mismatch")
+    return entries, source
+
+
 def export_french_pack(
     database: Path,
     chinese_glosses: Path | None = None,
+    reviewed_supplements: Path | None = None,
 ) -> dict[str, Any]:
     if not database.is_file():
         raise FileNotFoundError(f"Dictionary database not found: {database}")
@@ -191,6 +284,25 @@ def export_french_pack(
                 f"French entry count mismatch: expected {expected_count}, exported {len(entries)}"
             )
 
+        base_headwords = {entry["headword"].casefold() for entry in entries}
+        supplement_entries, supplement_source = load_reviewed_supplements(reviewed_supplements)
+        duplicate_headwords = sorted(
+            entry["headword"]
+            for entry in supplement_entries
+            if entry["headword"].casefold() in base_headwords
+        )
+        if duplicate_headwords:
+            raise ValueError(
+                "Reviewed supplements duplicate base headwords: " + ", ".join(duplicate_headwords)
+            )
+        base_identifiers = {entry["id"] for entry in entries}
+        if any(entry["id"] in base_identifiers for entry in supplement_entries):
+            raise ValueError("Reviewed supplement identifier collides with the base dictionary")
+        entries.extend(supplement_entries)
+        entries.sort(
+            key=lambda entry: (entry["headword"].casefold(), entry["headword"], entry["id"])
+        )
+
         entries_bytes = json.dumps(
             entries,
             ensure_ascii=False,
@@ -215,6 +327,8 @@ def export_french_pack(
         }
         if enrichment_source is not None:
             result["enrichmentSources"] = [enrichment_source]
+        if supplement_source is not None:
+            result["supplementSources"] = [supplement_source]
         return result
     finally:
         connection.close()
@@ -248,10 +362,19 @@ def main() -> None:
         type=Path,
         default=Path("tools/web_data/zhwiktionary_french_glosses.json"),
     )
+    parser.add_argument(
+        "--reviewed-supplements",
+        type=Path,
+        default=Path("tools/web_data/french_reviewed_supplements.json"),
+    )
     parser.add_argument("--pretty", action="store_true")
     arguments = parser.parse_args()
 
-    pack = export_french_pack(arguments.database, arguments.chinese_glosses)
+    pack = export_french_pack(
+        arguments.database,
+        arguments.chinese_glosses,
+        arguments.reviewed_supplements,
+    )
     write_pack(pack, arguments.output, arguments.pretty)
     size_mb = arguments.output.stat().st_size / (1024 * 1024)
     print(

@@ -29,7 +29,7 @@ test("complete French pack has deterministic metadata and identifiers", () => {
   assert.equal(pack.schemaVersion, 2);
   assert.equal(pack.enrichedEntryCount, 2_393);
   assert.equal(pack.language, "fr");
-  assert.equal(pack.entryCount, 10_923);
+  assert.equal(pack.entryCount, 10_924);
   assert.equal(pack.entries.length, pack.entryCount);
   assert.equal(pack.source.code, "FreeDict-fra-zho");
   assert.equal(pack.source.revision, "2025.11.23");
@@ -37,7 +37,7 @@ test("complete French pack has deterministic metadata and identifiers", () => {
 
   const identifiers = new Set(pack.entries.map((entry) => entry.id));
   assert.equal(identifiers.size, pack.entryCount);
-  assert.ok([...identifiers].every((identifier) => identifier.startsWith("fr:FreeDict-fra-zho:")));
+  assert.ok([...identifiers].every((identifier) => identifier.startsWith("fr:")));
 
   const digest = createHash("sha256")
     .update(JSON.stringify(canonicalize(pack.entries)), "utf8")
@@ -100,4 +100,11 @@ test("real pack keeps voler's principal meanings in separate senses", () => {
 test("real pack handles invalid and unknown input without failure", () => {
   assert.deepEqual(searchDictionary(index, "%_\"'"), []);
   assert.deepEqual(searchDictionary(index, "mot-totalement-inexistant"), []);
+});
+
+test("real pack resolves affiche without definition-prose false positives", () => {
+  const results = searchDictionary(index, "affiche", 10);
+  assert.equal(results[0]?.entry.headword, "affiche");
+  assert.ok(results[0].entry.senses.some((sense) => sense.chinese.includes("海报")));
+  assert.ok(results.every((result) => !["gigue", "punaise"].includes(result.entry.headword)));
 });

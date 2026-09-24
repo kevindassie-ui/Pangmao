@@ -13,9 +13,9 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 
-EXPECTED_ENTRY_COUNT = 10_923
-EXPECTED_SENSE_COUNT = 11_556
-EXPECTED_EQUIVALENT_COUNT = 15_168
+EXPECTED_ENTRY_COUNT = 10_924
+EXPECTED_SENSE_COUNT = 11_558
+EXPECTED_EQUIVALENT_COUNT = 15_176
 EXPECTED_SOURCE_CODE = "FreeDict-fra-zho"
 EXPECTED_SOURCE_REVISION = "2025.11.23"
 EXPECTED_SOURCE_LICENSE = "CC BY-SA 3.0"
@@ -43,6 +43,7 @@ REQUIRED_FILES = (
     "data/french-pack.json",
     "src/app.js",
     "src/chinese-fallback.js",
+    "src/reader.js",
     "src/search-engine.js",
     "src/storage.js",
 )
@@ -159,6 +160,21 @@ def validate_pack(path: Path) -> dict[str, int]:
         enrichment_source.get("license") == "CC BY-SA 4.0",
         "Unexpected Chinese glossary licence",
     )
+    supplement_sources = pack.get("supplementSources")
+    require(
+        isinstance(supplement_sources, list) and len(supplement_sources) == 1,
+        "Exactly one reviewed supplement source is required",
+    )
+    supplement_source = supplement_sources[0]
+    require(supplement_source.get("code") == "CFDICT", "Unexpected supplement source")
+    require(
+        supplement_source.get("revision") == "2026-09-11",
+        "Unexpected supplement source revision",
+    )
+    require(
+        supplement_source.get("license") == "CC BY-SA 3.0",
+        "Unexpected supplement source licence",
+    )
 
     identifiers: set[str] = set()
     by_headword: dict[str, list[dict[str, Any]]] = {}
@@ -166,17 +182,26 @@ def validate_pack(path: Path) -> dict[str, int]:
     equivalent_count = 0
     enriched_entry_count = 0
     expected_prefix = f"fr:{EXPECTED_SOURCE_CODE}:"
+    supplement_prefix = "fr:CFDICT:reviewed-"
 
     for entry_index, entry in enumerate(entries):
         label = f"entries[{entry_index}]"
         require(isinstance(entry, dict), f"{label} must be an object")
         identifier = entry.get("id")
-        require(isinstance(identifier, str) and identifier.startswith(expected_prefix), f"Invalid {label}.id")
+        require(
+            isinstance(identifier, str)
+            and (identifier.startswith(expected_prefix) or identifier.startswith(supplement_prefix)),
+            f"Invalid {label}.id",
+        )
         require(identifier not in identifiers, f"Duplicate dictionary id: {identifier}")
         identifiers.add(identifier)
 
-        source_index = identifier.removeprefix(expected_prefix)
-        require(source_index.isdigit() and int(source_index) > 0, f"Invalid source index in {identifier}")
+        if identifier.startswith(expected_prefix):
+            source_index = identifier.removeprefix(expected_prefix)
+            require(
+                source_index.isdigit() and int(source_index) > 0,
+                f"Invalid source index in {identifier}",
+            )
         headword = entry.get("headword")
         require(isinstance(headword, str) and bool(headword.strip()), f"Invalid {label}.headword")
         forms = string_list(entry.get("forms"), f"{label}.forms", allow_empty=False)
@@ -339,6 +364,9 @@ def validate_witnesses(by_headword: dict[str, list[dict[str, Any]]]) -> None:
     require(any("是" in values for values in sense_sets("être")), "être → 是 is missing")
     require(any("猫" in values for values in sense_sets("chat")), "chat → 猫 is missing")
     require(any("吃" in values for values in sense_sets("manger")), "manger → 吃 is missing")
+    affiche_senses = sense_sets("affiche")
+    require(any("海报" in values for values in affiche_senses), "affiche → 海报 is missing")
+    require(any("告示" in values for values in affiche_senses), "affiche → 告示 is missing")
 
     avocat_senses = sense_sets("avocat")
     lawyer_indexes = {
@@ -379,12 +407,21 @@ def validate_static_app(web_root: Path) -> None:
     for relative in REQUIRED_FILES:
         require((web_root / relative).is_file(), f"Missing web application file: {relative}")
 
+    html = (web_root / "index.html").read_text(encoding="utf-8")
     parser = LocalAssetParser()
-    parser.feed((web_root / "index.html").read_text(encoding="utf-8"))
+    parser.feed(html)
     for reference in parser.references:
         path = local_path(web_root, reference)
         if path is not None:
             require(path.is_file(), f"index.html references a missing asset: {reference}")
+    for element_id in (
+        "readerView",
+        "readerInput",
+        "readerFile",
+        "readerAnalyzeButton",
+        "readerSentences",
+    ):
+        require(f'id="{element_id}"' in html, f"Reader control is missing: {element_id}")
 
     manifest = read_json(web_root / "manifest.webmanifest")
     for key in ("name", "short_name", "start_url", "display"):
@@ -437,10 +474,14 @@ def validate_static_app(web_root: Path) -> None:
         "styles.css",
         "src/app.js",
         "src/chinese-fallback.js",
+        "src/reader.js",
         "data/french-pack.json",
         "data/chinese-fallback/manifest.json",
     ):
         require(asset in service_worker, f"Service worker does not mention required offline asset: {asset}")
+    app_source = (web_root / "src/app.js").read_text(encoding="utf-8")
+    require("segmentFrenchText" in app_source, "Reader is not connected to the application")
+    require("record.pinyin" not in app_source, "Chinese fallback results must not display pinyin")
     if brand.get("mascot"):
         mascot_asset = str(brand["mascot"]).removeprefix("./")
         require(

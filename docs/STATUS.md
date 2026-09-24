@@ -1,6 +1,6 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-23
+Checkpoint date: 2026-09-24
 
 ## Current direction
 
@@ -28,13 +28,13 @@ passed on both Android and iOS on 2026-09-23. This validates cross-device
 opening and the core dictionary loop, not yet stability: sustained daily use,
 accessibility checks and the enriched 0.2 build still require device acceptance.
 
-## Web French pilot 0.2 — current implementation
+## Web French pilot 0.3 — current implementation
 
 - Chinese meanings now dominate the entry sheet; the original French source
   paragraph is retained behind an explicit disclosure.
 - 2,393 exact French headwords receive attributed Chinese explanations from
-  Chinese Wiktionary. Existing FreeDict Chinese equivalents remain available
-  on all 10,923 entries.
+  Chinese Wiktionary. Existing FreeDict Chinese equivalents remain available;
+  one reviewed CFDICT supplement brings the pack to 10,924 entries.
 - An additional Chinese dictionary is split into 32 lazy shards. It exposes
   direct French meanings first and only 3,480 conservative semantic bridges;
   each inferred result is visibly labelled and names its dictionary basis.
@@ -45,6 +45,15 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
 - Authentic/contextual examples and on-demand AI examples remain in W4. This
   feedback confirms their priority but does not duplicate or pull that release
   into the present corrective lot.
+- French search now indexes lexical forms only. The pilot regression
+  `affiche → gigue / punaise`, caused by incidental prose in source definitions,
+  is covered by tests; `affiche` returns reviewed equivalents including `海报`,
+  `招贴` and `告示`.
+- Chinese fallback cards no longer display numbered pinyin beneath the queried
+  characters. French IPA remains visible because French is the studied language.
+- The first Reader slice accepts pasted text and `.txt` files up to 1 MiB,
+  segments locally, reads a selected sentence aloud and opens an exact lexical
+  entry from a touched word. Its draft stays on the device.
 
 ## Implemented on Android
 

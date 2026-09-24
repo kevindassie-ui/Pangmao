@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { loadFavorites, saveFavorites } from "../src/storage.js";
+import {
+  loadFavorites,
+  loadReaderDraft,
+  saveFavorites,
+  saveReaderDraft,
+} from "../src/storage.js";
 
 class MemoryStorage {
   values = new Map();
@@ -19,4 +24,20 @@ test("invalid local data is ignored safely", () => {
   const storage = new MemoryStorage();
   storage.setItem("pangmao.web.favorites.v1", "not-json");
   assert.deepEqual([...loadFavorites(storage)], []);
+});
+
+test("reader draft stays on the current device", () => {
+  const storage = new MemoryStorage();
+  saveReaderDraft("Une affiche rouge.", storage);
+  assert.equal(loadReaderDraft(storage), "Une affiche rouge.");
+});
+
+test("storage failures never break the offline interface", () => {
+  const storage = {
+    getItem() { throw new Error("blocked"); },
+    setItem() { throw new Error("full"); },
+  };
+  assert.equal(loadReaderDraft(storage), "");
+  assert.equal(saveReaderDraft("texte", storage), false);
+  assert.equal(saveFavorites(new Set(["fr:test:1"]), storage), false);
 });

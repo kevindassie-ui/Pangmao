@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "code": "CFDICT",
+    "name": "CFDICT",
+    "url": "https://chine.in/mandarin/dictionnaire/CFDICT/",
+    "revision": "2026-09-11",
+    "license": "CC BY-SA 3.0",
+    "attribution": "CFDICT contributors"
+  },
+  "entryCount": 1,
+  "entries": [
+    {
+      "id": "fr:CFDICT:reviewed-affiche-v1",
+      "headword": "affiche",
+      "forms": [
+        "affiche",
+        "affiches"
+      ],
+      "pronunciations": [],
+      "partsOfSpeech": [],
+      "genders": [],
+      "senses": [
+        {
+          "definitions": [],
+          "chinese": [
+            "海报",
+            "海報",
+            "招贴",
+            "招貼",
+            "宣传画",
+            "宣傳畫"
+          ]
+        },
+        {
+          "definitions": [],
+          "chinese": [
+            "告示",
+            "布告"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ on:
       - "tools/export_web_dictionary.py"
       - "tools/filter_zhwiktionary_french.py"
       - "tools/web_data/zhwiktionary_french_glosses.json"
+      - "tools/web_data/french_reviewed_supplements.json"
       - "tools/tests/**"
       - "tools/verify_web_app.py"
       - ".github/workflows/web-ci.yml"
