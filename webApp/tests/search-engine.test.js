@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   containsHan,
   createDictionaryIndex,
+  needsExactChineseFallback,
   normalizeFrench,
   searchDictionary,
 } from "../src/search-engine.js";
@@ -74,6 +75,12 @@ test("Chinese query returns the matching French sense first", () => {
   const [result] = searchDictionary(index, "律师");
   assert.equal(result.entry.headword, "avocat");
   assert.deepEqual(result.matchedSenseIndexes, [0]);
+});
+
+test("an exact Chinese fallback outranks incidental substring matches", () => {
+  assert.equal(needsExactChineseFallback("放屁", [{ matchType: "contains" }]), true);
+  assert.equal(needsExactChineseFallback("放屁", [{ matchType: "exact" }]), false);
+  assert.equal(needsExactChineseFallback("péter", []), false);
 });
 
 test("accent and common inflection fallbacks resolve to a lemma", () => {

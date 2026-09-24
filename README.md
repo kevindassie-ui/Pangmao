@@ -37,16 +37,20 @@ The public family pilot intentionally uses a warm red deer identity. The
 canonical `webApp/` keeps the global green Pangmao theme; the personal treatment
 is applied only by the reproducible `wife` build variant.
 
-The Web 0.3.1 candidate contains 10,924 French entries, including a reviewed
-CFDICT correction for `affiche`. French searches use lexical forms rather than
-incidental prose inside definitions. Its first French Reader slice accepts
-pasted text or a `.txt` file, segments it locally, reads a sentence aloud and
-opens the dictionary from a touched word. Chinese query cards omit pinyin while
-French IPA remains available. Versioned assets prevent an old offline pack from
-being combined with a new interface; French speech now requires an advertised
-French system voice and exposes a persistent voice selector and test. A
-release audit scans all 15,176 shipped French/Chinese pairs and protects 23
-reviewed regression headwords.
+The Web 0.3.2 candidate contains 10,926 French entries. It keeps the reviewed
+`affiche` correction, adds `péter`/`lâcher une caisse` and `bananer`, and replaces
+the unsuitable third `banane` sense with its light, playful French insult use.
+Exact Chinese fallback entries now outrank incidental substring matches, so
+`放屁` cannot stop at `放屁坐垫`. French searches use lexical forms rather than
+incidental prose inside definitions. The Reader accepts pasted text or a `.txt`
+file, segments it locally, reads a sentence aloud and opens the dictionary from
+a touched word. Chinese query cards omit pinyin while French IPA remains
+available. French speech retries delayed mobile voice discovery and exposes
+device-specific installation guidance while still refusing Chinese voices. A
+release audit scans all 15,187 shipped French/Chinese pairs and protects 26
+reviewed regression headwords. The private `wife` variant also gains subtle
+Mid-Autumn osmanthus and mooncake motifs; the global theme and icons stay
+unchanged.
 
 The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
 is a deployment-only mirror. Product code, Android code, tests and development

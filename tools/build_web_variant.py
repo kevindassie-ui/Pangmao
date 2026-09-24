@@ -52,9 +52,14 @@ def build_variant(source: Path, brand: str, output: Path) -> None:
             copy_tree(images, staging / "images")
             service_worker_path = staging / "sw.js"
             service_worker = service_worker_path.read_text(encoding="utf-8")
+            image_cache_entries = "".join(
+                f'  "./images/{path.name}",\n'
+                for path in sorted(images.iterdir())
+                if path.is_file()
+            )
             service_worker = service_worker.replace(
                 '  "./icons/icon-512.png",\n',
-                '  "./icons/icon-512.png",\n  "./images/deer-mascot.png",\n',
+                f'  "./icons/icon-512.png",\n{image_cache_entries}',
                 1,
             )
             service_worker_path.write_text(service_worker, encoding="utf-8")

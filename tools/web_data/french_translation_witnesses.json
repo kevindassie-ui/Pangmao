@@ -36,6 +36,21 @@
       "headword": "voler",
       "requiredGroups": [["飞", "飛", "飞行", "飛行"], ["偷", "偷窃", "偷竊"]],
       "distinctSenseGroups": [["飞", "飛", "飞行", "飛行"], ["偷", "偷窃", "偷竊"]]
+    },
+    {
+      "headword": "banane",
+      "requiredGroups": [["香蕉"], ["腰包"], ["傻瓜", "笨蛋", "呆瓜"]],
+      "distinctSenseGroups": [["香蕉"], ["腰包"], ["傻瓜", "笨蛋", "呆瓜"]],
+      "forbiddenChinese": ["香蕉人"]
+    },
+    {
+      "headword": "péter",
+      "requiredGroups": [["放屁"]]
+    },
+    {
+      "headword": "bananer",
+      "requiredGroups": [["欺骗", "坑骗", "耍"], ["上当", "被骗"]],
+      "distinctSenseGroups": [["欺骗", "坑骗", "耍"], ["上当", "被骗"]]
     }
   ]
 }

@@ -13,9 +13,9 @@ from typing import Any
 from urllib.parse import unquote, urlsplit
 
 
-EXPECTED_ENTRY_COUNT = 10_924
-EXPECTED_SENSE_COUNT = 11_558
-EXPECTED_EQUIVALENT_COUNT = 15_176
+EXPECTED_ENTRY_COUNT = 10_926
+EXPECTED_SENSE_COUNT = 11_562
+EXPECTED_EQUIVALENT_COUNT = 15_187
 EXPECTED_SOURCE_CODE = "FreeDict-fra-zho"
 EXPECTED_SOURCE_REVISION = "2025.11.23"
 EXPECTED_SOURCE_LICENSE = "CC BY-SA 3.0"
@@ -181,6 +181,20 @@ def validate_pack(path: Path, release_version: str) -> dict[str, int]:
         supplement_source.get("license") == "CC BY-SA 3.0",
         "Unexpected supplement source licence",
     )
+    editorial_sources = pack.get("editorialSources")
+    require(
+        isinstance(editorial_sources, list) and len(editorial_sources) == 1,
+        "Exactly one Pangmao editorial source is required",
+    )
+    editorial_source = editorial_sources[0]
+    require(
+        editorial_source.get("code") == "PANGMAO-EDITORIAL",
+        "Unexpected editorial source",
+    )
+    require(
+        editorial_source.get("revision") == "2026-09-24",
+        "Unexpected editorial source revision",
+    )
 
     identifiers: set[str] = set()
     by_headword: dict[str, list[dict[str, Any]]] = {}
@@ -189,6 +203,7 @@ def validate_pack(path: Path, release_version: str) -> dict[str, int]:
     enriched_entry_count = 0
     expected_prefix = f"fr:{EXPECTED_SOURCE_CODE}:"
     supplement_prefix = "fr:CFDICT:reviewed-"
+    editorial_prefix = "fr:PANGMAO-EDITORIAL:"
 
     for entry_index, entry in enumerate(entries):
         label = f"entries[{entry_index}]"
@@ -196,7 +211,11 @@ def validate_pack(path: Path, release_version: str) -> dict[str, int]:
         identifier = entry.get("id")
         require(
             isinstance(identifier, str)
-            and (identifier.startswith(expected_prefix) or identifier.startswith(supplement_prefix)),
+            and (
+                identifier.startswith(expected_prefix)
+                or identifier.startswith(supplement_prefix)
+                or identifier.startswith(editorial_prefix)
+            ),
             f"Invalid {label}.id",
         )
         require(identifier not in identifiers, f"Duplicate dictionary id: {identifier}")
@@ -395,6 +414,23 @@ def validate_witnesses(by_headword: dict[str, list[dict[str, Any]]]) -> None:
     require(flying_indexes and stealing_indexes, "voler's principal meanings are incomplete")
     require(flying_indexes.isdisjoint(stealing_indexes), "voler's meanings were merged")
 
+    banane_senses = sense_sets("banane")
+    require(any("香蕉" in values for values in banane_senses), "banane → 香蕉 is missing")
+    require(any("腰包" in values for values in banane_senses), "banane → 腰包 is missing")
+    require(
+        any(values.intersection({"傻瓜", "笨蛋", "呆瓜"}) for values in banane_senses),
+        "banane's playful insult sense is missing",
+    )
+    require(
+        all("香蕉人" not in values for values in banane_senses),
+        "banane still exposes the unsuitable 香蕉人 sense",
+    )
+    require(any("放屁" in values for values in sense_sets("péter")), "péter → 放屁 is missing")
+    require(
+        any(values.intersection({"欺骗", "坑骗", "耍"}) for values in sense_sets("bananer")),
+        "bananer's colloquial deception sense is missing",
+    )
+
 
 def local_path(web_root: Path, reference: str) -> Path | None:
     split = urlsplit(reference)
@@ -485,6 +521,21 @@ def validate_static_app(web_root: Path) -> str:
             continue
         path = local_path(web_root, reference)
         require(path is not None and path.is_file(), f"Brand asset is missing: {reference}")
+    seasonal = brand.get("seasonal")
+    if seasonal is not None:
+        require(isinstance(seasonal, dict), "Brand seasonal configuration must be an object")
+        require(
+            isinstance(seasonal.get("id"), str) and seasonal["id"].strip(),
+            "Brand seasonal id is missing",
+        )
+        for key in ("osmanthus", "mooncakes"):
+            reference = seasonal.get(key)
+            require(
+                isinstance(reference, str) and reference.strip(),
+                f"Brand seasonal asset is missing: {key}",
+            )
+            path = local_path(web_root, reference)
+            require(path is not None and path.is_file(), f"Brand asset is missing: {reference}")
 
     service_worker = (web_root / "sw.js").read_text(encoding="utf-8")
     for asset in (
@@ -534,6 +585,13 @@ def validate_static_app(web_root: Path) -> str:
             mascot_asset in service_worker,
             f"Service worker does not precache the brand mascot: {mascot_asset}",
         )
+    if seasonal is not None:
+        for key in ("osmanthus", "mooncakes"):
+            seasonal_asset = str(seasonal[key]).removeprefix("./")
+            require(
+                seasonal_asset in service_worker,
+                f"Service worker does not precache the seasonal asset: {seasonal_asset}",
+            )
     return release_version
 
 

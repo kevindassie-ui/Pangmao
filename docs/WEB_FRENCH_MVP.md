@@ -270,10 +270,13 @@ restent dans le dépôt privé Pangmao.
 
 La synthèse vocale Web dépend des voix installées et exposées par l'appareil.
 Elle doit toujours être déclenchée par une action utilisateur et signaler
-clairement son indisponibilité. Web 0.3.1 attend le chargement des voix du
-navigateur, ne retient que les locales françaises, privilégie `fr-FR` et offre
-un choix persistant ainsi qu'un essai dans « À propos ». Une voix chinoise
-n'est jamais utilisée comme repli silencieux pour lire du français.
+clairement son indisponibilité. Web 0.3.2 attend aussi le chargement retardé des
+voix après le geste utilisateur et au retour dans l'application, ne retient que
+les locales françaises, privilégie `fr-FR` et offre un choix persistant ainsi
+qu'un essai dans « À propos ». Si le navigateur n'expose aucune voix française,
+les chemins d'installation Android/iPhone et la limite des navigateurs intégrés
+sont affichés. Une voix chinoise n'est jamais utilisée comme repli silencieux
+pour lire du français.
 
 ## Portes de validation
 

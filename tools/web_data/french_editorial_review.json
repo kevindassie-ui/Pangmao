@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "code": "PANGMAO-EDITORIAL",
+    "name": "Pangmao（人工复核）",
+    "url": "https://github.com/kevindassie-ui/Pangmao",
+    "revision": "2026-09-24",
+    "license": "Contenu original Pangmao"
+  },
+  "entryCount": 3,
+  "additions": [
+    {
+      "id": "fr:PANGMAO-EDITORIAL:peter-v1",
+      "headword": "péter",
+      "forms": [
+        "péter",
+        "pète",
+        "pètes",
+        "pètent",
+        "pété",
+        "pétée",
+        "pétés",
+        "pétées",
+        "lâcher un pet",
+        "lâcher une caisse"
+      ],
+      "pronunciations": ["pe.te"],
+      "partsOfSpeech": ["v"],
+      "genders": [],
+      "senses": [
+        {
+          "definitions": [
+            "(Familier) Expulser des gaz intestinaux ; lâcher un pet."
+          ],
+          "chinese": ["放屁"]
+        },
+        {
+          "definitions": [
+            "(Familier) Casser, faire éclater ou exploser quelque chose."
+          ],
+          "chinese": ["弄坏", "炸裂", "爆炸"]
+        }
+      ]
+    },
+    {
+      "id": "fr:PANGMAO-EDITORIAL:bananer-v1",
+      "headword": "bananer",
+      "forms": [
+        "bananer",
+        "banane",
+        "bananes",
+        "bananent",
+        "banané",
+        "bananée",
+        "bananés",
+        "bananées",
+        "se faire bananer"
+      ],
+      "pronunciations": ["ba.na.ne"],
+      "partsOfSpeech": ["v"],
+      "genders": [],
+      "senses": [
+        {
+          "definitions": [
+            "(Familier) Tromper ou rouler quelqu’un."
+          ],
+          "chinese": ["欺骗", "坑骗", "耍"]
+        },
+        {
+          "definitions": [
+            "(Familier, pronominal) Se faire avoir ou se faire tromper."
+          ],
+          "chinese": ["上当", "被骗"]
+        }
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      "targetId": "fr:FreeDict-fra-zho:2860",
+      "headword": "banane",
+      "forms": ["banane", "bananes"],
+      "pronunciations": ["ba.nan"],
+      "partsOfSpeech": ["n"],
+      "genders": ["fem"],
+      "senses": [
+        {
+          "definitions": [
+            "Fruit comestible allongé du bananier, vert puis généralement jaune à maturité."
+          ],
+          "chinese": ["香蕉"]
+        },
+        {
+          "definitions": [
+            "Petite sacoche portée à la taille ou en bandoulière."
+          ],
+          "chinese": ["腰包"]
+        },
+        {
+          "definitions": [
+            "(Familier, souvent plaisant) Personne un peu sotte, maladroite ou ridicule ; petite insulte généralement peu agressive."
+          ],
+          "chinese": ["傻瓜", "笨蛋", "呆瓜"]
+        }
+      ]
+    }
+  ]
+}

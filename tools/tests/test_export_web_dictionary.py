@@ -188,6 +188,72 @@ class ExportWebDictionaryTest(unittest.TestCase):
         self.assertEqual(["海报", "海報"], affiche["senses"][0]["chinese"])
         self.assertEqual("CFDICT", pack["supplementSources"][0]["code"])
 
+    def test_applies_editorial_corrections_and_additions_with_attribution(self) -> None:
+        editorial = Path(self.temporary_directory.name) / "editorial.json"
+        editorial.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "source": {
+                        "code": "PANGMAO-EDITORIAL",
+                        "name": "Pangmao（人工复核）",
+                        "url": "https://example.test/pangmao",
+                        "revision": "2026-09-24",
+                        "license": "Original project content",
+                    },
+                    "entryCount": 2,
+                    "additions": [
+                        {
+                            "id": "fr:PANGMAO-EDITORIAL:bananer-v1",
+                            "headword": "bananer",
+                            "forms": ["bananer", "se faire bananer"],
+                            "pronunciations": ["ba.na.ne"],
+                            "partsOfSpeech": ["v"],
+                            "genders": [],
+                            "senses": [
+                                {
+                                    "definitions": ["(Familier) Tromper quelqu’un."],
+                                    "chinese": ["欺骗", "坑骗"],
+                                }
+                            ],
+                        }
+                    ],
+                    "overrides": [
+                        {
+                            "targetId": "fr:FreeDict-fra-zho:42",
+                            "headword": "avocat",
+                            "forms": ["avocat", "avocate"],
+                            "pronunciations": ["a.vɔ.ka"],
+                            "partsOfSpeech": ["n"],
+                            "genders": ["masc"],
+                            "senses": [
+                                {
+                                    "definitions": ["Professionnel du droit."],
+                                    "chinese": ["律师", "律師"],
+                                },
+                                {
+                                    "definitions": ["Fruit de l’avocatier."],
+                                    "chinese": ["牛油果"],
+                                },
+                            ],
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+        pack = export_french_pack(self.database, editorial_review=editorial)
+
+        self.assertEqual(2, pack["entryCount"])
+        avocat = next(entry for entry in pack["entries"] if entry["headword"] == "avocat")
+        self.assertEqual("fr:FreeDict-fra-zho:42", avocat["id"])
+        self.assertEqual("Professionnel du droit.", avocat["senses"][0]["definitions"][0])
+        bananer = next(entry for entry in pack["entries"] if entry["headword"] == "bananer")
+        self.assertEqual(["欺骗", "坑骗"], bananer["senses"][0]["chinese"])
+        self.assertEqual("PANGMAO-EDITORIAL", pack["editorialSources"][0]["code"])
+
 
 if __name__ == "__main__":
     unittest.main()
