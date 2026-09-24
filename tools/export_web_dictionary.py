@@ -163,6 +163,7 @@ def export_french_pack(
     database: Path,
     chinese_glosses: Path | None = None,
     reviewed_supplements: Path | None = None,
+    release_version: str = "development",
 ) -> dict[str, Any]:
     if not database.is_file():
         raise FileNotFoundError(f"Dictionary database not found: {database}")
@@ -312,6 +313,7 @@ def export_french_pack(
         source_code, display_name, url, revision, license_name = map(str, source_row)
         result = {
             "schemaVersion": WEB_PACK_SCHEMA_VERSION,
+            "releaseVersion": release_version,
             "language": "fr",
             "entryCount": len(entries),
             "enrichedEntryCount": enriched_entry_count,
@@ -367,13 +369,23 @@ def main() -> None:
         type=Path,
         default=Path("tools/web_data/french_reviewed_supplements.json"),
     )
+    parser.add_argument(
+        "--release-version",
+        help="Release identifier embedded in the pack (defaults to webApp/package.json)",
+    )
     parser.add_argument("--pretty", action="store_true")
     arguments = parser.parse_args()
+
+    release_version = arguments.release_version
+    if release_version is None:
+        package = json.loads(Path("webApp/package.json").read_text(encoding="utf-8"))
+        release_version = str(package["version"])
 
     pack = export_french_pack(
         arguments.database,
         arguments.chinese_glosses,
         arguments.reviewed_supplements,
+        release_version,
     )
     write_pack(pack, arguments.output, arguments.pretty)
     size_mb = arguments.output.stat().st_size / (1024 * 1024)

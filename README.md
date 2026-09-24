@@ -37,12 +37,16 @@ The public family pilot intentionally uses a warm red deer identity. The
 canonical `webApp/` keeps the global green Pangmao theme; the personal treatment
 is applied only by the reproducible `wife` build variant.
 
-The Web 0.3 candidate contains 10,924 French entries, including a reviewed
+The Web 0.3.1 candidate contains 10,924 French entries, including a reviewed
 CFDICT correction for `affiche`. French searches use lexical forms rather than
 incidental prose inside definitions. Its first French Reader slice accepts
 pasted text or a `.txt` file, segments it locally, reads a sentence aloud and
 opens the dictionary from a touched word. Chinese query cards omit pinyin while
-French IPA remains available.
+French IPA remains available. Versioned assets prevent an old offline pack from
+being combined with a new interface; French speech now requires an advertised
+French system voice and exposes a persistent voice selector and test. A
+release audit scans all 15,176 shipped French/Chinese pairs and protects 23
+reviewed regression headwords.
 
 The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
 is a deployment-only mirror. Product code, Android code, tests and development

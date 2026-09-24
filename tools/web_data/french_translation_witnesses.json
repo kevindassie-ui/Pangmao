@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "description": "Reviewed French-to-Chinese regression witnesses for the Pangmao Web family pilot.",
+  "entries": [
+    {
+      "headword": "affiche",
+      "requiredGroups": [["海报", "海報"], ["告示", "布告"]],
+      "forbiddenChinese": ["吉格舞", "吉格舞曲", "图钉"]
+    },
+    {
+      "headword": "avocat",
+      "requiredGroups": [["律师", "律師"], ["牛油果", "鳄梨", "酪梨"]],
+      "distinctSenseGroups": [["律师", "律師"], ["牛油果", "鳄梨", "酪梨"]]
+    },
+    {"headword": "médecin", "requiredGroups": [["医生"]]},
+    {"headword": "bonjour", "requiredGroups": [["你好"]]},
+    {"headword": "chat", "requiredGroups": [["猫", "貓"]]},
+    {"headword": "chien", "requiredGroups": [["狗", "犬"]]},
+    {"headword": "manger", "requiredGroups": [["吃"]]},
+    {"headword": "boire", "requiredGroups": [["喝", "饮", "飲"]]},
+    {"headword": "livre", "requiredGroups": [["书", "書"]]},
+    {"headword": "école", "requiredGroups": [["学校", "學校"]]},
+    {"headword": "maison", "requiredGroups": [["房子", "家"]]},
+    {"headword": "travail", "requiredGroups": [["工作"]]},
+    {"headword": "aller", "requiredGroups": [["去"]]},
+    {"headword": "être", "requiredGroups": [["是"]]},
+    {"headword": "merci", "requiredGroups": [["谢谢", "謝謝", "多谢"]]},
+    {"headword": "rouge", "requiredGroups": [["红", "紅", "红色", "紅色"]]},
+    {"headword": "femme", "requiredGroups": [["女人", "妇女", "婦女"]]},
+    {"headword": "homme", "requiredGroups": [["男人"]]},
+    {"headword": "enfant", "requiredGroups": [["孩子", "小孩"]]},
+    {"headword": "voiture", "requiredGroups": [["汽车", "汽車"]]},
+    {"headword": "eau", "requiredGroups": [["水"]]},
+    {"headword": "pain", "requiredGroups": [["面包", "麵包"]]},
+    {
+      "headword": "voler",
+      "requiredGroups": [["飞", "飛", "飞行", "飛行"], ["偷", "偷窃", "偷竊"]],
+      "distinctSenseGroups": [["飞", "飛", "飞行", "飛行"], ["偷", "偷窃", "偷竊"]]
+    }
+  ]
+}

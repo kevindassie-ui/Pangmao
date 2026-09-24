@@ -100,3 +100,17 @@ couverture bilingue des exemples, la provenance et un petit ensemble de
 candidats de revue. Il ne modifie jamais la base. Sa méthodologie et la mesure
 de référence v0.4.1 sont détaillées dans
 [`docs/DICTIONARY_QUALITY_BASELINE.md`](../docs/DICTIONARY_QUALITY_BASELINE.md).
+
+Pour le paquet français–chinois Web, exécuter également:
+
+```bash
+python3 tools/audit_web_dictionary_quality.py \
+  --strict \
+  --json-out build/reports/web-dictionary-quality.json
+```
+
+Ce second rapport parcourt chaque couple livré, contrôle les témoins éditoriaux
+et compare les équivalents aux définitions chinoises→français disponibles. Une
+absence d'accord lexical reste un candidat de revue et n'entraîne aucune
+modification automatique. Référence:
+[`docs/WEB_DICTIONARY_QUALITY_BASELINE.md`](../docs/WEB_DICTIONARY_QUALITY_BASELINE.md).

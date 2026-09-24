@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  loadFrenchVoiceId,
   loadFavorites,
   loadReaderDraft,
+  saveFrenchVoiceId,
   saveFavorites,
   saveReaderDraft,
 } from "../src/storage.js";
@@ -32,12 +34,20 @@ test("reader draft stays on the current device", () => {
   assert.equal(loadReaderDraft(storage), "Une affiche rouge.");
 });
 
+test("the selected French voice stays local to the device", () => {
+  const storage = new MemoryStorage();
+  saveFrenchVoiceId("com.apple.voice.compact.fr-FR.Thomas", storage);
+  assert.equal(loadFrenchVoiceId(storage), "com.apple.voice.compact.fr-FR.Thomas");
+});
+
 test("storage failures never break the offline interface", () => {
   const storage = {
     getItem() { throw new Error("blocked"); },
     setItem() { throw new Error("full"); },
   };
   assert.equal(loadReaderDraft(storage), "");
+  assert.equal(loadFrenchVoiceId(storage), "");
   assert.equal(saveReaderDraft("texte", storage), false);
+  assert.equal(saveFrenchVoiceId("fr", storage), false);
   assert.equal(saveFavorites(new Set(["fr:test:1"]), storage), false);
 });
