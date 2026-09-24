@@ -64,6 +64,12 @@ désormais d'une entrée revue issue de CFDICT et ne peut plus remonter `gigue`
 ou `punaise`. Les résultats saisis en chinois n'affichent plus de pinyin; l'IPA
 du français étudié reste conservé.
 
+Correctif 0.3.1 lancé le 24 septembre: les fichiers et le paquet de données sont
+liés à une même version afin d'empêcher tout assemblage de caches anciens et
+nouveaux. Le contrôle de traduction parcourt tout le paquet et protège 23
+témoins revus. Le TTS du Reader sélectionne exclusivement une voix française,
+avec choix, essai et diagnostic visibles dans l'application.
+
 ### W2 — Reader français
 
 - saisie, collage et import `.txt`;

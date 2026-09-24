@@ -8,6 +8,23 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
+### Pangmao Web 0.3.1
+
+#### Corrigé
+
+- Les ressources statiques et le paquet de 10 924 entrées portent désormais la
+  même version; un ancien service worker ne peut plus combiner l'interface 0.3
+  avec le paquet précédent de 10 923 entrées.
+- La lecture d'un mot ou d'une phrase n'accepte plus une voix chinoise par
+  défaut: seules les voix système françaises sont proposées et une erreur
+  explicite remplace tout repli de langue incorrect.
+
+#### Ajouté
+
+- Sélecteur persistant et essai de la voix française dans « À propos ».
+- Audit déterministe des 10 924 entrées, 11 558 sens et 15 176 équivalents,
+  complété par 23 mots témoins bloquants et un contrôle croisé conservateur.
+
 ## 0.12.2 — 2026-09-18
 
 ### Corrigé

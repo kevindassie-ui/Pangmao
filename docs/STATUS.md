@@ -28,7 +28,7 @@ passed on both Android and iOS on 2026-09-23. This validates cross-device
 opening and the core dictionary loop, not yet stability: sustained daily use,
 accessibility checks and the enriched 0.2 build still require device acceptance.
 
-## Web French pilot 0.3 — current implementation
+## Web French pilot 0.3.1 — current implementation
 
 - Chinese meanings now dominate the entry sheet; the original French source
   paragraph is retained behind an explicit disclosure.
@@ -54,6 +54,15 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
 - The first Reader slice accepts pasted text and `.txt` files up to 1 MiB,
   segments locally, reads a selected sentence aloud and opens an exact lexical
   entry from a touched word. Its draft stays on the device.
+- Every release now audits all 10,924 entries and 15,176 French/Chinese pairs,
+  with 23 reviewed blocking witnesses and a conservative reverse-dictionary
+  comparison that queues disagreements without changing them automatically.
+- Static code and dictionary URLs carry the same release identifier. A pack
+  from another release is rejected and fetched again, preventing the observed
+  Web 0.3 interface / 10,923-entry cache mixture.
+- Word and Reader speech only use voices advertised as French. The user can
+  inspect, choose, persist and test the French voice; a Chinese voice is never
+  accepted as an implicit fallback.
 
 ## Implemented on Android
 

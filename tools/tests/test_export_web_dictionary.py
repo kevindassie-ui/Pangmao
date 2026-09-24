@@ -80,9 +80,10 @@ class ExportWebDictionaryTest(unittest.TestCase):
         self.temporary_directory.cleanup()
 
     def test_exports_bidirectional_entries_without_merging_senses(self) -> None:
-        pack = export_french_pack(self.database)
+        pack = export_french_pack(self.database, release_version="0.3.1-test")
 
         self.assertEqual(2, pack["schemaVersion"])
+        self.assertEqual("0.3.1-test", pack["releaseVersion"])
         self.assertEqual(1, pack["entryCount"])
         self.assertEqual(0, pack["enrichedEntryCount"])
         self.assertEqual("fr:FreeDict-fra-zho:42", pack["entries"][0]["id"])

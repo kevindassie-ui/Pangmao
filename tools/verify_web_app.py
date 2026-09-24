@@ -44,8 +44,10 @@ REQUIRED_FILES = (
     "src/app.js",
     "src/chinese-fallback.js",
     "src/reader.js",
+    "src/release.js",
     "src/search-engine.js",
     "src/storage.js",
+    "src/tts.js",
 )
 
 
@@ -114,10 +116,14 @@ def canonical_entries_digest(entries: list[dict[str, Any]]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
-def validate_pack(path: Path) -> dict[str, int]:
+def validate_pack(path: Path, release_version: str) -> dict[str, int]:
     require(path.stat().st_size <= MAX_PACK_BYTES, f"Web dictionary exceeds {MAX_PACK_BYTES} bytes")
     pack = read_json(path)
     require(pack.get("schemaVersion") == 2, "Unsupported web dictionary schema")
+    require(
+        pack.get("releaseVersion") == release_version,
+        "Web dictionary release does not match the application release",
+    )
     require(pack.get("language") == "fr", "Web dictionary language must be 'fr'")
 
     entries = pack.get("entries")
@@ -403,11 +409,17 @@ def local_path(web_root: Path, reference: str) -> Path | None:
     return candidate
 
 
-def validate_static_app(web_root: Path) -> None:
+def validate_static_app(web_root: Path) -> str:
     for relative in REQUIRED_FILES:
         require((web_root / relative).is_file(), f"Missing web application file: {relative}")
 
     html = (web_root / "index.html").read_text(encoding="utf-8")
+    package = read_json(web_root / "package.json")
+    release_version = package.get("version")
+    require(
+        isinstance(release_version, str) and bool(release_version.strip()),
+        "Web package version is missing",
+    )
     parser = LocalAssetParser()
     parser.feed(html)
     for reference in parser.references:
@@ -420,8 +432,15 @@ def validate_static_app(web_root: Path) -> None:
         "readerFile",
         "readerAnalyzeButton",
         "readerSentences",
+        "voiceSelect",
+        "voiceTestButton",
     ):
         require(f'id="{element_id}"' in html, f"Reader control is missing: {element_id}")
+    for asset in ("styles.css", "manifest.webmanifest", "src/app.js"):
+        require(
+            f"{asset}?v={release_version}" in html,
+            f"index.html does not version {asset} with release {release_version}",
+        )
 
     manifest = read_json(web_root / "manifest.webmanifest")
     for key in ("name", "short_name", "start_url", "display"):
@@ -475,19 +494,47 @@ def validate_static_app(web_root: Path) -> None:
         "src/app.js",
         "src/chinese-fallback.js",
         "src/reader.js",
+        "src/release.js",
+        "src/tts.js",
         "data/french-pack.json",
         "data/chinese-fallback/manifest.json",
     ):
         require(asset in service_worker, f"Service worker does not mention required offline asset: {asset}")
     app_source = (web_root / "src/app.js").read_text(encoding="utf-8")
+    release_source = (web_root / "src/release.js").read_text(encoding="utf-8")
+    require(
+        f'WEB_VERSION = "{release_version}"' in release_source,
+        "release.js does not match package.json",
+    )
+    require(
+        f'RELEASE_VERSION = "{release_version}"' in service_worker,
+        "Service worker cache release does not match package.json",
+    )
+    for module in (
+        "chinese-fallback.js",
+        "reader.js",
+        "release.js",
+        "search-engine.js",
+        "storage.js",
+        "tts.js",
+    ):
+        require(
+            f'{module}?v={release_version}' in app_source,
+            f"Application import is not versioned: {module}",
+        )
     require("segmentFrenchText" in app_source, "Reader is not connected to the application")
     require("record.pinyin" not in app_source, "Chinese fallback results must not display pinyin")
+    require(
+        "speakWithFrenchVoice" in app_source,
+        "French-only TTS selection is not connected to the application",
+    )
     if brand.get("mascot"):
         mascot_asset = str(brand["mascot"]).removeprefix("./")
         require(
             mascot_asset in service_worker,
             f"Service worker does not precache the brand mascot: {mascot_asset}",
         )
+    return release_version
 
 
 def main() -> int:
@@ -498,8 +545,8 @@ def main() -> int:
     web_root = arguments.web_root.resolve()
     try:
         require(web_root.is_dir(), f"Web application directory not found: {web_root}")
-        validate_static_app(web_root)
-        metrics = validate_pack(web_root / "data/french-pack.json")
+        release_version = validate_static_app(web_root)
+        metrics = validate_pack(web_root / "data/french-pack.json", release_version)
         metrics.update(validate_fallback(web_root))
     except (OSError, UnicodeError, ValidationError) as error:
         print(f"Web application validation failed: {error}", file=sys.stderr)

@@ -2,8 +2,8 @@
 
 Dernière mise à jour: 2026-09-24.
 
-Statut: premier test technique réussi sur Android et iOS; candidat Web 0.3 avec
-correctif lexical et première tranche Reader en cours de validation.
+Statut: premier test technique réussi sur Android et iOS; correctif Web 0.3.1
+de cohérence PWA, qualité lexicale et TTS français en cours de validation.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
 checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
@@ -203,6 +203,13 @@ Le complément `affiche` est isolé, versionné et attribué à CFDICT. Il const
 un correctif éditorial traçable, pas une autorisation d'inverser automatiquement
 toutes les phrases d'un dictionnaire chinois–français.
 
+Un audit de livraison parcourt les 10 924 entrées, 11 558 sens et 15 176
+équivalents, protège 23 mots témoins revus et compare chaque couple aux
+définitions inverses disponibles. Les désaccords restent une file de revue et
+ne provoquent aucune correction automatique. La méthode et la référence
+chiffrée sont décrites dans
+[WEB_DICTIONARY_QUALITY_BASELINE.md](WEB_DICTIONARY_QUALITY_BASELINE.md).
+
 Le pack doit:
 
 - préserver les sens, homonymes, formes, prononciations et informations
@@ -263,7 +270,10 @@ restent dans le dépôt privé Pangmao.
 
 La synthèse vocale Web dépend des voix installées et exposées par l'appareil.
 Elle doit toujours être déclenchée par une action utilisateur et signaler
-clairement son indisponibilité.
+clairement son indisponibilité. Web 0.3.1 attend le chargement des voix du
+navigateur, ne retient que les locales françaises, privilégie `fr-FR` et offre
+un choix persistant ainsi qu'un essai dans « À propos ». Une voix chinoise
+n'est jamais utilisée comme repli silencieux pour lire du français.
 
 ## Portes de validation
 

@@ -1,0 +1,77 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import {
+  isFrenchVoice,
+  listFrenchVoices,
+  selectFrenchVoice,
+  speakWithFrenchVoice,
+  voiceIdentifier,
+} from "../src/tts.js";
+
+const voices = [
+  { name: "Mandarin", lang: "zh-CN", voiceURI: "zh", localService: true },
+  { name: "French Canada", lang: "fr-CA", voiceURI: "fr-ca", localService: true },
+  { name: "French France", lang: "fr_FR", voiceURI: "fr-fr", localService: true },
+  { name: "French Cloud", lang: "fr-FR", voiceURI: "fr-cloud", localService: false },
+];
+
+test("French voice discovery excludes every Chinese voice", () => {
+  assert.equal(isFrenchVoice(voices[0]), false);
+  assert.deepEqual(listFrenchVoices(voices).map(voiceIdentifier), [
+    "fr-fr",
+    "fr-cloud",
+    "fr-ca",
+  ]);
+});
+
+test("an explicit French voice preference wins without accepting another language", () => {
+  assert.equal(voiceIdentifier(selectFrenchVoice(voices, "fr-ca")), "fr-ca");
+  assert.equal(selectFrenchVoice([voices[0]], "zh"), null);
+});
+
+test("speech always binds an advertised French voice before playback", () => {
+  const calls = [];
+  const synth = {
+    getVoices: () => voices,
+    cancel: () => calls.push("cancel"),
+    resume: () => calls.push("resume"),
+    speak: (utterance) => calls.push(["speak", utterance]),
+  };
+  class Utterance {
+    constructor(text) { this.text = text; }
+  }
+
+  const result = speakWithFrenchVoice({
+    synth,
+    Utterance,
+    text: "Bonjour",
+    preferredIdentifier: "fr-ca",
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.utterance.text, "Bonjour");
+  assert.equal(result.utterance.voice.voiceURI, "fr-ca");
+  assert.equal(result.utterance.lang, "fr-CA");
+  assert.deepEqual(calls.map((call) => Array.isArray(call) ? call[0] : call), [
+    "cancel",
+    "resume",
+    "speak",
+  ]);
+});
+
+test("speech fails visibly instead of falling back to a Chinese voice", () => {
+  let spoken = false;
+  const result = speakWithFrenchVoice({
+    synth: {
+      getVoices: () => [voices[0]],
+      cancel() {},
+      speak() { spoken = true; },
+    },
+    Utterance: class {},
+    text: "Bonjour",
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "no-french-voice");
+  assert.equal(spoken, false);
+});
