@@ -143,6 +143,50 @@ class ExportWebDictionaryTest(unittest.TestCase):
         )
         self.assertEqual("律师", pack["entries"][0]["senses"][0]["chinese"][0])
 
+    def test_adds_reviewed_supplements_with_separate_source_metadata(self) -> None:
+        supplements = Path(self.temporary_directory.name) / "supplements.json"
+        supplements.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "source": {
+                        "code": "CFDICT",
+                        "name": "CFDICT",
+                        "url": "https://example.test/cfdict",
+                        "revision": "2026-09-11",
+                        "license": "CC BY-SA 3.0",
+                    },
+                    "entryCount": 1,
+                    "entries": [
+                        {
+                            "id": "fr:CFDICT:reviewed-affiche-v1",
+                            "headword": "affiche",
+                            "forms": ["affiche", "affiches"],
+                            "pronunciations": [],
+                            "partsOfSpeech": ["n"],
+                            "genders": ["fem"],
+                            "senses": [
+                                {
+                                    "definitions": [],
+                                    "chinese": ["海报", "海報"],
+                                }
+                            ],
+                        }
+                    ],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+
+        pack = export_french_pack(self.database, reviewed_supplements=supplements)
+
+        self.assertEqual(2, pack["entryCount"])
+        affiche = next(entry for entry in pack["entries"] if entry["headword"] == "affiche")
+        self.assertEqual("fr:CFDICT:reviewed-affiche-v1", affiche["id"])
+        self.assertEqual(["海报", "海報"], affiche["senses"][0]["chinese"])
+        self.assertEqual("CFDICT", pack["supplementSources"][0]["code"])
+
 
 if __name__ == "__main__":
     unittest.main()

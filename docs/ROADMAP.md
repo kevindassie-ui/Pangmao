@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-23.
+Dernière mise à jour: 2026-09-24.
 
 ## Principes
 
@@ -58,6 +58,12 @@ explications chinoises attribuées, un repli chinois fragmenté avec hypothèses
 explicitement signalées, et une variante visuelle rouge au `鹿` réservée à
 l'utilisatrice pilote. La marque globale verte reste inchangée.
 
+Correctif validé le 24 septembre: une requête française ne parcourt plus le
+texte libre des définitions ni les sous-chaînes internes. `affiche` dispose
+désormais d'une entrée revue issue de CFDICT et ne peut plus remonter `gigue`
+ou `punaise`. Les résultats saisis en chinois n'affichent plus de pinyin; l'IPA
+du français étudié reste conservé.
+
 ### W2 — Reader français
 
 - saisie, collage et import `.txt`;
@@ -66,6 +72,13 @@ l'utilisatrice pilote. La marque globale verte reste inchangée.
 - lecture depuis une phrase puis reprise depuis le mot précisément touché;
 - historique local, favoris et statut lexical après stabilisation des
   identifiants.
+
+État au 24 septembre 2026: la première tranche Web est implémentée avec saisie,
+collage, import `.txt` jusqu'à 1 Mio, segmentation locale en phrases et mots,
+TTS explicite par phrase, ouverture de la fiche au toucher et conservation
+locale du brouillon. La traduction de phrase, la reprise audio au milieu d'une
+phrase et l'historique de plusieurs textes restent dans les tranches suivantes;
+aucune traduction de phrase factice n'est affichée pour remplir l'interface.
 
 ### W3 — images, OCR et continuité entre applications
 

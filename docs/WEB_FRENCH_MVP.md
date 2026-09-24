@@ -1,9 +1,9 @@
 # Pangmao Web « 我学法语 » — cadrage du MVP
 
-Dernière mise à jour: 2026-09-23.
+Dernière mise à jour: 2026-09-24.
 
-Statut: premier test technique réussi sur Android et iOS; enrichissement 0.2 en
-cours de recette, puis observation d'usage prioritaire.
+Statut: premier test technique réussi sur Android et iOS; candidat Web 0.3 avec
+correctif lexical et première tranche Reader en cours de validation.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
 checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
@@ -114,6 +114,13 @@ complémentaire. Une correspondance indirecte est toujours intitulée « sens
 possible », accompagnée de sa base de rapprochement, et ne devient jamais une
 définition attestée par simple effet d'interface.
 
+La recherche française porte uniquement sur les formes lexicales: correspondance
+exacte, flexion connue ou préfixe. Le texte narratif d'une définition n'est pas
+un champ de recherche, car une occurrence telle que « affiches » dans la
+définition de `punaise` ne constitue pas une traduction de `affiche`. Une lacune
+confirmée peut recevoir un complément revu et attribué; elle ne doit pas être
+masquée par un résultat approximatif.
+
 Requêtes témoins minimales: `avocat`, `律师`, `être`, `etre` et un mot absent.
 Une erreur de chargement ou un manque d'espace doit produire un message
 compréhensible et une reprise possible, jamais un écran vide.
@@ -129,6 +136,12 @@ compréhensible et une reprise possible, jamais un écran vide.
 - traduction ou explication de la phrase, distincte de la définition du mot;
 - lecture TTS depuis une phrase, puis depuis le mot précis touché;
 - historique local des textes, désactivable et effaçable.
+
+La tranche 0.3 couvre déjà la saisie, le collage, l'import `.txt` UTF-8 jusqu'à
+1 Mio, la segmentation locale, le TTS par phrase, l'ouverture de la fiche d'un
+mot touché et un brouillon local. La traduction de phrase, la reprise à un mot
+sans ouvrir la fiche et l'historique de plusieurs textes restent à livrer après
+recette de cette boucle minimale.
 
 PDF et EPUB ne seront annoncés comme formats supportés qu'après un prototype
 qui conserve correctement texte, paragraphes et encodage. Ils ne font pas
@@ -175,16 +188,20 @@ de manière fiable.
 ## Données, provenance et licences
 
 La première base Web s'appuie sur le corpus français–chinois filtré de
-FreeDict/WikDict `fra-zho`, actuellement constitué de 10 923 entrées, 11 556
-sens et 15 168 équivalents chinois. Un export dédié ne doit contenir que les
-données nécessaires au profil français, au lieu de distribuer la base Android
-complète de 92,34 Mio.
+FreeDict/WikDict `fra-zho`, complété par une entrée CFDICT revue, actuellement
+constitué de 10 924 entrées, 11 558 sens et 15 176 équivalents chinois. Un
+export dédié ne doit contenir que les données nécessaires au profil français,
+au lieu de distribuer la base Android complète de 92,34 Mio.
 
-Le pack 0.2 ajoute 2 393 fiches avec une explication chinoise issue d'entrées
+Le pack ajoute 2 393 fiches avec une explication chinoise issue d'entrées
 françaises exactement appariées du Wiktionnaire chinois. Le fichier amont
 complet n'est pas livré. Le repli chinois–français est découpé en 32 fragments:
 le téléphone n'en télécharge qu'un, d'environ 0,5 Mio au maximum, lorsqu'une
 recherche absente l'exige.
+
+Le complément `affiche` est isolé, versionné et attribué à CFDICT. Il constitue
+un correctif éditorial traçable, pas une autorisation d'inverser automatiquement
+toutes les phrases d'un dictionnaire chinois–français.
 
 Le pack doit:
 
