@@ -27,14 +27,15 @@ function firstHeadword(query) {
 
 test("complete French pack has deterministic metadata and identifiers", () => {
   assert.equal(pack.schemaVersion, 2);
-  assert.equal(pack.releaseVersion, "0.3.1");
+  assert.equal(pack.releaseVersion, "0.3.2");
   assert.equal(pack.enrichedEntryCount, 2_393);
   assert.equal(pack.language, "fr");
-  assert.equal(pack.entryCount, 10_924);
+  assert.equal(pack.entryCount, 10_926);
   assert.equal(pack.entries.length, pack.entryCount);
   assert.equal(pack.source.code, "FreeDict-fra-zho");
   assert.equal(pack.source.revision, "2025.11.23");
   assert.equal(pack.source.license, "CC BY-SA 3.0");
+  assert.equal(pack.editorialSources[0].code, "PANGMAO-EDITORIAL");
 
   const identifiers = new Set(pack.entries.map((entry) => entry.id));
   assert.equal(identifiers.size, pack.entryCount);
@@ -108,4 +109,19 @@ test("real pack resolves affiche without definition-prose false positives", () =
   assert.equal(results[0]?.entry.headword, "affiche");
   assert.ok(results[0].entry.senses.some((sense) => sense.chinese.includes("海报")));
   assert.ok(results.every((result) => !["gigue", "punaise"].includes(result.entry.headword)));
+});
+
+test("reviewed everyday and colloquial entries stay useful in both directions", () => {
+  assert.equal(firstHeadword("péter"), "péter");
+  assert.equal(firstHeadword("peter"), "péter");
+  assert.equal(firstHeadword("lâcher une caisse"), "péter");
+  assert.equal(firstHeadword("放屁"), "péter");
+  assert.equal(firstHeadword("bananer"), "bananer");
+  assert.equal(firstHeadword("se faire bananer"), "bananer");
+
+  const banane = pack.entries.find((entry) => entry.headword === "banane");
+  assert.ok(banane.senses.some((sense) => sense.chinese.includes("香蕉")));
+  assert.ok(banane.senses.some((sense) => sense.chinese.includes("腰包")));
+  assert.ok(banane.senses.some((sense) => sense.chinese.includes("傻瓜")));
+  assert.ok(banane.senses.every((sense) => !sense.chinese.includes("香蕉人")));
 });

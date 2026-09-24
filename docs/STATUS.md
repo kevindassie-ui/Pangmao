@@ -28,13 +28,13 @@ passed on both Android and iOS on 2026-09-23. This validates cross-device
 opening and the core dictionary loop, not yet stability: sustained daily use,
 accessibility checks and the enriched 0.2 build still require device acceptance.
 
-## Web French pilot 0.3.1 — current implementation
+## Web French pilot 0.3.2 — current implementation
 
 - Chinese meanings now dominate the entry sheet; the original French source
   paragraph is retained behind an explicit disclosure.
 - 2,393 exact French headwords receive attributed Chinese explanations from
   Chinese Wiktionary. Existing FreeDict Chinese equivalents remain available;
-  one reviewed CFDICT supplement brings the pack to 10,924 entries.
+  reviewed CFDICT and Pangmao editorial layers bring the pack to 10,926 entries.
 - An additional Chinese dictionary is split into 32 lazy shards. It exposes
   direct French meanings first and only 3,480 conservative semantic bridges;
   each inferred result is visibly labelled and names its dictionary basis.
@@ -42,6 +42,8 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
 - The canonical application keeps its green Pangmao identity. A separate
   build-only pilot variant uses a warm red palette and a cute `鹿` mascot for
   the first user, without turning that personal treatment into the global brand.
+  The same private variant now includes transparent, cute `桂花` and `月饼`
+  ornaments inside the application only; neither app icon is changed.
 - Authentic/contextual examples and on-demand AI examples remain in W4. This
   feedback confirms their priority but does not duplicate or pull that release
   into the present corrective lot.
@@ -54,15 +56,25 @@ accessibility checks and the enriched 0.2 build still require device acceptance.
 - The first Reader slice accepts pasted text and `.txt` files up to 1 MiB,
   segments locally, reads a selected sentence aloud and opens an exact lexical
   entry from a touched word. Its draft stays on the device.
-- Every release now audits all 10,924 entries and 15,176 French/Chinese pairs,
-  with 23 reviewed blocking witnesses and a conservative reverse-dictionary
+- Every release now audits all 10,926 entries and 15,187 French/Chinese pairs,
+  with 26 reviewed blocking witnesses and a conservative reverse-dictionary
   comparison that queues disagreements without changing them automatically.
 - Static code and dictionary URLs carry the same release identifier. A pack
   from another release is rejected and fetched again, preventing the observed
   Web 0.3 interface / 10,923-entry cache mixture.
 - Word and Reader speech only use voices advertised as French. The user can
   inspect, choose, persist and test the French voice; a Chinese voice is never
-  accepted as an implicit fallback.
+  accepted as an implicit fallback. Version 0.3.2 also retries voice discovery
+  after the user action and after returning to the app, leaves the detection
+  action enabled when the first inventory is empty, and shows Android/iPhone
+  installation paths plus the limitation of embedded browsers.
+- Exact Chinese fallback results outrank substring-only base matches. `放屁`
+  reaches `péter` / `lâcher un pet` instead of stopping at `coussin péteur`.
+  The editorial review layer also adds `bananer` and replaces the obscure
+  `香蕉人` sense of `banane` with the common light insult `傻瓜 / 笨蛋 / 呆瓜`.
+- Broader slang, colloquial expressions and regional vocabulary are a measured
+  follow-up rather than a list of one-off patches; the source and acceptance
+  plan is recorded in [WEB_LEXICAL_DEPTH_PLAN.md](WEB_LEXICAL_DEPTH_PLAN.md).
 
 ## Implemented on Android
 

@@ -2,31 +2,32 @@
 
 Mesure du 24 septembre 2026, produite par
 [`tools/audit_web_dictionary_quality.py`](../tools/audit_web_dictionary_quality.py)
-sur le paquet Web 0.3.1.
+sur le paquet Web 0.3.2.
 
 ## Périmètre contrôlé
 
-Le contrôle parcourt les **10 924 entrées**, **11 558 sens** et **15 176 couples
+Le contrôle parcourt les **10 926 entrées**, **11 562 sens** et **15 187 couples
 français–chinois** effectivement livrés. Il ne se limite donc pas au témoin
 `affiche`.
 
 Deux niveaux sont volontairement séparés:
 
-1. vingt-trois mots usuels ou polysémiques revus servent de tests bloquants;
+1. vingt-six mots usuels ou polysémiques revus servent de tests bloquants;
    ils couvrent notamment `affiche`, `avocat`, `médecin`, `bonjour`, `chat`,
-   `chien`, `manger`, `boire`, `livre`, `école`, `être` et `voler`;
+   `chien`, `manger`, `boire`, `livre`, `école`, `être`, `voler`, `banane`,
+   `bananer` et `péter`;
 2. chaque couple livré est comparé, lorsqu'une entrée existe, aux définitions
    françaises du dictionnaire chinois→français indépendant déjà embarqué dans
    Pangmao.
 
-Le lot passe les 23 témoins sans échec. Parmi les 15 176 couples:
+Le lot passe les 26 témoins sans échec. Parmi les 15 187 couples:
 
 | Résultat du contrôle croisé | Couples |
 |---|---:|
-| Définition inverse disponible | 7 119 |
-| Accord lexical exact après normalisation | 4 957 |
-| Candidats à une revue humaine | 2 162 |
-| Pas de donnée inverse exploitable | 8 057 |
+| Définition inverse disponible | 7 128 |
+| Accord lexical exact après normalisation | 4 958 |
+| Candidats à une revue humaine | 2 170 |
+| Pas de donnée inverse exploitable | 8 059 |
 
 Ces catégories ne constituent pas une note de justesse. Une absence d'accord
 exact peut venir d'un synonyme, d'une paraphrase, d'une flexion ou d'un sens
@@ -46,6 +47,20 @@ fichiers de deux versions. Web 0.3.1 versionne désormais le code et les donnée
 refuse un paquet dont la version diffère, purge les anciens caches et recharge
 une seule fois après l'activation du nouveau service worker.
 
+## Corrections lexicales 0.3.2
+
+- `放屁` possède une correspondance directe `péter / lâcher un pet`; une
+  correspondance exacte du complément passe avant un mot qui contient seulement
+  la chaîne, comme `放屁坐垫`;
+- `péter`, `lâcher une caisse` et `bananer` sont des entrées éditoriales
+  attribuées et testées dans les deux sens;
+- le troisième sens de `banane` est remplacé en conservant l'identifiant source:
+  l'usage familier peu agressif `傻瓜 / 笨蛋 / 呆瓜` remplace `香蕉人` dans ce
+  profil d'apprentissage;
+- ces trois corrections prouvent le mécanisme mais ne constituent pas une
+  couverture suffisante de l'argot. L'extension par corpus et par lots est
+  cadrée séparément dans `WEB_LEXICAL_DEPTH_PLAN.md`.
+
 ## Politique de correction
 
 - une source ne remplace pas aveuglément une autre;
@@ -56,5 +71,5 @@ une seule fois après l'activation du nouveau service worker.
 - le rapport est déterministe, exécuté en CI et ne modifie jamais le corpus.
 
 Cette référence réduit les régressions et priorise la revue, mais ne permet pas
-d'affirmer que 15 176 équivalents ont tous été validés manuellement. Une telle
+d'affirmer que 15 187 équivalents ont tous été validés manuellement. Une telle
 promesse serait inexacte.

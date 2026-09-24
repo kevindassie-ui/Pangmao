@@ -159,10 +159,134 @@ def load_reviewed_supplements(path: Path | None) -> tuple[list[dict[str, Any]], 
     return entries, source
 
 
+def load_editorial_review(
+    path: Path | None,
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, Any]], dict | None]:
+    """Load original Pangmao additions and full-entry corrections.
+
+    Additions extend lexical coverage. Overrides replace one explicitly named
+    source entry while preserving its stable identifier, so favourites remain
+    valid and every manual correction stays reviewable in source control.
+    """
+
+    if path is None:
+        return [], {}, None
+    if not path.is_file():
+        raise FileNotFoundError(f"Editorial French review not found: {path}")
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if value.get("schemaVersion") != 1:
+        raise ValueError("Unsupported editorial French review schema")
+    source = value.get("source")
+    if not isinstance(source, dict) or not all(
+        source.get(key) for key in ("code", "name", "url", "revision", "license")
+    ):
+        raise ValueError("Editorial French review source metadata is incomplete")
+
+    additions_payload = value.get("additions")
+    overrides_payload = value.get("overrides")
+    if not isinstance(additions_payload, list) or not isinstance(overrides_payload, list):
+        raise ValueError("Editorial French review additions and overrides must be lists")
+
+    def clean_entry(item: Any, *, identifier: str, require_source_prefix: bool) -> dict[str, Any]:
+        if not isinstance(item, dict):
+            raise ValueError("Editorial French entry must be an object")
+        headword = item.get("headword")
+        forms = item.get("forms")
+        senses = item.get("senses")
+        if (
+            not identifier
+            or (require_source_prefix and not identifier.startswith(f'fr:{source["code"]}:'))
+            or not isinstance(headword, str)
+            or not headword.strip()
+            or not isinstance(forms, list)
+            or headword not in forms
+            or not all(isinstance(form, str) and form.strip() for form in forms)
+            or not isinstance(senses, list)
+            or not senses
+        ):
+            raise ValueError(f"Invalid editorial French entry: {identifier}")
+
+        clean_senses = []
+        for sense in senses:
+            definitions = sense.get("definitions") if isinstance(sense, dict) else None
+            chinese = sense.get("chinese") if isinstance(sense, dict) else None
+            if (
+                not isinstance(definitions, list)
+                or not definitions
+                or not all(isinstance(definition, str) and definition.strip() for definition in definitions)
+                or not isinstance(chinese, list)
+                or not chinese
+                or not all(isinstance(equivalent, str) and equivalent.strip() for equivalent in chinese)
+            ):
+                raise ValueError(f"Invalid editorial French sense: {identifier}")
+            clean_senses.append(
+                {
+                    "definitions": list(dict.fromkeys(definition.strip() for definition in definitions)),
+                    "chinese": list(dict.fromkeys(equivalent.strip() for equivalent in chinese)),
+                }
+            )
+
+        return {
+            "id": identifier,
+            "headword": headword.strip(),
+            "forms": list(dict.fromkeys(form.strip() for form in forms)),
+            "pronunciations": list(
+                dict.fromkeys(
+                    str(candidate).strip()
+                    for candidate in item.get("pronunciations", [])
+                    if str(candidate).strip()
+                )
+            ),
+            "partsOfSpeech": list(
+                dict.fromkeys(
+                    str(candidate).strip()
+                    for candidate in item.get("partsOfSpeech", [])
+                    if str(candidate).strip()
+                )
+            ),
+            "genders": list(
+                dict.fromkeys(
+                    str(candidate).strip()
+                    for candidate in item.get("genders", [])
+                    if str(candidate).strip()
+                )
+            ),
+            "senses": clean_senses,
+        }
+
+    additions: list[dict[str, Any]] = []
+    identifiers: set[str] = set()
+    for item in additions_payload:
+        identifier = str(item.get("id", "")) if isinstance(item, dict) else ""
+        if identifier in identifiers:
+            raise ValueError(f"Duplicate editorial French identifier: {identifier}")
+        additions.append(
+            clean_entry(item, identifier=identifier, require_source_prefix=True)
+        )
+        identifiers.add(identifier)
+
+    overrides: dict[str, dict[str, Any]] = {}
+    for item in overrides_payload:
+        target_identifier = str(item.get("targetId", "")) if isinstance(item, dict) else ""
+        if not target_identifier or target_identifier in overrides:
+            raise ValueError(f"Invalid or duplicate editorial override: {target_identifier}")
+        overrides[target_identifier] = clean_entry(
+            item,
+            identifier=target_identifier,
+            require_source_prefix=False,
+        )
+
+    expected_count = len(additions) + len(overrides)
+    if value.get("entryCount") != expected_count:
+        raise ValueError("Editorial French review entryCount mismatch")
+    return additions, overrides, source
+
+
 def export_french_pack(
     database: Path,
     chinese_glosses: Path | None = None,
     reviewed_supplements: Path | None = None,
+    editorial_review: Path | None = None,
     release_version: str = "development",
 ) -> dict[str, Any]:
     if not database.is_file():
@@ -285,11 +409,24 @@ def export_french_pack(
                 f"French entry count mismatch: expected {expected_count}, exported {len(entries)}"
             )
 
+        editorial_entries, editorial_overrides, editorial_source = load_editorial_review(
+            editorial_review
+        )
+        if editorial_overrides:
+            available_identifiers = {entry["id"] for entry in entries}
+            missing_targets = sorted(set(editorial_overrides) - available_identifiers)
+            if missing_targets:
+                raise ValueError(
+                    "Editorial overrides target missing base entries: " + ", ".join(missing_targets)
+                )
+            entries = [editorial_overrides.get(entry["id"], entry) for entry in entries]
+
         base_headwords = {entry["headword"].casefold() for entry in entries}
         supplement_entries, supplement_source = load_reviewed_supplements(reviewed_supplements)
+        all_additions = [*supplement_entries, *editorial_entries]
         duplicate_headwords = sorted(
             entry["headword"]
-            for entry in supplement_entries
+            for entry in all_additions
             if entry["headword"].casefold() in base_headwords
         )
         if duplicate_headwords:
@@ -297,9 +434,12 @@ def export_french_pack(
                 "Reviewed supplements duplicate base headwords: " + ", ".join(duplicate_headwords)
             )
         base_identifiers = {entry["id"] for entry in entries}
-        if any(entry["id"] in base_identifiers for entry in supplement_entries):
+        addition_identifiers = [entry["id"] for entry in all_additions]
+        if len(addition_identifiers) != len(set(addition_identifiers)):
+            raise ValueError("Reviewed and editorial additions share an identifier")
+        if any(entry["id"] in base_identifiers for entry in all_additions):
             raise ValueError("Reviewed supplement identifier collides with the base dictionary")
-        entries.extend(supplement_entries)
+        entries.extend(all_additions)
         entries.sort(
             key=lambda entry: (entry["headword"].casefold(), entry["headword"], entry["id"])
         )
@@ -331,6 +471,8 @@ def export_french_pack(
             result["enrichmentSources"] = [enrichment_source]
         if supplement_source is not None:
             result["supplementSources"] = [supplement_source]
+        if editorial_source is not None:
+            result["editorialSources"] = [editorial_source]
         return result
     finally:
         connection.close()
@@ -370,6 +512,11 @@ def main() -> None:
         default=Path("tools/web_data/french_reviewed_supplements.json"),
     )
     parser.add_argument(
+        "--editorial-review",
+        type=Path,
+        default=Path("tools/web_data/french_editorial_review.json"),
+    )
+    parser.add_argument(
         "--release-version",
         help="Release identifier embedded in the pack (defaults to webApp/package.json)",
     )
@@ -385,6 +532,7 @@ def main() -> None:
         arguments.database,
         arguments.chinese_glosses,
         arguments.reviewed_supplements,
+        arguments.editorial_review,
         release_version,
     )
     write_pack(pack, arguments.output, arguments.pretty)

@@ -70,6 +70,32 @@ nouveaux. Le contrôle de traduction parcourt tout le paquet et protège 23
 témoins revus. Le TTS du Reader sélectionne exclusivement une voix française,
 avec choix, essai et diagnostic visibles dans l'application.
 
+Correctif Web 0.3.2 lancé le 24 septembre: la détection TTS est relancée depuis
+le geste utilisateur et au retour dans l'application; l'aide indique comment
+installer une voix française sur Android ou iPhone et rappelle que les
+navigateurs intégrés peuvent masquer les voix système. La recherche chinoise
+préfère désormais un mot exact du complément à une sous-chaîne fortuite. Une
+couche éditoriale traçable ajoute `péter`, `lâcher une caisse` et `bananer`, et
+remplace le sens `香蕉人` de `banane` par l'insulte légère réellement utile en
+France. La variante épouse reçoit des motifs intérieurs `桂花` et `月饼`, sans
+modifier les icônes ni le thème global.
+
+### W1.5 — profondeur lexicale et registres
+
+- mesurer les recherches sans résultat à partir d'une liste exportable locale,
+  sans collecte analytique implicite;
+- étendre l'inventaire avec des sources compatibles couvrant locutions,
+  français familier, argot, vulgarismes et variantes régionales;
+- conserver obligatoirement le registre, le sens, la provenance et une
+  traduction chinoise revue; une proposition automatique reste explicitement
+  marquée et ne devient jamais silencieusement une entrée directe;
+- contrôler la recherche bidirectionnelle, les faux positifs de sous-chaîne et
+  les sens socioculturels peu pertinents pour une apprenante vivant en France;
+- intégrer par lots mesurés plutôt que corriger uniquement les mots signalés.
+
+Plan de sources et portes qualité:
+[WEB_LEXICAL_DEPTH_PLAN.md](WEB_LEXICAL_DEPTH_PLAN.md).
+
 ### W2 — Reader français
 
 - saisie, collage et import `.txt`;
