@@ -393,3 +393,17 @@ format est annoncée.
 La traduction ou l'explication d'une phrase reste un bloc séparé et ne sera
 affichée qu'avec une source ou un moteur identifié. Pangmao ne génère pas une
 traduction décorative pour donner l'impression que W2 est déjà complet.
+
+## D-041 — genre vocal choisi et validé par l'utilisatrice
+
+**Décision:** la PWA propose deux profils explicites, `女声` et `男声`. Pour
+chacun, l'utilisatrice écoute la même phrase entièrement française, choisit une
+voix parmi celles que Safari expose, puis confirme et mémorise cette affectation
+sur l'appareil. Le profil actif s'applique au dictionnaire et au Reader.
+
+La Web Speech API fournit le nom, la langue, l'identifiant et le caractère local
+ou distant d'une voix, mais pas son genre. Pangmao ne déduit donc pas
+silencieusement femme ou homme à partir d'un prénom ou d'un identifiant
+propriétaire susceptible de changer. Une voix non encore affectée reste un
+candidat à écouter; la décision de l'utilisatrice fait foi. Un diagnostic local
+copiable liste les voix françaises et les deux choix sans envoyer de données.

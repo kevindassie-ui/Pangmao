@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   availableVoices,
+  formatFrenchVoiceDiagnostics,
   isFrenchVoice,
   listFrenchVoices,
   selectFrenchVoice,
@@ -35,6 +36,20 @@ test("an explicit French voice preference wins without accepting another languag
 test("voice inventory failures are treated as an empty device inventory", () => {
   assert.deepEqual(availableVoices(null), []);
   assert.deepEqual(availableVoices({ getVoices() { throw new Error("not ready"); } }), []);
+});
+
+test("voice diagnostics expose both saved profiles and only French candidates", () => {
+  const diagnostics = formatFrenchVoiceDiagnostics(voices, {
+    releaseVersion: "0.3.3",
+    activeGender: "male",
+    profileVoices: { female: "fr-fr", male: "fr-ca" },
+  });
+  assert.match(diagnostics, /Pangmao Web 0\.3\.3/);
+  assert.match(diagnostics, /activeProfile=male/);
+  assert.match(diagnostics, /femaleVoice=fr-fr/);
+  assert.match(diagnostics, /maleVoice=fr-ca/);
+  assert.match(diagnostics, /frenchVoiceCount=3/);
+  assert.doesNotMatch(diagnostics, /Mandarin/);
 });
 
 test("voice discovery waits for Chrome-style delayed voiceschanged population", async () => {

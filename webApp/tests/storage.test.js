@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  loadFrenchVoiceProfile,
   loadFrenchVoiceId,
   loadFavorites,
   loadReaderDraft,
+  saveFrenchVoiceProfile,
   saveFrenchVoiceId,
   saveFavorites,
   saveReaderDraft,
@@ -40,6 +42,36 @@ test("the selected French voice stays local to the device", () => {
   assert.equal(loadFrenchVoiceId(storage), "com.apple.voice.compact.fr-FR.Thomas");
 });
 
+test("female and male French voice profiles stay independent", () => {
+  const storage = new MemoryStorage();
+  saveFrenchVoiceProfile({
+    activeGender: "male",
+    voices: {
+      female: "com.apple.voice.compact.fr-FR.Amelie",
+      male: "com.apple.voice.compact.fr-FR.Thomas",
+    },
+  }, storage);
+  assert.deepEqual(loadFrenchVoiceProfile(storage), {
+    activeGender: "male",
+    voices: {
+      female: "com.apple.voice.compact.fr-FR.Amelie",
+      male: "com.apple.voice.compact.fr-FR.Thomas",
+    },
+  });
+});
+
+test("invalid voice profile data falls back to an empty female profile", () => {
+  const storage = new MemoryStorage();
+  storage.setItem("pangmao.web.french-voice-profile.v1", JSON.stringify({
+    activeGender: "unknown",
+    voices: { female: 42, male: null },
+  }));
+  assert.deepEqual(loadFrenchVoiceProfile(storage), {
+    activeGender: "female",
+    voices: { female: "", male: "" },
+  });
+});
+
 test("storage failures never break the offline interface", () => {
   const storage = {
     getItem() { throw new Error("blocked"); },
@@ -47,7 +79,12 @@ test("storage failures never break the offline interface", () => {
   };
   assert.equal(loadReaderDraft(storage), "");
   assert.equal(loadFrenchVoiceId(storage), "");
+  assert.deepEqual(loadFrenchVoiceProfile(storage), {
+    activeGender: "female",
+    voices: { female: "", male: "" },
+  });
   assert.equal(saveReaderDraft("texte", storage), false);
   assert.equal(saveFrenchVoiceId("fr", storage), false);
+  assert.equal(saveFrenchVoiceProfile({ activeGender: "male" }, storage), false);
   assert.equal(saveFavorites(new Set(["fr:test:1"]), storage), false);
 });

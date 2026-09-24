@@ -121,6 +121,13 @@ ouverts simultanément.
   système distincte: elle ne doit ni provoquer une voix chinoise de repli ni
   masquer la réussite du parcours iPhone.
 
+État Web 0.3.3: deux profils locaux `女声` et `男声` sont implémentés. Chaque
+profil peut recevoir une voix française distincte après écoute de la même phrase
+témoin; le choix actif est partagé par les fiches et le Reader. L'inventaire
+français et les choix enregistrés peuvent être copiés localement pour le
+diagnostic. La validation de la qualité reste à effectuer sur l'iPhone pilote;
+le lot n'est pas accepté sur la seule base des tests automatisés.
+
 ### W1.5 — profondeur lexicale et registres
 
 - mesurer les recherches sans résultat à partir d'une liste exportable locale,

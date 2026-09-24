@@ -8,9 +8,43 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
-### Pangmao Web 0.3.1
+### Pangmao Web 0.3.3
 
-#### Corrigé
+#### Ajouté
+
+- Deux profils vocaux locaux `女声` et `男声`, chacun associé à une voix
+  française choisie et confirmée par l'utilisatrice.
+- Comparaison de toutes les voix françaises exposées par l'appareil avec une
+  phrase témoin identique, entièrement française.
+- Copie locale de l'inventaire vocal et des deux choix pour faciliter la recette
+  sur iPhone sans activer de télémétrie.
+
+#### Modifié
+
+- Le dictionnaire et le Reader utilisent le même profil vocal actif.
+- Pangmao ne déduit pas le genre à partir du nom de la voix, car la Web Speech
+  API ne l'expose pas; l'affectation femme/homme repose sur l'écoute et la
+  confirmation de l'utilisatrice.
+
+## Pangmao Web 0.3.2 — 2026-09-24
+
+### Ajouté
+
+- Couche éditoriale traçable pour `péter`, `lâcher une caisse`, `bananer` et le
+  sens d'insulte légère de `banane`.
+- Motifs intérieurs `桂花` et `月饼` dans la variante familiale uniquement.
+- Aide Android/iPhone lorsque l'appareil n'expose aucune voix française.
+
+### Corrigé
+
+- Les correspondances chinoises exactes, notamment `放屁`, passent avant les
+  résultats dus à une sous-chaîne.
+- Le chargement tardif des voix mobiles est retenté après le geste utilisateur
+  et au retour dans la PWA.
+
+## Pangmao Web 0.3.1 — 2026-09-24
+
+### Corrigé
 
 - Les ressources statiques et le paquet de 10 924 entrées portent désormais la
   même version; un ancien service worker ne peut plus combiner l'interface 0.3
@@ -19,7 +53,7 @@ numéros suivent le versionnage sémantique.
   défaut: seules les voix système françaises sont proposées et une erreur
   explicite remplace tout repli de langue incorrect.
 
-#### Ajouté
+### Ajouté
 
 - Sélecteur persistant et essai de la voix française dans « À propos ».
 - Audit déterministe des 10 924 entrées, 11 558 sens et 15 176 équivalents,

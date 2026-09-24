@@ -28,7 +28,7 @@ passed on both Android and iOS on 2026-09-23. This validates cross-device
 opening and the core dictionary loop, not yet stability: sustained daily use,
 accessibility checks and French voice quality still require device acceptance.
 
-## Web French pilot 0.3.2 — current implementation
+## Web French pilot 0.3.3 — current implementation
 
 - Chinese meanings now dominate the entry sheet; the original French source
   paragraph is retained behind an explicit disclosure.
@@ -73,6 +73,11 @@ accessibility checks and French voice quality still require device acceptance.
   strongly non-native. The Android Web browser tested still exposes no voice.
   Voice quality and explicit approval on the real iPhone are therefore the
   next acceptance gate; locale matching alone is no longer considered enough.
+- Web 0.3.3 implements separate `女声` and `男声` profiles. Each profile stores
+  a user-confirmed French voice, uses the same French-only comparison sentence,
+  and applies the active choice to word and Reader playback. A copy action
+  exports the local French voice inventory and both saved identifiers without
+  analytics. Real iPhone listening remains the blocking acceptance check.
 - Exact Chinese fallback results outrank substring-only base matches. `放屁`
   reaches `péter` / `lâcher un pet` instead of stopping at `coussin péteur`.
   The editorial review layer also adds `bananer` and replaces the obscure

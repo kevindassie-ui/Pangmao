@@ -2,9 +2,9 @@
 
 Dernière mise à jour: 2026-09-24.
 
-Statut: Web 0.3.2 publié; boucle dictionnaire et Reader testée sur Android et
-iOS. Le prochain jalon est la qualification de la voix française réellement
-utilisée par la PWA installée sur l'iPhone pilote.
+Statut: candidat Web 0.3.3 en validation; boucle dictionnaire et Reader testée
+sur Android et iOS. Le prochain jalon reste la qualification des voix féminine
+et masculine réellement utilisées par la PWA installée sur l'iPhone pilote.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
 checkpoint signé, avec une régression manuscrite bloquante désormais suivie.
 
@@ -290,6 +290,13 @@ persistance du choix approuvé, identité technique visible et utilisation
 identique dans les fiches et le Reader. La prononciation d'un nom chinois par
 une voix française reste un test séparé et ne doit pas servir seule à déterminer
 l'accent de la voix.
+
+Web 0.3.3 fournit deux profils configurables, `女声` et `男声`. Safari ne donnant
+pas le genre dans son objet Web de voix, Pangmao présente toutes les voix
+françaises disponibles avec leur nom, locale et type local/distant. Pour chaque
+profil, l'utilisatrice écoute la phrase témoin, confirme la voix retenue et la
+retrouve ensuite dans le dictionnaire comme dans le Reader. Les deux choix et
+l'inventaire peuvent être copiés localement pour la recette, sans télémétrie.
 
 ## Ordre des prochaines tranches
 

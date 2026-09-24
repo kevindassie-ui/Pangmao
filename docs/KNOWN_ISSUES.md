@@ -8,8 +8,8 @@ fois le correctif publié puis confirmé.
 
 ## Priorité Web confirmée — qualité de la voix française
 
-**Statut:** son disponible dans la PWA installée sur l'iPhone pilote, mais voix
-non acceptée; aucune voix exposée dans le navigateur Web Android testé.
+**Statut:** correctif Web 0.3.3 implémenté, recette sur l'iPhone pilote en
+attente; aucune voix exposée dans le navigateur Web Android testé.
 
 Le 2026-09-24, la lecture du dictionnaire et du Reader fonctionne depuis
 l'application ajoutée à l'écran d'accueil de l'iPhone. La voix retenue est
@@ -33,6 +33,11 @@ voix. Avant de poursuivre les fonctions suivantes, il faut:
 
 Ce défaut est la première porte de la section W1.6 de
 [ROADMAP.md](ROADMAP.md).
+
+Le candidat 0.3.3 ajoute les profils `女声` et `男声`, une phrase de comparaison
+commune, une confirmation persistante par profil et la copie locale de
+l'inventaire vocal. Le problème ne quittera cette liste qu'après validation
+auditive des deux profils sur l'iPhone réel.
 
 ## Régression bloquante confirmée — v0.12.2
 
