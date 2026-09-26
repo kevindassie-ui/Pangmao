@@ -1,0 +1,29 @@
+name: Prune old Pangmao CI artifacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/prune-old-artifacts.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Keep the newest temporary artifact of each type
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | select(.name == "Pangmao-ARM64-APK" or .name == "pangmao-web-global-static-site" or .name == "pangmao-web-wife-static-site") | {id, name, created_at}' \
+            | jq -s -r 'group_by(.name)[] | sort_by(.created_at) | reverse | .[1:][] | .id' \
+            | while read -r artifact_id; do
+                echo "Deleting old temporary artifact ${artifact_id}"
+                gh api --method DELETE "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}"
+              done
