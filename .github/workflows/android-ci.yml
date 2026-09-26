@@ -3,8 +3,46 @@ name: Android CI
 on:
   push:
     branches: [main]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle.properties"
+      - "gradlew"
+      - "gradlew.bat"
+      - "tools/data/**"
+      - "tools/tests/**"
+      - "tools/build_dictionary.py"
+      - "tools/build_stroke_database.py"
+      - "tools/fetch_and_build_dictionary.sh"
+      - "tools/fetch_and_build_strokes.sh"
+      - "tools/verify_dictionary.py"
+      - "tools/verify_strokes.py"
+      - "tools/audit_dictionary_quality.py"
+      - ".github/workflows/android-ci.yml"
+      - ".github/workflows/android-release.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradle.properties"
+      - "gradlew"
+      - "gradlew.bat"
+      - "tools/data/**"
+      - "tools/tests/**"
+      - "tools/build_dictionary.py"
+      - "tools/build_stroke_database.py"
+      - "tools/fetch_and_build_dictionary.sh"
+      - "tools/fetch_and_build_strokes.sh"
+      - "tools/verify_dictionary.py"
+      - "tools/verify_strokes.py"
+      - "tools/audit_dictionary_quality.py"
+      - ".github/workflows/android-ci.yml"
+      - ".github/workflows/android-release.yml"
   workflow_dispatch:
 
 permissions:
@@ -58,30 +96,25 @@ jobs:
           python3 -m unittest discover -s tools/tests -p "test_*.py"
           python3 tools/audit_dictionary_quality.py --json-out build/reports/dictionary-quality.json
 
-      - name: Upload dictionary quality audit
-        uses: actions/upload-artifact@v4
-        with:
-          name: Pangmao-dictionary-quality
-          path: build/reports/dictionary-quality.json
-          if-no-files-found: error
-          retention-days: 30
-
       - name: Build, lint and test
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
 
       - name: Collect installable APK
+        if: github.event_name == 'workflow_dispatch'
         run: cp app/build/outputs/apk/debug/app-arm64-v8a-debug.apk Pangmao-arm64-debug.apk
 
       - name: Upload APK
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: Pangmao-ARM64-APK
           path: Pangmao-arm64-debug.apk
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 3
 
       - name: Upload test reports on failure
         if: failure()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Pangmao-build-reports
@@ -89,4 +122,4 @@ jobs:
             app/build/reports/
             app/build/test-results/
           if-no-files-found: ignore
-          retention-days: 14
+          retention-days: 1

@@ -48,7 +48,7 @@ jobs:
           path: webApp
           if-no-files-found: error
           include-hidden-files: true
-          retention-days: 14
+          retention-days: 1
 
       - name: Upload validated private deer pilot
         uses: actions/upload-artifact@v4
@@ -57,4 +57,4 @@ jobs:
           path: build/web-wife
           if-no-files-found: error
           include-hidden-files: true
-          retention-days: 14
+          retention-days: 1
