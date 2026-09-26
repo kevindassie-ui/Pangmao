@@ -96,14 +96,6 @@ jobs:
           python3 -m unittest discover -s tools/tests -p "test_*.py"
           python3 tools/audit_dictionary_quality.py --json-out build/reports/dictionary-quality.json
 
-      - name: Upload dictionary quality audit
-        uses: actions/upload-artifact@v4
-        with:
-          name: Pangmao-dictionary-quality
-          path: build/reports/dictionary-quality.json
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Build, lint and test
         run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
 
@@ -122,6 +114,7 @@ jobs:
 
       - name: Upload test reports on failure
         if: failure()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: Pangmao-build-reports
