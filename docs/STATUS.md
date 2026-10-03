@@ -1,6 +1,50 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-24
+Checkpoint date: 2026-10-03
+
+## Codex handover checkpoint
+
+- Canonical repository: private `kevindassie-ui/Pangmao`. The inspected `main`
+  checkpoint is `d5252f3`; the checkout has no pre-existing uncommitted changes.
+- `main` and the public `Pangmao-Web` mirror both contain Web **0.3.3**.
+  The mirror version was checked in its `package.json`; this is not a fresh
+  device acceptance test.
+- Work in progress is already saved in
+  [draft PR #14](https://github.com/kevindassie-ui/Pangmao/pull/14), branch
+  `feat/web-missed-searches-20261003`, head
+  `b6095fd6bd69cf69e6cba77177742502fbf01491`. Its Web **0.3.4** candidate adds
+  an optional local journal of explicitly submitted searches without results:
+  disabled by default, 100 queries of up to 120 characters, counters, retry,
+  copy/export JSON and isolated deletion. Chinese fallback failures and stale
+  results are excluded. The lexical corpus and identifiers are unchanged.
+- The existing candidate plan is
+  [WEB_MISSED_SEARCHES_PLAN.md on the saved branch](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md).
+  Do not recreate it on `main` or implement a second journal. The PR records
+  46 passing Web tests and Web CI
+  [37126331821](https://github.com/kevindassie-ui/Pangmao/actions/runs/37126331821)
+  on `164089a7`; this is historical evidence, not a new check of the later head.
+- User feedback recorded on 3 October confirms Amélie/Thomas selection and a
+  much improved French accent on iPhone; the timbre remains robotic. Amélie is
+  labelled `fr-CA`. Naturalness, persistence and Reader acceptance remain open;
+  W1.6 is only partially accepted. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+- The later accepted direction requires natural voices integrated into
+  Pangmao without complex iOS/Android setup. System voice installation is a
+  diagnostic option, not the target product flow. No new engine, provider or
+  recurring expense has been approved or implemented. See
+  [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système).
+- Since PR #13, Android CI is filtered by paths and uploads an APK only for a
+  manual run (three days); Web packages and failure reports expire after one
+  day. The current cleanup workflow has a fixed manifest of 47 legacy artifacts
+  with rollback safeguards. Its presence is verified in code; this handover
+  neither reruns deletions nor certifies the current quota or cleanup outcome.
+- This handover updates documentation and agent instructions only. No feature,
+  release tag, Android build, draft promotion or public deployment is performed.
+  Resume with [NEXT_RELEASE.md](NEXT_RELEASE.md) and [../AGENTS.md](../AGENTS.md).
+- Local verification on the inspected Web 0.3.3 code: Node tests pass across
+  seven test files; static/pack validation passes for 10,926 entries, 11,562
+  senses and 15,187 pairs; all 26 strict audit witnesses pass. Documentation
+  links and whitespace checks pass. No new iPhone acceptance or full CI result
+  is claimed for the 0.3.4 candidate.
 
 ## Current direction
 
@@ -71,13 +115,14 @@ accessibility checks and French voice quality still require device acceptance.
 - Device feedback on 2026-09-24 confirms audible speech from the installed
   iPhone PWA, but the automatically selected French-labelled voice sounds
   strongly non-native. The Android Web browser tested still exposes no voice.
-  Voice quality and explicit approval on the real iPhone are therefore the
-  next acceptance gate; locale matching alone is no longer considered enough.
+  This describes the September report; the partial improvement confirmed on
+  3 October is recorded above. Locale matching alone remains insufficient.
 - Web 0.3.3 implements separate `女声` and `男声` profiles. Each profile stores
   a user-confirmed French voice, uses the same French-only comparison sentence,
   and applies the active choice to word and Reader playback. A copy action
   exports the local French voice inventory and both saved identifiers without
-  analytics. Real iPhone listening remains the blocking acceptance check.
+  analytics. Naturalness and complete iPhone acceptance remain open as recorded
+  above; selection and improved accent have been confirmed.
 - Exact Chinese fallback results outrank substring-only base matches. `放屁`
   reaches `péter` / `lâcher un pet` instead of stopping at `coussin péteur`.
   The editorial review layer also adds `bananer` and replaces the obscure
@@ -96,8 +141,9 @@ accessibility checks and French voice quality still require device acceptance.
 - Optional on-device sentence translation after explicit model download.
 - Camera and gallery OCR using the bundled ML Kit Chinese model, with tappable
   text-region selection.
-- Pleco-like handwriting canvas with safe automatic offline recognition after
-  the optional, one-time Chinese handwriting model download.
+- Handwriting canvas and automatic offline recognition code after the optional,
+  one-time Chinese model download; recognition is currently blocked on the
+  reference device by the confirmed v0.12.2 regression.
 - Separate local histories for searches and viewed entries, favourites and SRS
   flashcards.
 - Rounded Material 3 / Compose interface with Porcelaine light and Sceau de nuit
@@ -110,12 +156,12 @@ accessibility checks and French voice quality still require device acceptance.
 - Reproducible dictionary builder and validator.
 - GitHub Actions workflows for build, unit tests, lint and APK artifacts.
 
-## Verified data
+## Historical Android data checkpoints
 
 - Dictionary integrity: 132,342 entries, 64,912 unique Chinese examples and
   14,622 character records.
 - Thirty-eight reviewed examples currently provide aligned French and English;
-  broader bilingual coverage is tracked for v0.5.0.
+  this is the published v0.5 checkpoint, not a pending release target.
 
 ## Verified on GitHub Actions
 

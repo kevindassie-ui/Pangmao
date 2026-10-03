@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-09-24.
+Dernière mise à jour: 2026-10-03.
 
 ## Principes
 
@@ -88,11 +88,11 @@ prioritaire: une locale `fr-FR` ne suffit pas à garantir une voix pédagogique
 acceptable. Le choix doit être qualifié sur l'iPhone réel et partagé par le
 dictionnaire et le Reader.
 
-### Ordre d'implémentation après Web 0.3.2
+### Ordre de reprise après Web 0.3.3
 
 | Priorité | Lot | Résultat attendu |
 | --- | --- | --- |
-| 1 | **W1.6 — voix et stabilisation appareil** | Comparer toutes les voix françaises exposées sur l'iPhone, mémoriser la voix approuvée, afficher son identité technique, utiliser exactement ce choix dans les fiches et le Reader, puis valider mise à jour, cache et hors-ligne sur plusieurs jours. La recette porte sur des phrases entièrement françaises; un nom chinois prononcé à la française n'est pas un critère suffisant pour juger l'accent français. |
+| 1 | **W1.6 — voix et stabilisation appareil** | Qualifier le choix système déjà livré puis comparer une solution de voix naturelles intégrées à Pangmao selon D-042, avec femme/homme et débit sans réglages système complexes. Vérifier dictionnaire, Reader, persistance, cache, mise à jour et hors-ligne disponible sur l'iPhone. La recette utilise des phrases françaises communes, pas un nom propre isolé. |
 | 2 | **W1.5 — profondeur lexicale** | Journal local exportable des recherches manquées, extension par lots du français courant, oral, familier, argotique et des locutions, formes fléchies, registres, traductions chinoises revues et premiers exemples authentiques attribués. |
 | 3 | **W2 — Reader avancé** | Traduction ou explication de phrase, reprise TTS depuis le mot choisi, historique de plusieurs textes et amélioration progressive des imports. |
 | 4 | **W3 — image et OCR** | Import de photo ou capture, sélection et gel d'une zone, OCR puis envoi vers traduction, segmentation et dictionnaire. |
@@ -104,6 +104,10 @@ actuelle passe avant une nouvelle fonction; les lots 2 à 5 ne doivent pas être
 ouverts simultanément.
 
 ### W1.6 — voix française et stabilisation appareil
+
+Les contrôles suivants portent sur la synthèse système déjà livrée. La cible
+intégrée définie le 3 octobre est précisée après ce checkpoint; elle ne se
+limite pas à installer ou sélectionner une voix dans les réglages iOS.
 
 - inventorier sur l'iPhone pilote le nom, l'identifiant, la locale et le type
   local ou distant de chaque voix déclarée française;
@@ -125,8 +129,18 @@ ouverts simultanément.
 profil peut recevoir une voix française distincte après écoute de la même phrase
 témoin; le choix actif est partagé par les fiches et le Reader. L'inventaire
 français et les choix enregistrés peuvent être copiés localement pour le
-diagnostic. La validation de la qualité reste à effectuer sur l'iPhone pilote;
-le lot n'est pas accepté sur la seule base des tests automatisés.
+diagnostic. Le retour du 3 octobre confirme le choix Amélie/Thomas et un accent
+nettement amélioré; le timbre reste robotique. Persistance et Reader ne sont
+pas encore explicitement acceptés. W1.6 reste partiellement validé.
+
+La décision ultérieure [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système)
+fixe la cible: voix naturelles, femme/homme et débit dans Pangmao, sans parcours
+de réglage iOS/Android complexe. Le choix système existant reste un secours;
+l'amélioration du débit seule ne remplace pas un moteur de meilleure qualité.
+Comparer d'abord un petit lot avec deux voix: audio de dictionnaire préparé en
+amont et mis en cache à la demande, puis moteur local ou serveur pour le Reader.
+Ces pistes exigent évaluation des licences, qualité, poids, délai, coût et
+confidentialité; aucun fournisseur ni coût récurrent n'est choisi.
 
 ### W1.5 — profondeur lexicale et registres
 
@@ -145,6 +159,13 @@ le lot n'est pas accepté sur la seule base des tests automatisés.
 
 Plan de sources et portes qualité:
 [WEB_LEXICAL_DEPTH_PLAN.md](WEB_LEXICAL_DEPTH_PLAN.md).
+
+La première tranche de journal est déjà préparée en Web 0.3.4 dans la
+[PR brouillon #14](https://github.com/kevindassie-ui/Pangmao/pull/14), sur
+`feat/web-missed-searches-20261003`. Elle n'est ni fusionnée ni publiée et
+n'ajoute pas de nouvelles entrées. Réutiliser son
+[plan existant](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md);
+la reprise et les portes de promotion sont dans [NEXT_RELEASE.md](NEXT_RELEASE.md).
 
 ### W2 — Reader français
 
@@ -205,7 +226,9 @@ large et ajoute les générations IA facultatives, toujours étiquetées.
 - Corriger l'interface `zh-Hans`.
 - Publier un APK universel et un APK ARM64 plus léger.
 
-Spécification détaillée: [NEXT_RELEASE.md](NEXT_RELEASE.md).
+Historique: [STATUS.md](STATUS.md#corrective-release-021) et
+[CHANGELOG.md](../CHANGELOG.md#021--2026-09-12). `NEXT_RELEASE.md` décrit
+désormais la reprise Web actuelle.
 
 ## v0.3.0 — comprendre un texte · publiée
 

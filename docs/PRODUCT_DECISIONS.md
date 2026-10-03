@@ -1,6 +1,6 @@
 # Décisions produit
 
-Dernière mise à jour: 2026-09-23.
+Dernière mise à jour: 2026-10-03.
 
 ## D-001 — séparer interface et apprentissage
 
@@ -62,6 +62,9 @@ la lecture isolée d'un mot ne peut pas offrir.
 
 Une voix système de haute qualité sera proposée d'abord. Un modèle local libre
 optionnel ne sera ajouté que si son gain justifie son poids et sa complexité.
+
+Pour le Web français, D-042 fixe désormais la cible intégrée; la voix système
+actuelle ne constitue pas une garantie de naturel et reste un secours possible.
 
 ## D-007 — historique local unifié
 
@@ -407,3 +410,28 @@ silencieusement femme ou homme à partir d'un prénom ou d'un identifiant
 propriétaire susceptible de changer. Une voix non encore affectée reste un
 candidat à écouter; la décision de l'utilisatrice fait foi. Un diagnostic local
 copiable liste les voix françaises et les deux choix sans envoyer de données.
+
+## D-042 — voix naturelles intégrées sans configuration système
+
+**Décision utilisateur du 3 octobre 2026:** un nouvel utilisateur doit pouvoir
+écouter une voix française naturelle dès le premier usage, choisir femme/homme
+et régler le débit dans Pangmao. Aucun réglage iOS/Android complexe, installation
+manuelle de voix, compte tiers ou clé API utilisateur ne fait partie du parcours
+normal. « Intégré » n'impose pas une application iOS native.
+
+Cette exigence complète D-041: les profils actuels sont conservés, mais la seule
+sélection des voix système ne garantit pas le résultat. Le retour Amélie/Thomas
+valide le choix et l'amélioration de l'accent, pas le naturel. Le téléchargement
+manuel d'une voix système reste une aide au diagnostic, pas la solution cible.
+
+Les pistes cadrées restent à comparer: deux voix de dictionnaire produites en
+amont et chargées/mises en cache à la demande, puis un moteur local ou serveur
+pour le texte libre du Reader. Qualité, licences, taille, délai, coût et
+confidentialité doivent être évalués sur un petit lot commun avant choix. D-016
+continue de s'appliquer aux appels distants; les audios en cache et le secours
+système sont annoncés honnêtement, sans promettre un Reader naturel entièrement
+hors ligne.
+
+Aucun fournisseur, moteur ou coût récurrent n'est validé par cette décision.
+Elle est reprise du cadrage existant dans
+[WEB_MISSED_SEARCHES_PLAN.md, section « Direction vocale intégrée »](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md#direction-vocale-intégrée--décision-utilisateur-du-3-octobre-2026).

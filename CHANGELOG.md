@@ -8,7 +8,18 @@ numéros suivent le versionnage sémantique.
 
 ## Non publié
 
-### Pangmao Web 0.3.3
+### Préparation documentaire de la reprise Codex — 2026-10-03
+
+- Références existantes actualisées, ancienne cible de `NEXT_RELEASE.md`
+  remplacée et instructions racine `AGENTS.md` ajoutées.
+- Décision vocale intégrée consignée sous D-042; état publié 0.3.3 et candidat
+  0.3.4 de la PR #14 distingués. Ce lot ne change aucune fonctionnalité.
+
+Le journal local 0.3.4 et son plan sont conservés dans la
+[PR brouillon #14](https://github.com/kevindassie-ui/Pangmao/pull/14), sans
+fusion ni publication à cette étape.
+
+## Pangmao Web 0.3.3 — 2026-09-24
 
 #### Ajouté
 
