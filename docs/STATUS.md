@@ -7,8 +7,15 @@ Checkpoint date: 2026-09-24
 - Le blocage de stockage GitHub Actions est levé: le packaging Web du commit
   `3589e159` a réussi lors de la reprise ciblée du 2026-10-02. Les artefacts
   temporaires Web expirent après un jour; aucune dépense ni runner personnel.
-- L'utilisateur confirme le 2026-10-03 que les deux profils vocaux Web 0.3.3
-  n'ont pas encore été testés sur l'iPhone. W1.6 reste donc ouvert.
+- Retour utilisateur du 2026-10-03 à 16 h 32 (Paris): la prononciation reste
+  insatisfaisante, sans amélioration perçue. La capture de l'application affiche
+  bien 0.3.3; le miroir public contient également le code 0.3.3. Son README
+  resté à 0.3.1 a été corrigé. W1.6 reste ouvert: aucun succès vocal accepté.
+  La capture montre une interface Android; l'appareil où la voix a été écoutée
+  reste à confirmer. Prochaine investigation: copier « 复制声音信息 » sur
+  l'appareil concerné et préciser Safari/PWA ou Chrome/PWA. Les profils
+  mémorisent des voix système annoncées comme françaises; ils n'embarquent pas
+  de nouveau moteur ni ne garantissent automatiquement le genre ou l'accent.
 - Le candidat Web 0.3.4 prépare la première tranche W1.5: journal local des
   recherches explicitement soumises sans résultat, désactivé par défaut,
   borné à 100 requêtes de 120 caractères, avec compteurs, reprise, copie,
