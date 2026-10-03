@@ -1,7 +1,9 @@
 # Web 0.3.4 — journal local des recherches manquées
 
 Préparation: 3 octobre 2026. Première tranche du lot W1.5, après la correction
-vocale Web 0.3.3. La recette auditive W1.6 n'est pas encore effectuée.
+vocale Web 0.3.3. Le retour du 3 octobre à 16 h 32 signale une voix toujours
+insatisfaisante. La recette auditive W1.6 n'est pas acceptée; le diagnostic de
+l'appareil est attendu avant de choisir un correctif.
 
 ## Comportement
 
