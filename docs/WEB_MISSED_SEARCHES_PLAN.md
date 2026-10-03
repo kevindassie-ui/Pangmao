@@ -4,8 +4,9 @@ Préparation: 3 octobre 2026. Première tranche du lot W1.5, après la correctio
 vocale Web 0.3.3. Le dernier retour du 3 octobre confirme une sélection
 fonctionnelle d'Amélie et Thomas et un accent français nettement amélioré.
 Le timbre reste robotique: W1.6 est partiellement validé, avec naturel et
-persistance/Reader encore à vérifier. La première piste est une voix France
-en qualité améliorée ou premium, sous réserve qu'elle soit exposée à Safari.
+persistance/Reader encore à vérifier. À 17 h 29, l'utilisateur précise que la
+solution produit doit être intégrée à Pangmao, sans réglages système complexes.
+Le téléchargement manuel de voix iOS ne constitue donc pas la solution cible.
 
 ## Comportement
 
@@ -74,3 +75,33 @@ l'application indique l'export fichier comme solution de repli.
 
 Les fonctions de presse-papiers, de téléchargement et la voix réelle exigent
 une recette sur l'appareil; les tests automatisés ne les déclarent pas validées.
+
+## Direction vocale intégrée — décision utilisateur du 3 octobre 2026
+
+Exigence: un nouvel utilisateur peut écouter une voix française naturelle dès
+le premier usage, avec choix femme/homme et débit dans Pangmao. Aucun réglage
+iOS/Android, installation manuelle de voix, compte tiers ou clé API utilisateur
+ne doit faire partie du parcours normal. « Intégré » décrit l'expérience; il
+n'impose pas une migration vers une application iOS native.
+
+La synthèse Web actuelle dépend des voix exposées par l'appareil et ne garantit
+pas ce résultat. Son réglage de débit seul ne remplace pas un meilleur moteur.
+Source technique: <https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/getVoices>.
+
+Direction à évaluer avant implémentation:
+- Dictionnaire: deux voix françaises de référence avec fichiers audio produits
+  en amont, téléchargés à la demande et mis en cache avec une limite d'espace.
+  Ne pas embarquer toutes les prononciations dans le téléchargement initial.
+- Reader: synthèse intégrée pour le texte libre. Comparer un moteur local
+  téléchargeable automatiquement et une synthèse côté serveur avec cache;
+  mesurer qualité, poids, délai, coût et confidentialité sur iPhone/Android.
+- Hors ligne: lire les audios déjà en cache; garder la voix système comme
+  secours explicite lorsqu'aucun audio intégré n'est disponible. Ne pas
+  présenter le secours comme de même qualité ni déclarer tout le Reader
+  naturel hors ligne sans moteur local validé.
+
+Validation: comparer un petit lot identique (mots isolés, liaisons, nombres,
+phrases longues), avec les deux voix, avant de produire un corpus complet ou
+retenir un service. Vérifier les licences de redistribution et les deux voix
+françaises réelles. Aucun fournisseur ni coût récurrent n'est choisi dans ce
+cadrage. Les pages publiques restent sur 0.3.3; aucun moteur n'est encore intégré.
