@@ -1,9 +1,11 @@
 # Web 0.3.4 — journal local des recherches manquées
 
 Préparation: 3 octobre 2026. Première tranche du lot W1.5, après la correction
-vocale Web 0.3.3. Le retour du 3 octobre à 16 h 32 signale une voix toujours
-insatisfaisante. La recette auditive W1.6 n'est pas acceptée; le diagnostic de
-l'appareil est attendu avant de choisir un correctif.
+vocale Web 0.3.3. Le dernier retour du 3 octobre confirme une sélection
+fonctionnelle d'Amélie et Thomas et un accent français nettement amélioré.
+Le timbre reste robotique: W1.6 est partiellement validé, avec naturel et
+persistance/Reader encore à vérifier. La première piste est une voix France
+en qualité améliorée ou premium, sous réserve qu'elle soit exposée à Safari.
 
 ## Comportement
 
