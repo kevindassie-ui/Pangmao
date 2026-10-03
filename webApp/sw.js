@@ -1,4 +1,4 @@
-const RELEASE_VERSION = "0.3.3";
+const RELEASE_VERSION = "0.3.4";
 const CACHE_NAME = `pangmao-web-v${RELEASE_VERSION}`;
 
 function versioned(path) {
@@ -15,6 +15,7 @@ const APP_SHELL = [
   versioned("./src/app.js"),
   versioned("./src/chinese-fallback.js"),
   versioned("./src/reader.js"),
+  versioned("./src/missed-searches.js"),
   versioned("./src/release.js"),
   versioned("./src/search-engine.js"),
   versioned("./src/storage.js"),

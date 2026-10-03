@@ -2,6 +2,24 @@
 
 Checkpoint date: 2026-09-24
 
+## Reprise Web — 2026-10-03
+
+- Le blocage de stockage GitHub Actions est levé: le packaging Web du commit
+  `3589e159` a réussi lors de la reprise ciblée du 2026-10-02. Les artefacts
+  temporaires Web expirent après un jour; aucune dépense ni runner personnel.
+- L'utilisateur confirme le 2026-10-03 que les deux profils vocaux Web 0.3.3
+  n'ont pas encore été testés sur l'iPhone. W1.6 reste donc ouvert.
+- Le candidat Web 0.3.4 prépare la première tranche W1.5: journal local des
+  recherches explicitement soumises sans résultat, désactivé par défaut,
+  borné à 100 requêtes de 120 caractères, avec compteurs, reprise, copie,
+  export JSON et effacement. Les erreurs de complément chinois, les recherches
+  en cours de saisie et les résultats obsolètes ne sont pas enregistrés.
+- Le corpus reste à 10 926 entrées; aucun équivalent chinois ni exemple nouveau
+  n'est ajouté dans ce lot. Les sources, l'audit et les 26 témoins sont conservés.
+- Le candidat reste sur une branche de préparation. Aucune fusion ni mise à
+  jour du miroir public avant la recette des voix 0.3.3 sur l'iPhone. Recette et
+  promotion: [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
+
 ## Current direction
 
 - Android `v0.12.2` is the frozen, signed checkpoint for the « J'apprends le

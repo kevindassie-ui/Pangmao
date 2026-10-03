@@ -27,7 +27,7 @@ function firstHeadword(query) {
 
 test("complete French pack has deterministic metadata and identifiers", () => {
   assert.equal(pack.schemaVersion, 2);
-  assert.equal(pack.releaseVersion, "0.3.3");
+  assert.equal(pack.releaseVersion, "0.3.4");
   assert.equal(pack.enrichedEntryCount, 2_393);
   assert.equal(pack.language, "fr");
   assert.equal(pack.entryCount, 10_926);

@@ -1,12 +1,18 @@
-import { createChineseFallbackLoader } from "./chinese-fallback.js?v=0.3.3";
-import { segmentFrenchText } from "./reader.js?v=0.3.3";
-import { WEB_VERSION, versionedAsset } from "./release.js?v=0.3.3";
+import { createChineseFallbackLoader } from "./chinese-fallback.js?v=0.3.4";
+import { segmentFrenchText } from "./reader.js?v=0.3.4";
+import { WEB_VERSION, versionedAsset } from "./release.js?v=0.3.4";
+import {
+  createMissedSearchRecorder,
+  exportMissedSearchJournal,
+  loadMissedSearchJournal,
+  saveMissedSearchJournal,
+} from "./missed-searches.js?v=0.3.4";
 import {
   createDictionaryIndex,
   getEntry,
   needsExactChineseFallback,
   searchDictionary,
-} from "./search-engine.js?v=0.3.3";
+} from "./search-engine.js?v=0.3.4";
 import {
   dismissInstallHint,
   isInstallHintDismissed,
@@ -18,7 +24,7 @@ import {
   saveFrenchVoiceProfile,
   saveFavorites,
   saveReaderDraft,
-} from "./storage.js?v=0.3.3";
+} from "./storage.js?v=0.3.4";
 import {
   availableVoices,
   formatFrenchVoiceDiagnostics,
@@ -27,7 +33,7 @@ import {
   speakWithFrenchVoice,
   waitForFrenchVoice,
   voiceIdentifier,
-} from "./tts.js?v=0.3.3";
+} from "./tts.js?v=0.3.4";
 
 const elements = Object.fromEntries(
   [
@@ -54,6 +60,12 @@ const elements = Object.fromEntries(
     "fallbackState",
     "installHint",
     "loadingState",
+    "missedSearchEnabled",
+    "missedSearchList",
+    "missedSearchStatus",
+    "missedSearchCopy",
+    "missedSearchExport",
+    "missedSearchClear",
     "resultCount",
     "results",
     "resultsSection",
@@ -121,6 +133,11 @@ const frenchVoiceSample = "Bonjour, je voudrais acheter une baguette et prendre 
 
 let dictionary = null;
 let favorites = loadFavorites();
+let missedSearchJournal = loadMissedSearchJournal();
+const missedSearchRecorder = createMissedSearchRecorder({
+  getJournal: () => missedSearchJournal,
+  onRecord: (journal) => persistMissedSearchJournal(journal),
+});
 let activeEntryId = null;
 let lastFocusedElement = null;
 let searchTimer = null;
@@ -501,7 +518,8 @@ function renderFallbackResults(query, records) {
   elements.emptyState.hidden = records.length !== 0;
 }
 
-async function runSearch({ focus = false } = {}) {
+async function runSearch({ focus = false, submitted = false } = {}) {
+  const attempt = missedSearchRecorder.begin(elements.searchInput.value, submitted);
   if (!dictionary) return;
   const generation = ++searchGeneration;
   const query = elements.searchInput.value.trim();
@@ -516,6 +534,8 @@ async function runSearch({ focus = false } = {}) {
     elements.resultCount.textContent = "";
   } else {
     const results = searchDictionary(dictionary, query);
+    let fallbackResultCount = 0;
+    let fallbackFailed = false;
     renderResults(results);
     if (needsExactChineseFallback(query, results)) {
       if (results.length === 0) elements.emptyState.hidden = true;
@@ -524,15 +544,22 @@ async function runSearch({ focus = false } = {}) {
         const fallbackResults = await lookupChineseFallback(query);
         if (generation !== searchGeneration || elements.searchInput.value.trim() !== query) return;
         elements.fallbackState.hidden = true;
+        fallbackResultCount = fallbackResults.length;
         if (fallbackResults.length) renderFallbackResults(query, fallbackResults);
         else if (results.length === 0) renderResults([]);
       } catch (error) {
+        fallbackFailed = true;
         console.warn("Unable to load Chinese fallback", error);
         if (generation !== searchGeneration) return;
         elements.fallbackState.hidden = true;
         if (results.length === 0) elements.emptyState.hidden = false;
       }
     }
+    missedSearchRecorder.finish(attempt, {
+      resultCount: results.length,
+      fallbackResultCount,
+      fallbackFailed,
+    });
   }
   if (focus) elements.searchInput.focus();
 }
@@ -863,6 +890,7 @@ function closeEntry({ restoreFocus = true } = {}) {
 }
 
 function openAbout() {
+  renderMissedSearchJournal();
   lastFocusedElement = document.activeElement;
   elements.aboutBackdrop.hidden = false;
   elements.aboutSheet.hidden = false;
@@ -876,6 +904,64 @@ function closeAbout() {
   elements.aboutBackdrop.hidden = true;
   document.body.classList.remove("sheet-open");
   if (lastFocusedElement instanceof HTMLElement) lastFocusedElement.focus({ preventScroll: true });
+}
+
+function renderMissedSearchJournal() {
+  elements.missedSearchEnabled.checked = missedSearchJournal.enabled;
+  const { entries } = missedSearchJournal;
+  elements.missedSearchStatus.textContent = entries.length
+    ? `${entries.length} 个未找到的词（最多保留最近 100 个）`
+    : "还没有记录。启用后，请在搜索框中按“搜索”确认查询。";
+  elements.missedSearchList.replaceChildren(...entries.map((entry) => {
+    const button = node("button", {
+      className: "text-button missed-search-query",
+      text: entry.query,
+      type: "button",
+      ariaLabel: `再次搜索：${entry.query}`,
+      attributes: { lang: entry.language },
+    });
+    button.addEventListener("click", () => {
+      closeAbout();
+      searchFor(entry.query);
+    });
+    return node("li", {}, [button, node("span", { text: `${entry.count} 次` })]);
+  }));
+  for (const button of [elements.missedSearchCopy, elements.missedSearchExport,
+    elements.missedSearchClear]) button.disabled = entries.length === 0;
+}
+
+function persistMissedSearchJournal(journal) {
+  if (!saveMissedSearchJournal(journal)) {
+    showToast("无法保存记录；请检查浏览器的本地存储设置", 4_200);
+    renderMissedSearchJournal();
+    return false;
+  }
+  missedSearchJournal = journal;
+  renderMissedSearchJournal();
+  return true;
+}
+
+async function copyMissedSearchJournal() {
+  try {
+    await navigator.clipboard.writeText(exportMissedSearchJournal(missedSearchJournal, WEB_VERSION));
+    showToast("缺词记录已复制；是否分享由你决定");
+  } catch {
+    showToast("无法复制，请使用“导出文件”", 4_200);
+  }
+}
+
+function downloadMissedSearchJournal() {
+  const blob = new Blob([exportMissedSearchJournal(missedSearchJournal, WEB_VERSION)],
+    { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = node("a", { attributes: {
+    href: url,
+    download: `pangmao-missed-searches-${new Date().toISOString().slice(0, 10)}.json`,
+  } });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 function renderFavorites() {
@@ -1017,10 +1103,12 @@ function bindEvents() {
   elements.searchForm.addEventListener("submit", (event) => {
     event.preventDefault();
     window.clearTimeout(searchTimer);
-    runSearch();
+    runSearch({ submitted: true });
     elements.searchInput.blur();
   });
   elements.searchInput.addEventListener("input", () => {
+    missedSearchRecorder.invalidate();
+    ++searchGeneration;
     elements.clearSearch.hidden = elements.searchInput.value.length === 0;
     window.clearTimeout(searchTimer);
     searchTimer = window.setTimeout(runSearch, 140);
@@ -1068,6 +1156,22 @@ function bindEvents() {
   elements.aboutButton.addEventListener("click", openAbout);
   elements.closeAbout.addEventListener("click", closeAbout);
   elements.aboutBackdrop.addEventListener("click", closeAbout);
+  elements.missedSearchEnabled.addEventListener("change", () => {
+    missedSearchRecorder.invalidate();
+    persistMissedSearchJournal({
+      ...missedSearchJournal,
+      enabled: elements.missedSearchEnabled.checked,
+    });
+  });
+  elements.missedSearchCopy.addEventListener("click", copyMissedSearchJournal);
+  elements.missedSearchExport.addEventListener("click", downloadMissedSearchJournal);
+  elements.missedSearchClear.addEventListener("click", () => {
+    if (!window.confirm("清空这台设备上的全部缺词记录？收藏和声音设置会保留。")) return;
+    missedSearchRecorder.invalidate();
+    if (persistMissedSearchJournal({ ...missedSearchJournal, entries: [] })) {
+      showToast("缺词记录已清空");
+    }
+  });
   elements.retryButton.addEventListener("click", loadDictionary);
   elements.dismissInstallHint.addEventListener("click", () => {
     dismissInstallHint();
