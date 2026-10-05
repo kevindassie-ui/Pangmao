@@ -177,3 +177,79 @@ jobs:
               'live_bytes': sum(a['size_in_bytes'] for a in artifacts if not a.get('expired')),
               'deleted_artifacts': 0}))
           PY
+
+      - name: Remove the reviewed first Web package superseded by validated newer packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+          
+          REPO = 'kevindassie-ui/Pangmao'
+          TARGET = 10768362883
+          REPLACEMENT = 10831060866
+          PROTECTED = {10380370700, 10379113716, 10830387526, 10831060866, 10831080721}
+          if os.environ['GITHUB_REPOSITORY'] != REPO:
+              raise RuntimeError('Wrong repository')
+          root = 'https://api.github.com/repos/' + REPO
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                     'Accept': 'application/vnd.github+json',
+                     'X-GitHub-Api-Version': '2022-11-28'}
+          
+          def api(path, method='GET'):
+              request = urllib.request.Request(root + path, headers=headers, method=method)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return None if response.status == 204 else json.load(response)
+          
+          def inventory():
+              result = []
+              for page in range(1, 1001):
+                  batch = api('/actions/artifacts?per_page=100&page=' + str(page))['artifacts']
+                  result.extend(batch)
+                  if len(batch) < 100:
+                      return {a['id']: a for a in result if not a.get('expired')}
+              raise RuntimeError('Incomplete inventory')
+          
+          before = inventory()
+          artifact = before.get(TARGET)
+          deleted = 0
+          if artifact is not None:
+              expected = {'name': 'pangmao-web-static-site', 'size_in_bytes': 816548,
+                          'digest': 'sha256:f4a830c5bae969208fa4edbb60ee34184ee1159ae51227477ad4d040346d521c'}
+              if any(artifact.get(k) != v for k, v in expected.items()):
+                  raise RuntimeError('Old package differs from reviewed manifest')
+              if (artifact.get('workflow_run') or {}).get('id') != 35900256788:
+                  raise RuntimeError('Unexpected old package run')
+              if not PROTECTED.issubset(before):
+                  raise RuntimeError('A protected replacement or rollback archive is missing')
+              replacement = before[REPLACEMENT]
+              if replacement.get('name') != 'pangmao-web-global-static-site':
+                  raise RuntimeError('Unexpected replacement')
+              if replacement['created_at'] <= artifact['created_at']:
+                  raise RuntimeError('Replacement is not newer')
+              for run_id in (35900256788, 36050910668):
+                  run = api('/actions/runs/' + str(run_id))
+                  if (run.get('status'), run.get('conclusion'), run.get('head_branch'), run.get('path')) != (
+                          'completed', 'success', 'main', '.github/workflows/web-pages.yml'):
+                      raise RuntimeError('Unsafe package source workflow')
+              if (replacement.get('workflow_run') or {}).get('id') != 36050910668:
+                  raise RuntimeError('Unexpected replacement run')
+              api('/actions/artifacts/' + str(TARGET), 'DELETE')
+              deleted = artifact['size_in_bytes']
+          after = inventory()
+          if TARGET in after or (deleted and not PROTECTED.issubset(after)):
+              raise RuntimeError('Cleanup verification failed')
+          summary = {'repository': REPO, 'reviewed_id': TARGET,
+                     'deleted_count': int(deleted > 0), 'deleted_bytes': deleted,
+                     'remaining_count': len(after),
+                     'remaining_bytes': sum(a['size_in_bytes'] for a in after.values()),
+                     'protected_present': sorted(PROTECTED.intersection(after))}
+          print('SUPERSEDED_WEB_PACKAGE_CLEANUP ' + json.dumps(summary))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('\n## Superseded Web package cleanup — 2026-10-05\n\n')
+              output.write('```json\n' + json.dumps(summary, indent=2) + '\n```\n')
+              output.write('Only the reviewed first Web package is removed. Newer global/family packages, all three rollback/test APK archives, reports, releases, caches and run history are preserved.\n')
+          PY
