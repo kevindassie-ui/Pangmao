@@ -46,6 +46,47 @@ Checkpoint date: 2026-10-03
   links and whitespace checks pass. No new iPhone acceptance or full CI result
   is claimed for the 0.3.4 candidate.
 
+## Actions storage audit — 2026-10-05
+
+- Account inventory covered all four repositories exposed by the all-repository
+  GitHub installation and 182 existing runs: 143 Pangmao, 31 meeting recorder,
+  eight public Pages runs and none in Home-Menu.
+- Verified historical cleanup run
+  [37148237510](https://github.com/kevindassie-ui/Pangmao/actions/runs/37148237510)
+  deleted 47 legacy `Pangmao-MVP-APK` archives on 3 October:
+  5,510,076,604 bytes. This was already complete and was not repeated.
+- Current Pangmao artifacts total 370,062,715 bytes after deleting only the
+  superseded first Web package `10768362883` (816,548 bytes).
+  [Cleanup run 37340862843](https://github.com/kevindassie-ui/Pangmao/actions/runs/37340862843)
+  verified that both newer Web packages and all three protected APK archives
+  remain. There are 72 retained artifacts, including 67 dictionary reports
+  totalling only 142,196 bytes.
+- Protected APKs remain pending any further explicit user decision:
+  `10380370700` and `10379113716` (legacy universal test/rollback builds,
+  258,443,210 bytes combined, expiry 15 October), and `10830387526`
+  (latest ARM64 CI APK, 99,534,026 bytes, expiry 24 October).
+  Signed Releases are distinct and were not deleted. Android regression/device
+  acceptance status is unchanged.
+- Account current artifacts total 370,231,079 bytes after this targeted cleanup.
+  meeting-transcription-app retained its 168,364-byte report; its duplicate
+  `alpha.3.2` archive was removed after all four file hashes matched its Release.
+  Public Pangmao-Web and Home-Menu have no current artifacts.
+- Current `main` and active PR #14 Android workflows already upload APKs only
+  on manual runs (three days). Web packages and failure reports retain one day.
+  Twelve other legacy Pangmao branches still have the old Android workflow
+  (30-day APK/quality report and 14-day failure report retention). They are not
+  current producers; synchronize workflow corrections before resuming them or
+  rerunning their old jobs. Do not merge or delete these branches for housekeeping.
+- Older archives keep their original expiry; shortening current workflow
+  retention does not retroactively shorten them. Three-day retention also does
+  not cap the number of concurrent manual APK archives.
+- GitHub's monthly accrued artifact storage is measured in GB-hours. Removing
+  stored archives does not erase already accrued usage; the 3 October alert is
+  consistent with the multi-GB legacy backlog surviving into October.
+  Account billing/Packages totals have not been read; the artifact inventory is
+  exact for the accessible account repositories, not a billing-dashboard reading.
+- No feature, tag, APK build, PR #14 promotion or public deployment was performed.
+
 ## Current direction
 
 - Android `v0.12.2` is the frozen, signed checkpoint for the « J'apprends le
