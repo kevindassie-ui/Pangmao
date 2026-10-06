@@ -46,6 +46,26 @@ Checkpoint date: 2026-10-03
   links and whitespace checks pass. No new iPhone acceptance or full CI result
   is claimed for the 0.3.4 candidate.
 
+## User-approved Actions cleanup — 2026-10-06
+
+- User selected removal of only the older of the two historical universal APKs.
+  Artifact `10379113716`, originating in Android CI run `34925963711`,
+  was deleted: 129,221,473 compressed bytes.
+- [Cleanup run 37431024963](https://github.com/kevindassie-ui/Pangmao/actions/runs/37431024963)
+  completed successfully. Its paginated before/after inventory confirms exactly
+  one removal; previous cleanup manifests removed zero additional artifacts.
+  The source-run artifact API separately confirms the target is absent.
+- The newer historical APK `10380370700` and latest ARM64 CI APK
+  `10830387526` remain present and explicitly protected. Their metadata was
+  checked before deletion and their presence checked again afterward.
+  Signed Releases, reports, newer Web packages, caches and run history are unchanged.
+- Pangmao now retains 71 artifacts totalling 240,841,242 bytes (240.841 MB).
+  This is current Pangmao artifact storage, not an account billing-dashboard
+  reading or a reset of monthly accrued GB-hours.
+- The maintenance workflow uses the single fixed ID approved on 6 October.
+  Retained artifact and Release policy otherwise remains as documented.
+  No Android build, product change, tag, draft promotion or deployment occurred.
+
 ## Actions storage audit — 2026-10-05
 
 - Account inventory covered all four repositories exposed by the all-repository
