@@ -31,6 +31,27 @@ Checkpoint date: 2026-10-07
   Les mesures de génération et le protocole d'écoute sont dans
   [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
 
+### Sauvegarde et page de recette
+
+- Candidat sauvegardé dans la PR #14 au commit
+  `0315a7903df7ed1ee24a1f3feeae20bc4d25e6d9`, avec deux parents conservant
+  le candidat antérieur et le `main` courant. Aucun push forcé.
+- [Web CI 37658786608](https://github.com/kevindassie-ui/Pangmao/actions/runs/37658786608)
+  réussie sur ce commit: tests Node/Python, validation globale, variante cerf
+  et audit strict. Aucun build Android ni upload d'APK lancé pour ce lot.
+- Page de recette publiée seule dans le miroir au commit
+  `c96e6404a6ae363af88468d39660ca85a2b6e16e`:
+  [essai vocal](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/).
+  Le diff du miroir ajoute uniquement `voice-trial/`; le site stable garde
+  Web 0.3.3. Le lien d'essai du panneau À propos appartient au candidat.
+  Les douze audios publiés ont été relus par HTTP et leurs tailles/hashes
+  correspondent au manifeste; le package stable distant indique 0.3.3.
+- Vérification du site publié dans Chrome: les deux récits MP3 sont décodés
+  et atteignent leur fin, le débit passe à 0,85×, Arrêter retire la source,
+  le panneau signale le cache actif. [Capture](evidence/voice-trial-20261007.jpg).
+  Ceci ne valide ni la qualité à l'oreille, ni Safari/iPhone, ni une lecture
+  réellement hors ligne; ces points restent dans la recette téléphone.
+
 ## Checkpoint historique du 3 octobre
 
 

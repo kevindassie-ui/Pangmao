@@ -35,6 +35,9 @@ de réglage système complexe. Aucun moteur n'est encore choisi.
 
 Le petit lot est maintenant implémenté dans `webApp/voice-trial/`: deux voix
 UPMC Jessica/Pierre, six textes identiques et 385 252 octets d'audio au total.
+La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
+sert à la recette; l'application stable reste en 0.3.3. La CI Web du candidat
+`0315a79` est réussie (run 37658786608).
 Tester la phrase quotidienne et la phrase longue à 1×, puis les liaisons et
 nombres avec les deux voix. Évaluer qualité sur iPhone/Android,
 licences de redistribution, poids, délai, coût, confidentialité et hors-ligne.
