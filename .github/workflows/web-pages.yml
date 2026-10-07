@@ -15,6 +15,7 @@ on:
       - "tools/web_data/french_translation_witnesses.json"
       - "tools/tests/**"
       - "tools/verify_web_app.py"
+      - "tools/verify_web_voice_trial.py"
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/web-pages.yml"
   workflow_dispatch:

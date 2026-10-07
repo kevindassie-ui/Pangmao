@@ -1,5 +1,11 @@
 # Pangmao notices
 
+The optional Web voice comparison ships synthetic audio under CC BY-SA 4.0,
+prepared from the UPMC Jessica/Pierre Piper voice model. Complete provenance,
+speaker attribution and generation details are in
+[`webApp/voice-trial/NOTICE.md`](webApp/voice-trial/NOTICE.md). These samples are
+separate from dictionary data; no synthesis model or runtime is shipped.
+
 Pangmao is an independent language-learning project with an Android application
 and a separately built Web client. It is not affiliated with, endorsed by, or
 derived from Pleco Software. “Pleco” is used in project documentation only to

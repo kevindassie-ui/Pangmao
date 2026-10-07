@@ -7,6 +7,10 @@ import argparse
 import hashlib
 import json
 import sys
+if __package__:
+    from .verify_web_voice_trial import verify_trial
+else:
+    from verify_web_voice_trial import verify_trial
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -600,6 +604,7 @@ def validate_static_app(web_root: Path) -> str:
                 seasonal_asset in service_worker,
                 f"Service worker does not precache the seasonal asset: {seasonal_asset}",
             )
+    verify_trial(web_root)
     return release_version
 
 

@@ -1,8 +1,8 @@
 # Pangmao Web « 我学法语 » — cadrage du MVP
 
-Dernière mise à jour: 2026-09-24.
+Dernière mise à jour: 2026-10-03.
 
-Statut: candidat Web 0.3.3 en validation; boucle dictionnaire et Reader testée
+Statut: Web 0.3.3 publié, en validation; boucle dictionnaire et Reader testée
 sur Android et iOS. Le prochain jalon reste la qualification des voix féminine
 et masculine réellement utilisées par la PWA installée sur l'iPhone pilote.
 La version Android 0.12.2 « J'apprends le chinois » est conservée comme
@@ -297,6 +297,18 @@ françaises disponibles avec leur nom, locale et type local/distant. Pour chaque
 profil, l'utilisatrice écoute la phrase témoin, confirme la voix retenue et la
 retrouve ensuite dans le dictionnaire comme dans le Reader. Les deux choix et
 l'inventaire peuvent être copiés localement pour la recette, sans télémétrie.
+
+La recette vocale du 3 octobre confirme le choix Amélie/Thomas et l'amélioration
+de l'accent, mais pas encore le naturel, la persistance ni le Reader.
+[D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système)
+demande désormais des voix naturelles intégrées, avec femme/homme et débit,
+sans réglages système complexes. Les pistes audio préproduit et synthèse
+Reader restent à comparer; aucune intégration ou dépense nouvelle n'est validée.
+
+Web 0.3.4 et son journal local facultatif restent le candidat non publié de la
+[PR brouillon #14](https://github.com/kevindassie-ui/Pangmao/pull/14).
+Le checkpoint et la prochaine action vivent dans [STATUS.md](STATUS.md) et
+[NEXT_RELEASE.md](NEXT_RELEASE.md), sans second cadrage de MVP.
 
 ## Ordre des prochaines tranches
 

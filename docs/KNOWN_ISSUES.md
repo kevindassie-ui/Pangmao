@@ -1,6 +1,6 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-09-24.
+Dernière mise à jour: 2026-10-07.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
@@ -8,8 +8,23 @@ fois le correctif publié puis confirmé.
 
 ## Priorité Web confirmée — qualité de la voix française
 
-**Statut:** correctif Web 0.3.3 implémenté, recette sur l'iPhone pilote en
-attente; aucune voix exposée dans le navigateur Web Android testé.
+**Statut:** Web 0.3.3, choix Amélie/Thomas et accent amélioré confirmés le
+3 octobre; naturel insatisfaisant, persistance et Reader encore à confirmer.
+L'absence de voix dans le navigateur Web Android est le constat du 24 septembre,
+sans nouveau résultat appareil.
+
+Le 7 octobre, un essai indépendant des voix système est implémenté:
+`webApp/voice-trial/`, Jessica/Pierre via Piper, six textes et douze fichiers
+MP3 (385 252 octets), vitesse et cache à la demande. Il évite la configuration
+système pour ces extraits. Le naturel n'est pas encore accepté; ces voix ne
+remplacent pas encore le moteur du dictionnaire et du Reader libre.
+
+Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
+Amélie est déclarée `fr-CA`, pas `fr-FR`; la locale ne certifie pas le naturel.
+La demande ultérieure exige une solution intégrée à Pangmao, sans réglages
+système complexes: [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système).
+L'installation manuelle de voix iOS n'est plus la solution produit cible.
+Les options de moteur restent à évaluer; aucune n'est encore implémentée.
 
 Le 2026-09-24, la lecture du dictionnaire et du Reader fonctionne depuis
 l'application ajoutée à l'écran d'accueil de l'iPhone. La voix retenue est
@@ -34,10 +49,11 @@ voix. Avant de poursuivre les fonctions suivantes, il faut:
 Ce défaut est la première porte de la section W1.6 de
 [ROADMAP.md](ROADMAP.md).
 
-Le candidat 0.3.3 ajoute les profils `女声` et `男声`, une phrase de comparaison
+La version publiée 0.3.3 ajoute les profils `女声` et `男声`, une phrase de comparaison
 commune, une confirmation persistante par profil et la copie locale de
 l'inventaire vocal. Le problème ne quittera cette liste qu'après validation
-auditive des deux profils sur l'iPhone réel.
+du naturel des deux profils, de leur persistance et de leur usage dans le
+Reader sur l'iPhone réel. Le retour du 3 octobre est une validation partielle.
 
 ## Régression bloquante confirmée — v0.12.2
 

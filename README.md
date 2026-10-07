@@ -1,7 +1,7 @@
 # Pangmao · 胖猫
 
-Pangmao is an independent, offline-first language-learning project. Its stable
-client is the Android Chinese dictionary and learning companion described below.
+Pangmao is an independent, offline-first language-learning project. Its frozen
+Android client is the Chinese dictionary and learning companion described below.
 Current development targets a separate Safari-installable Web client for a
 Chinese-speaking learner of French.
 
@@ -23,6 +23,12 @@ Chinese-speaking learner of French.
 
 See the [Web French MVP plan](docs/WEB_FRENCH_MVP.md) for scope, sequencing and
 acceptance criteria.
+
+For a Codex handover, read [AGENTS.md](AGENTS.md), the
+[current checkpoint](docs/STATUS.md) and [next steps](docs/NEXT_RELEASE.md).
+Web 0.3.3 is on `main` and in the public mirror. Web 0.3.4 is an unpublished
+candidate on `feat/web-missed-searches-20261003`, preserved in
+[draft PR #14](https://github.com/kevindassie-ui/Pangmao/pull/14).
 
 ## Try Pangmao Web
 
@@ -58,7 +64,13 @@ Web 0.3.3 adds two device-local speech profiles, `女声` and `男声`. The lear
 can audition every French voice exposed by Safari with the same French sentence,
 save one model for each profile, switch the active profile and copy a local
 diagnostic inventory. The Web API does not expose voice gender, so Pangmao never
-guesses it from a provider-specific name.
+guesses it from a provider-specific name. Feedback on 2026-10-03 confirms that
+Amélie/Thomas selection works and the French accent is much improved, but speech
+still sounds robotic. Naturalness, persistence and Reader acceptance remain
+open. The accepted product target is natural speech integrated into Pangmao,
+with female/male voices and speed controls, without complex system setup; no
+new speech engine or paid provider has been selected or implemented. See
+[D-042](docs/PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système).
 
 The public [Pangmao-Web repository](https://github.com/kevindassie-ui/Pangmao-Web)
 is a deployment-only mirror. Product code, Android code, tests and development
@@ -191,9 +203,30 @@ tools/fetch_and_build_strokes.sh
 ./gradlew testDebugUnitTest lintDebug assembleDebug
 ```
 
-Every push to `main` runs data validation, unit tests, Android lint and a debug
-APK build. During private development, a `v*` tag publishes one tested and
-signed ARM64 APK as a GitHub release.
+Android CI runs for changes covered by its path filters, including Android,
+shared data tooling and tests; documentation-only and Web-only changes do not
+trigger an Android build. A manual Android CI run uploads a debug ARM64 APK
+with three-day retention; failure reports expire after one day. During private
+development, a `v*` tag publishes one tested and signed ARM64 APK as a GitHub
+release. Web releases must use a separate namespace.
+
+Web validation and local preview need no bundler or npm dependency installation:
+
+```bash
+npm --prefix webApp test
+python3 -m unittest discover -s tools/tests -p 'test_web*.py'
+python3 -m unittest tools.tests.test_export_web_dictionary
+python3 tools/verify_web_app.py
+python3 tools/audit_web_dictionary_quality.py --strict --json-out build/reports/web-dictionary-quality.json
+python3 tools/build_web_variant.py --brand wife --output build/web-wife
+python3 tools/verify_web_app.py build/web-wife
+python3 -m http.server 8000 --directory webApp
+```
+
+Web packaging on relevant `main` changes runs the Web checks and uploads global
+and deer static artifacts with one-day retention. It does not deploy the public
+mirror automatically. Build outputs and generated SQLite assets are ignored by
+Git; keep sources, reviewed data and documentation in the canonical repository.
 
 ## Current Android architecture
 

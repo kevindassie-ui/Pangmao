@@ -19,7 +19,7 @@ ROOT_FILES = (
     "styles.css",
     "sw.js",
 )
-ROOT_DIRECTORIES = ("data", "icons", "src")
+ROOT_DIRECTORIES = ("data", "icons", "src", "voice-trial")
 
 
 def copy_tree(source: Path, destination: Path) -> None:
@@ -78,6 +78,16 @@ def build_variant(source: Path, brand: str, output: Path) -> None:
             1,
         )
         html_path.write_text(html, encoding="utf-8")
+
+        trial_html_path = staging / "voice-trial/index.html"
+        trial_html = trial_html_path.read_text(encoding="utf-8").replace(
+            '<html lang="zh-Hans">',
+            f'<html lang="zh-Hans" data-brand="{brand_data["theme"]}">', 1,
+        ).replace(
+            '<meta name="theme-color" content="#0f6b4f" />',
+            f'<meta name="theme-color" content="{brand_data["themeColor"]}" />', 1,
+        )
+        trial_html_path.write_text(trial_html, encoding="utf-8")
 
         if output.exists():
             shutil.rmtree(output)

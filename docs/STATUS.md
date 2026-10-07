@@ -1,6 +1,143 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-09-24
+Checkpoint date: 2026-10-07
+
+## Reprise du développement — 2026-10-07
+
+- Le dépôt canonique `kevindassie-ui/Pangmao` est désormais public. La reprise
+  demandée par l'utilisateur récupère le candidat de la PR #14 et rapproche
+  `main` (`d0b1466`, nettoyage approuvé du 6 octobre), sans réécrire l'historique.
+- Le journal local 0.3.4 existant est conservé. La nouvelle étape W1.6 est
+  `webApp/voice-trial/`: six textes communs, douze extraits MP3, voix UPMC
+  Jessica/Pierre (français de France), produits avec Piper 1.4.1. L'essai
+  permet de comparer femme/homme, débit, liaisons, nombres et phrase longue
+  sans installer de voix ni fournir de compte ou de clé sur le téléphone.
+- Poids total des douze extraits: **385 252 octets**. Aucun audio préchargé;
+  seuls les fichiers écoutés sont téléchargés et mis en cache à la demande.
+  Le lecteur unique arrête l'extrait précédent; le cache audio gère les requêtes
+  partielles nécessaires à Safari et reste séparé du cache de l'application.
+- Modèle épinglé et vérifié par SHA-256, sources humaines attribuées,
+  CC BY-SA 4.0. Modèle et moteur restent hors du produit. Génération locale
+  sans service payant; télémétrie ONNX désactivée avant initialisation.
+- Vérification locale: 52 tests Node, 6 tests Python Web et 5 tests Python
+  d'export réussis; validateurs global/cerf et audit strict des 26 témoins
+  réussis (10 926 entrées, 11 562 sens, 15 187 couples).
+- L'essai est une étape de recette, pas une intégration de ces voix à tout le
+  dictionnaire ou au Reader libre. Le naturel exige une écoute iPhone/Android;
+  W1.6 reste ouvert, la PR #14 reste en brouillon et Web 0.3.3 reste la base
+  stable. Aucun service, coût récurrent, tag ou build Android n'est ajouté.
+- Le téléchargement des navigateurs Playwright n'a pas abouti dans cet
+  environnement; les tests Node de plages HTTP ne sont pas une recette Safari.
+  Les mesures de génération et le protocole d'écoute sont dans
+  [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
+
+## Checkpoint historique du 3 octobre
+
+
+## Codex handover checkpoint
+
+- Canonical repository: private `kevindassie-ui/Pangmao`. The inspected `main`
+  checkpoint is `d5252f3`; the checkout has no pre-existing uncommitted changes.
+- `main` and the public `Pangmao-Web` mirror both contain Web **0.3.3**.
+  The mirror version was checked in its `package.json`; this is not a fresh
+  device acceptance test.
+- Work in progress is already saved in
+  [draft PR #14](https://github.com/kevindassie-ui/Pangmao/pull/14), branch
+  `feat/web-missed-searches-20261003`, head
+  `b6095fd6bd69cf69e6cba77177742502fbf01491`. Its Web **0.3.4** candidate adds
+  an optional local journal of explicitly submitted searches without results:
+  disabled by default, 100 queries of up to 120 characters, counters, retry,
+  copy/export JSON and isolated deletion. Chinese fallback failures and stale
+  results are excluded. The lexical corpus and identifiers are unchanged.
+- The existing candidate plan is
+  [WEB_MISSED_SEARCHES_PLAN.md on the saved branch](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md).
+  Do not recreate it on `main` or implement a second journal. The PR records
+  46 passing Web tests and Web CI
+  [37126331821](https://github.com/kevindassie-ui/Pangmao/actions/runs/37126331821)
+  on `164089a7`; this is historical evidence, not a new check of the later head.
+- User feedback recorded on 3 October confirms Amélie/Thomas selection and a
+  much improved French accent on iPhone; the timbre remains robotic. Amélie is
+  labelled `fr-CA`. Naturalness, persistence and Reader acceptance remain open;
+  W1.6 is only partially accepted. See [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+- The later accepted direction requires natural voices integrated into
+  Pangmao without complex iOS/Android setup. System voice installation is a
+  diagnostic option, not the target product flow. No new engine, provider or
+  recurring expense has been approved or implemented. See
+  [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système).
+- Since PR #13, Android CI is filtered by paths and uploads an APK only for a
+  manual run (three days); Web packages and failure reports expire after one
+  day. The current cleanup workflow has a fixed manifest of 47 legacy artifacts
+  with rollback safeguards. Its presence is verified in code; this handover
+  neither reruns deletions nor certifies the current quota or cleanup outcome.
+- This handover updates documentation and agent instructions only. No feature,
+  release tag, Android build, draft promotion or public deployment is performed.
+  Resume with [NEXT_RELEASE.md](NEXT_RELEASE.md) and [../AGENTS.md](../AGENTS.md).
+- Local verification on the inspected Web 0.3.3 code: Node tests pass across
+  seven test files; static/pack validation passes for 10,926 entries, 11,562
+  senses and 15,187 pairs; all 26 strict audit witnesses pass. Documentation
+  links and whitespace checks pass. No new iPhone acceptance or full CI result
+  is claimed for the 0.3.4 candidate.
+
+## User-approved Actions cleanup — 2026-10-06
+
+- User selected removal of only the older of the two historical universal APKs.
+  Artifact `10379113716`, originating in Android CI run `34925963711`,
+  was deleted: 129,221,473 compressed bytes.
+- [Cleanup run 37431024963](https://github.com/kevindassie-ui/Pangmao/actions/runs/37431024963)
+  completed successfully. Its paginated before/after inventory confirms exactly
+  one removal; previous cleanup manifests removed zero additional artifacts.
+  The source-run artifact API separately confirms the target is absent.
+- The newer historical APK `10380370700` and latest ARM64 CI APK
+  `10830387526` remain present and explicitly protected. Their metadata was
+  checked before deletion and their presence checked again afterward.
+  Signed Releases, reports, newer Web packages, caches and run history are unchanged.
+- Pangmao now retains 71 artifacts totalling 240,841,242 bytes (240.841 MB).
+  This is current Pangmao artifact storage, not an account billing-dashboard
+  reading or a reset of monthly accrued GB-hours.
+- The maintenance workflow uses the single fixed ID approved on 6 October.
+  Retained artifact and Release policy otherwise remains as documented.
+  No Android build, product change, tag, draft promotion or deployment occurred.
+
+## Actions storage audit — 2026-10-05
+
+- Account inventory covered all four repositories exposed by the all-repository
+  GitHub installation and 182 existing runs: 143 Pangmao, 31 meeting recorder,
+  eight public Pages runs and none in Home-Menu.
+- Verified historical cleanup run
+  [37148237510](https://github.com/kevindassie-ui/Pangmao/actions/runs/37148237510)
+  deleted 47 legacy `Pangmao-MVP-APK` archives on 3 October:
+  5,510,076,604 bytes. This was already complete and was not repeated.
+- Current Pangmao artifacts total 370,062,715 bytes after deleting only the
+  superseded first Web package `10768362883` (816,548 bytes).
+  [Cleanup run 37340862843](https://github.com/kevindassie-ui/Pangmao/actions/runs/37340862843)
+  verified that both newer Web packages and all three protected APK archives
+  remain. There are 72 retained artifacts, including 67 dictionary reports
+  totalling only 142,196 bytes.
+- Protected APKs remain pending any further explicit user decision:
+  `10380370700` and `10379113716` (legacy universal test/rollback builds,
+  258,443,210 bytes combined, expiry 15 October), and `10830387526`
+  (latest ARM64 CI APK, 99,534,026 bytes, expiry 24 October).
+  Signed Releases are distinct and were not deleted. Android regression/device
+  acceptance status is unchanged.
+- Account current artifacts total 370,231,079 bytes after this targeted cleanup.
+  meeting-transcription-app retained its 168,364-byte report; its duplicate
+  `alpha.3.2` archive was removed after all four file hashes matched its Release.
+  Public Pangmao-Web and Home-Menu have no current artifacts.
+- Current `main` and active PR #14 Android workflows already upload APKs only
+  on manual runs (three days). Web packages and failure reports retain one day.
+  Twelve other legacy Pangmao branches still have the old Android workflow
+  (30-day APK/quality report and 14-day failure report retention). They are not
+  current producers; synchronize workflow corrections before resuming them or
+  rerunning their old jobs. Do not merge or delete these branches for housekeeping.
+- Older archives keep their original expiry; shortening current workflow
+  retention does not retroactively shorten them. Three-day retention also does
+  not cap the number of concurrent manual APK archives.
+- GitHub's monthly accrued artifact storage is measured in GB-hours. Removing
+  stored archives does not erase already accrued usage; the 3 October alert is
+  consistent with the multi-GB legacy backlog surviving into October.
+  Account billing/Packages totals have not been read; the artifact inventory is
+  exact for the accessible account repositories, not a billing-dashboard reading.
+- No feature, tag, APK build, PR #14 promotion or public deployment was performed.
 
 ## Reprise Web — 2026-10-03
 
@@ -104,13 +241,14 @@ accessibility checks and French voice quality still require device acceptance.
 - Device feedback on 2026-09-24 confirms audible speech from the installed
   iPhone PWA, but the automatically selected French-labelled voice sounds
   strongly non-native. The Android Web browser tested still exposes no voice.
-  Voice quality and explicit approval on the real iPhone are therefore the
-  next acceptance gate; locale matching alone is no longer considered enough.
+  This describes the September report; the partial improvement confirmed on
+  3 October is recorded above. Locale matching alone remains insufficient.
 - Web 0.3.3 implements separate `女声` and `男声` profiles. Each profile stores
   a user-confirmed French voice, uses the same French-only comparison sentence,
   and applies the active choice to word and Reader playback. A copy action
   exports the local French voice inventory and both saved identifiers without
-  analytics. Real iPhone listening remains the blocking acceptance check.
+  analytics. Naturalness and complete iPhone acceptance remain open as recorded
+  above; selection and improved accent have been confirmed.
 - Exact Chinese fallback results outrank substring-only base matches. `放屁`
   reaches `péter` / `lâcher un pet` instead of stopping at `coussin péteur`.
   The editorial review layer also adds `bananer` and replaces the obscure
@@ -129,8 +267,9 @@ accessibility checks and French voice quality still require device acceptance.
 - Optional on-device sentence translation after explicit model download.
 - Camera and gallery OCR using the bundled ML Kit Chinese model, with tappable
   text-region selection.
-- Pleco-like handwriting canvas with safe automatic offline recognition after
-  the optional, one-time Chinese handwriting model download.
+- Handwriting canvas and automatic offline recognition code after the optional,
+  one-time Chinese model download; recognition is currently blocked on the
+  reference device by the confirmed v0.12.2 regression.
 - Separate local histories for searches and viewed entries, favourites and SRS
   flashcards.
 - Rounded Material 3 / Compose interface with Porcelaine light and Sceau de nuit
@@ -143,12 +282,12 @@ accessibility checks and French voice quality still require device acceptance.
 - Reproducible dictionary builder and validator.
 - GitHub Actions workflows for build, unit tests, lint and APK artifacts.
 
-## Verified data
+## Historical Android data checkpoints
 
 - Dictionary integrity: 132,342 entries, 64,912 unique Chinese examples and
   14,622 character records.
 - Thirty-eight reviewed examples currently provide aligned French and English;
-  broader bilingual coverage is tracked for v0.5.0.
+  this is the published v0.5 checkpoint, not a pending release target.
 
 ## Verified on GitHub Actions
 

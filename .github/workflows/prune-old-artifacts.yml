@@ -6,24 +6,331 @@ on:
     paths:
       - ".github/workflows/prune-old-artifacts.yml"
   workflow_dispatch:
+    inputs:
+      apply_reviewed:
+        description: Apply fixed artifact manifests reviewed on 2026-10-03, 05 and 06
+        type: boolean
+        default: false
 
 permissions:
   actions: write
   contents: read
 
+concurrency:
+  group: artifact-maintenance
+  cancel-in-progress: false
+
 jobs:
-  prune:
+  cleanup:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Keep the newest temporary artifact of each type
+      - name: Apply narrowly scoped legacy cleanup and verify remaining storage
         env:
           GH_TOKEN: ${{ github.token }}
+          APPLY_REVIEWED: ${{ github.event_name == 'push' || inputs.apply_reviewed }}
+        shell: bash
         run: |
-          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq '.artifacts[] | select(.name == "Pangmao-ARM64-APK" or .name == "pangmao-web-global-static-site" or .name == "pangmao-web-wife-static-site") | {id, name, created_at}' \
-            | jq -s -r 'group_by(.name)[] | sort_by(.created_at) | reverse | .[1:][] | .id' \
-            | while read -r artifact_id; do
-                echo "Deleting old temporary artifact ${artifact_id}"
-                gh api --method DELETE "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}"
-              done
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.request
+          from datetime import datetime, timezone
+
+          # Fixed review manifest: never delete newly created or unknown artifacts.
+          TARGETS = {
+              10370268183,10370182644,10369597157,10369398402,10369383699,
+              10368741720,10368661703,10348225693,10348110423,10347983491,
+              10347200052,10347082481,10346287432,10345164749,10337460774,
+              10336735820,10336494944,10335916198,10327121062,10325318605,
+              10325177002,10322590915,10322266246,10321504663,10319122634,
+              10318982509,10317295798,10317167258,10313571743,10313092654,
+              10312721716,10312662040,10307844724,10307567467,10306859545,
+              10301630051,10300885547,10297340213,10295908971,10294077099,
+              10293367030,10293287721,10292984169,10287221080,10286911372,
+              10285699376,10278322307,
+          }
+          # Keep the newest legacy universal APK and the current ARM64 CI APK.
+          ANCHORS = {10380370700, 10830387526}
+          CUTOFF = datetime(2026, 9, 15, tzinfo=timezone.utc)
+          repo = os.environ['GITHUB_REPOSITORY']
+          if repo != 'kevindassie-ui/Pangmao':
+              raise RuntimeError('This reviewed manifest belongs to Pangmao only')
+          root = 'https://api.github.com/repos/' + repo
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                     'Accept': 'application/vnd.github+json',
+                     'X-GitHub-Api-Version': '2022-11-28'}
+          apply = os.environ.get('APPLY_REVIEWED', 'false').lower() == 'true'
+
+          def api(path, method='GET'):
+              request = urllib.request.Request(root + path, headers=headers, method=method)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return None if response.status == 204 else json.load(response)
+
+          def artifacts():
+              result = []
+              for page in range(1, 1001):
+                  batch = api('/actions/artifacts?per_page=100&page=' + str(page))['artifacts']
+                  result.extend(batch)
+                  if len(batch) < 100:
+                      return result
+              raise RuntimeError('Pagination limit reached; no partial inventory accepted')
+
+          def validate(items, runs):
+              live = {a['id']: a for a in items if not a.get('expired')}
+              targets = [live[i] for i in sorted(TARGETS) if i in live]
+              if targets and not ANCHORS.issubset(live):
+                  raise RuntimeError('A protected rollback artifact is unavailable')
+              for artifact in targets:
+                  run_id = (artifact.get('workflow_run') or {}).get('id')
+                  created = datetime.fromisoformat(artifact['created_at'].replace('Z', '+00:00'))
+                  if artifact['name'] != 'Pangmao-MVP-APK' or created >= CUTOFF:
+                      raise RuntimeError('Artifact differs from reviewed legacy scope')
+                  run = runs[run_id]
+                  if (run.get('status'), run.get('conclusion'), run.get('head_branch'), run.get('path')) != (
+                          'completed', 'success', 'main', '.github/workflows/android-ci.yml'):
+                      raise RuntimeError('Unsafe source workflow')
+              return targets
+
+          before = artifacts()
+          live = {a['id']: a for a in before if not a.get('expired')}
+          run_ids = {(live[i].get('workflow_run') or {}).get('id') for i in TARGETS if i in live}
+          if None in run_ids:
+              raise RuntimeError('A reviewed artifact has no source workflow')
+          runs = {i: api('/actions/runs/' + str(i)) for i in run_ids}
+          targets = validate(before, runs)
+          # Abort before deleting anything if the two stable rollback releases are missing.
+          if targets:
+              for tag in ('v0.12.2', 'v0.12.1'):
+                  release = api('/releases/tags/' + tag)
+                  if release.get('draft') or not any(
+                          a.get('name') == 'Pangmao-' + tag + '-arm64.apk'
+                          and a.get('state') == 'uploaded' and a.get('size', 0) > 0
+                          for a in release.get('assets', [])):
+                      raise RuntimeError('A stable rollback release is unavailable: ' + tag)
+          print('PLAN ' + json.dumps({'apply': apply, 'count': len(targets),
+                                     'bytes': sum(a['size_in_bytes'] for a in targets),
+                                     'protected_ids': sorted(ANCHORS)}))
+          deleted = []
+          for artifact in targets:
+              record = {k: artifact.get(k) for k in ('id', 'name', 'size_in_bytes', 'digest')}
+              if not apply:
+                  print('WOULD_DELETE ' + json.dumps(record))
+                  continue
+              try:
+                  api('/actions/artifacts/' + str(artifact['id']), 'DELETE')
+              except urllib.error.HTTPError as error:
+                  if error.code == 404:
+                      print('ALREADY_ABSENT ' + str(artifact['id']))
+                      continue
+                  raise
+              deleted.append(artifact)
+              print('DELETED ' + json.dumps(record))
+          after = artifacts()
+          remaining = {a['id']: a for a in after if not a.get('expired')}
+          if apply and TARGETS.intersection(remaining):
+              raise RuntimeError('Verification failed: reviewed targets remain')
+          if targets and not ANCHORS.issubset(remaining):
+              raise RuntimeError('Verification failed: a protected artifact disappeared')
+          summary = {'repository': repo, 'mode': 'apply' if apply else 'audit',
+                     'before_count': len(live), 'before_bytes': sum(a['size_in_bytes'] for a in live.values()),
+                     'deleted_count': len(deleted), 'deleted_bytes': sum(a['size_in_bytes'] for a in deleted),
+                     'after_count': len(remaining), 'after_bytes': sum(a['size_in_bytes'] for a in remaining.values()),
+                     'protected_ids_present': sorted(ANCHORS.intersection(remaining))}
+          print('CLEANUP_SUMMARY ' + json.dumps(summary))
+          for artifact in remaining.values():
+              if artifact['size_in_bytes'] >= 1_000_000:
+                  print('PRESERVED ' + json.dumps({k: artifact.get(k) for k in ('id', 'name', 'size_in_bytes', 'expires_at')}))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('## Reviewed artifact cleanup — 2026-10-03\n\n')
+              output.write('```json\n' + json.dumps(summary, indent=2) + '\n```\n\n')
+              output.write('Only the fixed manifest of obsolete MVP APKs is eligible. All other artifacts, releases, source code, caches, logs and run history are untouched.\n')
+          PY
+
+      - name: Inventory public Pangmao-Web artifacts without changes
+        continue-on-error: true
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import urllib.request
+          root = 'https://api.github.com/repos/kevindassie-ui/Pangmao-Web'
+          artifacts = []
+          for page in range(1, 1001):
+              request = urllib.request.Request(
+                  root + '/actions/artifacts?per_page=100&page=' + str(page),
+                  headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  batch = json.load(response)['artifacts']
+              artifacts.extend(batch)
+              if len(batch) < 100:
+                  break
+          else:
+              raise RuntimeError('Incomplete public artifact inventory')
+          for artifact in artifacts:
+              print('PUBLIC_ARTIFACT ' + json.dumps({key: artifact.get(key) for key in
+                    ('id', 'name', 'size_in_bytes', 'created_at', 'expires_at', 'expired')}))
+          print('PUBLIC_AUDIT_SUMMARY ' + json.dumps({
+              'repository': 'kevindassie-ui/Pangmao-Web', 'listed_artifacts': len(artifacts),
+              'live_bytes': sum(a['size_in_bytes'] for a in artifacts if not a.get('expired')),
+              'deleted_artifacts': 0}))
+          PY
+
+      - name: Remove the reviewed first Web package superseded by validated newer packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          REPO = 'kevindassie-ui/Pangmao'
+          TARGET = 10768362883
+          REPLACEMENT = 10831060866
+          PROTECTED = {10380370700, 10830387526, 10831060866, 10831080721}
+          if os.environ['GITHUB_REPOSITORY'] != REPO:
+              raise RuntimeError('Wrong repository')
+          root = 'https://api.github.com/repos/' + REPO
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                     'Accept': 'application/vnd.github+json',
+                     'X-GitHub-Api-Version': '2022-11-28'}
+
+          def api(path, method='GET'):
+              request = urllib.request.Request(root + path, headers=headers, method=method)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return None if response.status == 204 else json.load(response)
+
+          def inventory():
+              result = []
+              for page in range(1, 1001):
+                  batch = api('/actions/artifacts?per_page=100&page=' + str(page))['artifacts']
+                  result.extend(batch)
+                  if len(batch) < 100:
+                      return {a['id']: a for a in result if not a.get('expired')}
+              raise RuntimeError('Incomplete inventory')
+
+          before = inventory()
+          artifact = before.get(TARGET)
+          deleted = 0
+          if artifact is not None:
+              expected = {'name': 'pangmao-web-static-site', 'size_in_bytes': 816548,
+                          'digest': 'sha256:f4a830c5bae969208fa4edbb60ee34184ee1159ae51227477ad4d040346d521c'}
+              if any(artifact.get(k) != v for k, v in expected.items()):
+                  raise RuntimeError('Old package differs from reviewed manifest')
+              if (artifact.get('workflow_run') or {}).get('id') != 35900256788:
+                  raise RuntimeError('Unexpected old package run')
+              if not PROTECTED.issubset(before):
+                  raise RuntimeError('A protected replacement or rollback archive is missing')
+              replacement = before[REPLACEMENT]
+              if replacement.get('name') != 'pangmao-web-global-static-site':
+                  raise RuntimeError('Unexpected replacement')
+              if replacement['created_at'] <= artifact['created_at']:
+                  raise RuntimeError('Replacement is not newer')
+              for run_id in (35900256788, 36050910668):
+                  run = api('/actions/runs/' + str(run_id))
+                  if (run.get('status'), run.get('conclusion'), run.get('head_branch'), run.get('path')) != (
+                          'completed', 'success', 'main', '.github/workflows/web-pages.yml'):
+                      raise RuntimeError('Unsafe package source workflow')
+              if (replacement.get('workflow_run') or {}).get('id') != 36050910668:
+                  raise RuntimeError('Unexpected replacement run')
+              api('/actions/artifacts/' + str(TARGET), 'DELETE')
+              deleted = artifact['size_in_bytes']
+          after = inventory()
+          if TARGET in after or (deleted and not PROTECTED.issubset(after)):
+              raise RuntimeError('Cleanup verification failed')
+          summary = {'repository': REPO, 'reviewed_id': TARGET,
+                     'deleted_count': int(deleted > 0), 'deleted_bytes': deleted,
+                     'remaining_count': len(after),
+                     'remaining_bytes': sum(a['size_in_bytes'] for a in after.values()),
+                     'protected_present': sorted(PROTECTED.intersection(after))}
+          print('SUPERSEDED_WEB_PACKAGE_CLEANUP ' + json.dumps(summary))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('\n## Superseded Web package cleanup — 2026-10-05\n\n')
+              output.write('```json\n' + json.dumps(summary, indent=2) + '\n```\n')
+              output.write('Only the reviewed first Web package is removed. Newer global/family packages, both protected rollback/test APK archives, reports, releases, caches and run history are preserved.\n')
+          PY
+
+      - name: Remove only the oldest historical APK explicitly approved by the user
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPLY_REVIEWED: ${{ github.event_name == 'push' || inputs.apply_reviewed }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          REPO = 'kevindassie-ui/Pangmao'
+          TARGET = 10379113716
+          PROTECTED = {
+              10380370700: ('Pangmao-MVP-APK', 129221737, 'sha256:7da3f5eb90ddd8295cb0e0fe50a4e4602bd2ff560ed5729c520a51c7220456f5'),
+              10830387526: ('Pangmao-ARM64-APK', 99534026, 'sha256:7a8e0d393a1e1a650d5ef65aba8f88480302c17e2678551f70993b23b8d2b255'),
+          }
+          if os.environ['GITHUB_REPOSITORY'] != REPO:
+              raise RuntimeError('Wrong repository')
+          apply = os.environ.get('APPLY_REVIEWED', 'false').lower() == 'true'
+          root = 'https://api.github.com/repos/' + REPO
+          headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                     'Accept': 'application/vnd.github+json',
+                     'X-GitHub-Api-Version': '2022-11-28'}
+
+          def api(path, method='GET'):
+              request = urllib.request.Request(root + path, headers=headers, method=method)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return None if response.status == 204 else json.load(response)
+
+          def inventory():
+              result = []
+              for page in range(1, 1001):
+                  batch = api('/actions/artifacts?per_page=100&page=' + str(page))['artifacts']
+                  result.extend(batch)
+                  if len(batch) < 100:
+                      return {a['id']: a for a in result if not a.get('expired')}
+              raise RuntimeError('Incomplete inventory')
+
+          before = inventory()
+          target = before.get(TARGET)
+          deleted = 0
+          if target is not None:
+              expected = ('Pangmao-MVP-APK', 129221473, 'sha256:518a60391d93e9f34681b67121df8dd660f15aad19b18a1fabc2fa938956fdab')
+              if tuple(target.get(k) for k in ('name', 'size_in_bytes', 'digest')) != expected:
+                  raise RuntimeError('Target differs from the user-approved archive')
+              source = target.get('workflow_run') or {}
+              if (source.get('id'), source.get('head_sha')) != (
+                      34925963711, 'bb43feee0a7478f0f6d2c27546bf1fe84f59c98c'):
+                  raise RuntimeError('Unexpected source run')
+              for artifact_id, expected in PROTECTED.items():
+                  artifact = before.get(artifact_id, {})
+                  if tuple(artifact.get(k) for k in ('name', 'size_in_bytes', 'digest')) != expected:
+                      raise RuntimeError('A protected APK is unavailable or changed')
+              if before[10380370700]['created_at'] <= target['created_at']:
+                  raise RuntimeError('The protected historical APK is not newer')
+              if apply:
+                  api('/actions/artifacts/' + str(TARGET), 'DELETE')
+                  deleted = target['size_in_bytes']
+              else:
+                  print('WOULD_DELETE ' + str(TARGET))
+          after = inventory()
+          if apply and TARGET in after:
+              raise RuntimeError('Approved archive is still present')
+          if deleted and not set(PROTECTED).issubset(after):
+              raise RuntimeError('A protected APK disappeared')
+          summary = {'repository': REPO, 'mode': 'apply' if apply else 'audit',
+                     'user_approved_id': TARGET, 'deleted_count': int(deleted > 0),
+                     'deleted_bytes': deleted,
+                     'before_count': len(before),
+                     'before_bytes': sum(a['size_in_bytes'] for a in before.values()),
+                     'after_count': len(after),
+                     'after_bytes': sum(a['size_in_bytes'] for a in after.values()),
+                     'protected_present': sorted(set(PROTECTED).intersection(after))}
+          print('USER_APPROVED_OLDEST_APK_CLEANUP ' + json.dumps(summary))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write('\n## User-approved oldest APK removal — 2026-10-06\n\n')
+              output.write('```json\n' + json.dumps(summary, indent=2) + '\n```\n')
+              output.write('Only archive 10379113716 is removed. The newer historical APK and latest ARM64 archive are protected; no Release, report, source, cache or run history is deleted.\n')
+          PY
