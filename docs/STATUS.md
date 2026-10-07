@@ -1,6 +1,23 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-10-07
+Checkpoint date: 2026-10-08 (Europe/Paris)
+
+## Reconnexion — 2026-10-08
+
+- Checkout propre et aligné sur la PR #14, head distant vérifié
+  `54078f51cfd0e6cf15ce690da5183c3e60c41757` avant ce lot documentaire.
+  La PR reste ouverte et en brouillon. Le journal et l'essai vocal sont conservés.
+- [Web CI 37659560197](https://github.com/kevindassie-ui/Pangmao/actions/runs/37659560197)
+  terminée avec succès sur ce head; aucun besoin de relancer les contrôles
+  fonctionnels pour corriger uniquement les références de reprise.
+- Miroir au commit `c96e6404a6ae363af88468d39660ca85a2b6e16e`.
+  La page d'essai répond HTTP 200; manifeste `2026-10-07-v1`, six textes,
+  douze extraits et 385 252 octets. Le package stable distant reste en 0.3.3.
+- `NEXT_RELEASE.md` pointait encore vers `b6095fd`, antérieur au petit lot
+  vocal. La référence de départ et la preuve CI sont corrigées à leur place.
+- Aucun nouveau retour d'écoute dans la demande de reconnexion. Le naturel
+  reste à évaluer sur téléphone avant production du dictionnaire complet ou
+  sélection d'un moteur Reader. Ce lot ne change que la documentation.
 
 ## Reprise du développement — 2026-10-07
 

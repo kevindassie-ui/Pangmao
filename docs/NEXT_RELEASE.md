@@ -1,7 +1,7 @@
 # Pangmao — prochaine reprise dans Codex
 
-Checkpoint de développement: 2026-10-07. Reprise autorisée par l'utilisateur,
-à partir du candidat sauvegardé. État et preuves: [STATUS.md](STATUS.md).
+Checkpoint de reprise: 2026-10-08 (Europe/Paris). État distant et page d'essai
+revérifiés après reconnexion. État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
 
@@ -12,10 +12,13 @@ plans `V0.*` décrivent des versions Android historiques.
 
 - Base publiée: `main`, Web 0.3.3; Android signé `v0.12.2` gelé.
 - Candidat sauvegardé: `feat/web-missed-searches-20261003`,
-  `b6095fd6bd69cf69e6cba77177742502fbf01491`,
+  head vérifié avant ce checkpoint documentaire:
+  `54078f51cfd0e6cf15ce690da5183c3e60c41757`,
   [PR #14 en brouillon](https://github.com/kevindassie-ui/Pangmao/pull/14).
-- Son plan [WEB_MISSED_SEARCHES_PLAN.md](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md)
-  existe sur cette branche: le lire sur place, sans en créer une copie.
+- Son plan [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md) existe
+  sur cette branche et inclut maintenant le petit lot vocal. Le lire sur place,
+  sans en créer une copie. `b6095fd` est le candidat historique du 3 octobre,
+  antérieur à cet essai; revérifier le head de la PR avant toute modification.
 
 Avant de reprendre le candidat, vérifier l'état Git, récupérer `main` et la
 branche, puis rapprocher les références documentaires de `main` avec celles de
@@ -36,8 +39,9 @@ de réglage système complexe. Aucun moteur n'est encore choisi.
 Le petit lot est maintenant implémenté dans `webApp/voice-trial/`: deux voix
 UPMC Jessica/Pierre, six textes identiques et 385 252 octets d'audio au total.
 La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
-sert à la recette; l'application stable reste en 0.3.3. La CI Web du candidat
-`0315a79` est réussie (run 37658786608).
+sert à la recette; l'application stable reste en 0.3.3. La CI Web du head
+`54078f5` est réussie
+([run 37659560197](https://github.com/kevindassie-ui/Pangmao/actions/runs/37659560197)).
 Tester la phrase quotidienne et la phrase longue à 1×, puis les liaisons et
 nombres avec les deux voix. Évaluer qualité sur iPhone/Android,
 licences de redistribution, poids, délai, coût, confidentialité et hors-ligne.
@@ -45,6 +49,11 @@ Les pistes déjà cadrées sont l'audio de dictionnaire produit en amont et mis 
 cache à la demande, puis un moteur Reader local ou serveur à comparer. Une
 piste n'est ni un fournisseur validé ni un engagement de dépense. Un éventuel
 appel distant reste soumis au consentement explicite de D-016.
+
+Aucun nouveau retour d'écoute n'accompagne la reconnexion. Le point de reprise
+est donc cette comparaison sur téléphone, pas une approbation du naturel ni
+une demande de régénérer les extraits. La lecture du Reader libre et le corpus
+complet ne sont pas encore intégrés à ces deux voix.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 
