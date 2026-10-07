@@ -31,6 +31,24 @@ Checkpoint date: 2026-10-08 (Europe/Paris)
   l'application stable et le Reader libre ne sont pas encore promus.
 
 
+### Preuves de publication de la révision 2
+
+- Commit fonctionnel `0c2a3bb6b9b2ff5ea1b3e1c034920d21c182a903`,
+  [Web CI 37703131947](https://github.com/kevindassie-ui/Pangmao/actions/runs/37703131947)
+  réussie: 55 tests Node, 11 tests Python, deux variantes et audit strict.
+- Miroir au commit `1a645df23f612dc8062048dafb6145b3f322161a`,
+  [Pages 37703216302](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37703216302)
+  réussie. Le diff se limite aux dix fichiers de l'essai nécessaires à la
+  correction. L'application stable reste en 0.3.3.
+- Chrome a d'abord affiché l'ancien essai en cache, puis « ESSAI DES VOIX 2 »
+  après une actualisation. L'extrait des nombres de Jessica est chargé avec
+  le nouveau hash et décodé jusqu'à sa fin (6,606 secondes). La phrase
+  d'achat de Jessica est aussi décodée jusqu'à sa fin (3,622 secondes), avec
+  le nouveau hash. [Capture des passages](evidence/voice-trial-v2-20261008.jpg).
+- Les douze fichiers publiés ont été relus par HTTP: tailles et hashes
+  conformes au manifeste v2, total 384 835 octets, titre d'essai 2 et package
+  stable 0.3.3. La prononciation perçue reste à confirmer par l'utilisateur.
+
 ## Reconnexion — 2026-10-08
 
 - Checkout propre et aligné sur la PR #14, head distant vérifié

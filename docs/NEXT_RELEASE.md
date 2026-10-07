@@ -13,7 +13,7 @@ plans `V0.*` décrivent des versions Android historiques.
 - Base publiée: `main`, Web 0.3.3; Android signé `v0.12.2` gelé.
 - Candidat sauvegardé: `feat/web-missed-searches-20261003`,
   head vérifié avant ce checkpoint documentaire:
-  `54078f51cfd0e6cf15ce690da5183c3e60c41757`,
+  `0c2a3bb6b9b2ff5ea1b3e1c034920d21c182a903`,
   [PR #14 en brouillon](https://github.com/kevindassie-ui/Pangmao/pull/14).
 - Son plan [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md) existe
   sur cette branche et inclut maintenant le petit lot vocal. Le lire sur place,
@@ -41,8 +41,8 @@ UPMC Jessica/Pierre, six textes identiques. La révision 2 corrige les heures et
 « je voudrais acheter »; quatre extraits régénérés, 384 835 octets au total.
 La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
 sert à la recette; l'application stable reste en 0.3.3. La CI Web du head
-`54078f5` est réussie
-([run 37659560197](https://github.com/kevindassie-ui/Pangmao/actions/runs/37659560197)).
+`0c2a3bb` est réussie
+([run 37703131947](https://github.com/kevindassie-ui/Pangmao/actions/runs/37703131947)).
 Tester la phrase quotidienne et la phrase longue à 1×, puis les liaisons et
 nombres avec les deux voix. Évaluer qualité sur iPhone/Android,
 licences de redistribution, poids, délai, coût, confidentialité et hors-ligne.
