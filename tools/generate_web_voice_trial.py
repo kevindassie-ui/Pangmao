@@ -19,6 +19,8 @@ import time
 import urllib.request
 import wave
 
+from web_voice_text import prepare_speech
+
 REVISION = "c10ece1aade47bb51c153c893d14e5bf8e5b7117"
 MODEL_NAME = "fr_FR-upmc-medium.onnx"
 EXPECTED_INPUTS = {
@@ -27,7 +29,7 @@ EXPECTED_INPUTS = {
     "MODEL_CARD": "cf1ac7309e0e04bb159b7e6ae80bc8f66bfce9bdfb3e62ae93a6f57e210ab98a",
 }
 BASE_URL = f"https://huggingface.co/rhasspy/piper-voices/resolve/{REVISION}/fr/fr_FR/upmc/medium/"
-TRIAL_VERSION = "2026-10-07-v1"
+TRIAL_VERSION = "2026-10-08-v2"
 VOICES = [
     {"id": "female", "label": "Femme · 女声", "speaker": "jessica", "speakerId": 0},
     {"id": "male", "label": "Homme · 男声", "speaker": "pierre", "speakerId": 1},
@@ -42,6 +44,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model-dir", type=Path, default=Path("build/voice-models"))
     parser.add_argument("--output", type=Path, default=Path("webApp/voice-trial"))
+    parser.add_argument("--samples", nargs="+", help="Regenerate only named texts; preserve the other audio files")
     args = parser.parse_args()
     if importlib.metadata.version("piper-tts") != "1.4.1":
         raise SystemExit("Use piper-tts==1.4.1 in a separate environment")
@@ -75,17 +78,40 @@ def main() -> None:
     audio_dir = args.output / "audio"
     audio_dir.mkdir(exist_ok=True)
     samples = []
+    previous_path = args.output / "manifest.json"
+    previous = json.loads(previous_path.read_text(encoding="utf-8")) if previous_path.exists() else {}
+    if args.samples and not set(args.samples) <= {text["id"] for text in texts}:
+        raise SystemExit("Unknown sample requested")
     for text in texts:
-        sample = {**text, "clips": {}}
+        prepared = prepare_speech(text["text"])
+        sample = {**text, **prepared, "clips": {}}
+        if args.samples and text["id"] not in args.samples:
+            old = next((s for s in previous.get("samples", []) if s["id"] == text["id"]), None)
+            if not old or old["text"] != text["text"] or old.get("synthesisText", old["text"]) != prepared["synthesisText"]:
+                raise SystemExit(f"Cannot preserve changed sample: {text['id']}")
+            if (previous.get("modelRevision") != REVISION or previous.get("voices") != VOICES or
+                    previous.get("engine") != "Piper 1.4.1" or previous.get("modelInputsSha256") != inputs):
+                raise SystemExit("Cannot preserve audio from another voice model")
+            for clip in old["clips"].values():
+                if digest(args.output / clip["file"]) != clip["sha256"]:
+                    raise SystemExit("Preserved clip differs from its hash")
+            sample["clips"] = {gender: {**clip, "generatedForVersion": clip.get("generatedForVersion", previous["version"])}
+                               for gender, clip in old["clips"].items()}
+            samples.append(sample)
+            continue
         for voice in VOICES:
             started = time.perf_counter()
             with tempfile.TemporaryDirectory() as temporary:
                 wav_path = Path(temporary) / "clip.wav"
                 with wave.open(str(wav_path), "wb") as wav:
-                    model.synthesize_wav(text["text"], wav, syn_config=SynthesisConfig(
+                    model.synthesize_wav(prepared["synthesisText"], wav, syn_config=SynthesisConfig(
                         speaker_id=voice["speakerId"], length_scale=1.0,
                     ))
                 elapsed = time.perf_counter() - started
+                phonemes = ["".join(sentence) for sentence in model.phonemize(prepared["synthesisText"])]
+                unknown = set("".join(phonemes)) - set(model.config.phoneme_id_map)
+                if unknown:
+                    raise SystemExit(f"Unsupported pronunciation symbols: {unknown}")
                 with wave.open(str(wav_path)) as wav:
                     duration = wav.getnframes() / wav.getframerate()
                 target = audio_dir / f'{voice["id"]}-{text["id"]}.mp3'
@@ -98,6 +124,7 @@ def main() -> None:
                 "file": f"audio/{target.name}", "bytes": target.stat().st_size,
                 "sha256": digest(target), "durationSeconds": round(duration, 3),
                 "generationSeconds": round(elapsed, 3),
+                "generatedForVersion": TRIAL_VERSION, "phonemes": phonemes,
             }
         samples.append(sample)
     manifest = {

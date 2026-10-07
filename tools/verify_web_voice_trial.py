@@ -3,6 +3,11 @@ import hashlib
 import json
 from pathlib import Path
 
+if __package__:
+    from .web_voice_text import prepare_speech
+else:
+    from web_voice_text import prepare_speech
+
 
 def verify_trial(root: Path) -> None:
     trial = root / "voice-trial"
@@ -11,14 +16,18 @@ def verify_trial(root: Path) -> None:
             raise ValueError(f"Missing voice trial asset: {name}")
     manifest = json.loads((trial / "manifest.json").read_text(encoding="utf-8"))
     version = manifest["version"]
-    if f'TRIAL_VERSION = "{version}"' not in (trial / "player.js").read_text():
-        raise ValueError("Trial cache/manifest version mismatch")
+    for asset in ["player.js", "sw.js"]:
+        if f'TRIAL_VERSION = "{version}"' not in (trial / asset).read_text():
+            raise ValueError("Trial cache/manifest version mismatch")
     texts = json.loads((trial / "texts.json").read_text(encoding="utf-8"))
     if len(texts) != 6 or len(manifest["samples"]) != 6:
         raise ValueError("Expected six fixed comparison texts")
     for sample, text in zip(manifest["samples"], texts):
         if any(sample[k] != text[k] for k in ["id", "label", "text"]):
             raise ValueError("Generated speech labels differ from fixed texts")
+        prepared = prepare_speech(text["text"])
+        if any(sample.get(k) != v for k, v in prepared.items()):
+            raise ValueError("Speech preparation differs from its recorded input")
     paths = set()
     total = 0
     for sample in manifest["samples"]:

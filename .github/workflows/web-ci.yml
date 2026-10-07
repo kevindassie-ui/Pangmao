@@ -16,6 +16,8 @@ on:
       - "tools/tests/**"
       - "tools/verify_web_app.py"
       - "tools/verify_web_voice_trial.py"
+      - "tools/web_voice_text.py"
+      - "tools/generate_web_voice_trial.py"
       - ".github/workflows/web-ci.yml"
       - ".github/workflows/web-pages.yml"
   workflow_call:

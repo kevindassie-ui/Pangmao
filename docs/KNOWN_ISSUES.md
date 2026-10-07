@@ -16,8 +16,12 @@ sans nouveau résultat appareil.
 Le 7 octobre, un essai indépendant des voix système est implémenté:
 `webApp/voice-trial/`, Jessica/Pierre via Piper, six textes et douze fichiers
 MP3 (385 252 octets), vitesse et cache à la demande. Il évite la configuration
-système pour ces extraits. Le naturel n'est pas encore accepté; ces voix ne
-remplacent pas encore le moteur du dictionnaire et du Reader libre.
+système pour ces extraits. Le retour retrouvé le
+8 octobre juge les deux voix naturelles globalement, avec deux défauts:
+Jessica donne l'impression de « je voudrait t'acheter »; les deux voix épellent
+le h de 18h30. La révision 2 corrige la préparation des heures et les phonèmes
+de la phrase d'achat. Ces passages restent à recetter. Les voix ne remplacent
+pas encore le moteur du dictionnaire et du Reader libre.
 
 Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
 Amélie est déclarée `fr-CA`, pas `fr-FR`; la locale ne certifie pas le naturel.

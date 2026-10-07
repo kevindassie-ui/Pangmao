@@ -2,11 +2,57 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { createTrialPlayer, validateManifest } from "../voice-trial/player.js";
 import { withByteRange } from "../voice-trial/ranges.js";
 
 const root = new URL("../voice-trial/", import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL("manifest.json", root), "utf8"));
+
+function prepareTexts(texts) {
+  return JSON.parse(execFileSync("python3", [new URL("../../tools/web_voice_text.py", import.meta.url).pathname],
+    { input: JSON.stringify(texts), encoding: "utf8" }));
+}
+
+test("French clock times expand for speech without altering numbers or invalid times", () => {
+  const input = ["à 18h30", "à 18 h 30", "à 18\u202fh\u202f30", "1H00", "23h59",
+    "25h30 et 18h60", "h = 18 ; 30 euros", "18h300", "a18h30", "18h30a"];
+  assert.deepEqual(prepareTexts(input).map((p) => p.spokenText),
+    ["à 18 heures 30", "à 18 heures 30", "à 18 heures 30", "1 heure", "23 heures 59", ...input.slice(5)]);
+});
+
+test("the reviewed purchase phrase retains its wording and receives explicit pronunciation only there", () => {
+  const input = ["Bonjour, je voudrais acheter une baguette.", "Je voudrais acheter.",
+    "je voudrais prendre le train", "voudrais", "acheter", "je voudrais acheterais"];
+  const output = prepareTexts(input);
+  assert.deepEqual(output.map((p) => p.spokenText), input);
+  assert.match(output[0].synthesisText, /\[\[ʒə vudʁˈɛ aʃətˈe\]\]/);
+  assert.equal(output[0].pronunciationOverrides[0].text, "je voudrais acheter");
+  assert.equal(output[1].pronunciationOverrides.length, 1);
+  for (const p of output.slice(2)) {
+    assert.equal(p.synthesisText, p.spokenText);
+    assert.deepEqual(p.pronunciationOverrides, []);
+  }
+});
+
+test("shipped corrected audio records expanded hours and the exact phrase phonemes for both voices", () => {
+  const prepared = prepareTexts(manifest.samples.map((s) => s.text));
+  manifest.samples.forEach((s, i) => {
+    for (const key of ["spokenText", "synthesisText", "pronunciationOverrides"]) assert.deepEqual(s[key], prepared[i][key]);
+  });
+  const clock = manifest.samples.find((s) => s.id === "nombres");
+  const purchase = manifest.samples.find((s) => s.id === "quotidien");
+  assert.match(clock.text, /18 h 30/);
+  assert.match(clock.spokenText, /18 heures 30/);
+  for (const gender of ["female", "male"]) {
+    assert.doesNotMatch(clock.clips[gender].phonemes.join(" "), /ˈaʃ/);
+    assert.match(clock.clips[gender].phonemes.join(" "), /ˈœʁ/);
+    assert.match(purchase.clips[gender].phonemes.join(" "), /vudʁˈɛ aʃətˈe/);
+    assert.equal(purchase.clips[gender].generatedForVersion, manifest.version);
+  }
+  const worker = readFileSync(new URL("sw.js", root), "utf8");
+  assert.ok(worker.includes(`TRIAL_VERSION = "${manifest.version}"`));
+});
 
 test("both French trial voices ship intact and stay under the audio budget", () => {
   validateManifest(manifest);

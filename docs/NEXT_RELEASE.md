@@ -1,7 +1,7 @@
 # Pangmao — prochaine reprise dans Codex
 
-Checkpoint de reprise: 2026-10-08 (Europe/Paris). État distant et page d'essai
-revérifiés après reconnexion. État et preuves: [STATUS.md](STATUS.md).
+Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
+et deux corrections de prononciation implémentées. État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
 
@@ -34,10 +34,11 @@ Le choix Amélie/Thomas et l'amélioration de l'accent sont confirmés. Le natur
 reste insatisfaisant; persistance et Reader ne sont pas encore explicitement
 acceptés. La décision [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-intégrées-sans-configuration-système)
 demande une solution dans Pangmao, avec voix femme/homme et débit, sans parcours
-de réglage système complexe. Aucun moteur n'est encore choisi.
+de réglage système complexe. Aucun moteur de production n'est encore choisi.
 
 Le petit lot est maintenant implémenté dans `webApp/voice-trial/`: deux voix
-UPMC Jessica/Pierre, six textes identiques et 385 252 octets d'audio au total.
+UPMC Jessica/Pierre, six textes identiques. La révision 2 corrige les heures et
+« je voudrais acheter »; quatre extraits régénérés, 384 835 octets au total.
 La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
 sert à la recette; l'application stable reste en 0.3.3. La CI Web du head
 `54078f5` est réussie
@@ -50,10 +51,12 @@ cache à la demande, puis un moteur Reader local ou serveur à comparer. Une
 piste n'est ni un fournisseur validé ni un engagement de dépense. Un éventuel
 appel distant reste soumis au consentement explicite de D-016.
 
-Aucun nouveau retour d'écoute n'accompagne la reconnexion. Le point de reprise
-est donc cette comparaison sur téléphone, pas une approbation du naturel ni
-une demande de régénérer les extraits. La lecture du Reader libre et le corpus
-complet ne sont pas encore intégrés à ces deux voix.
+Le retour d'écoute retrouvé vers 01 h 15 juge les deux voix « naturelle » et
+le rendu « plutôt naturel globalement ». Deux exceptions restent à recetter:
+la phrase d'achat de Jessica et « 18 heures 30 » pour les deux voix, corrigées
+dans l'essai `2026-10-08-v2`. Le titre doit afficher « ESSAI DES VOIX 2 »;
+actualiser un ancien onglet si nécessaire. Confirmer ces passages avant
+généralisation. Reader libre et corpus complet restent à intégrer séparément.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 

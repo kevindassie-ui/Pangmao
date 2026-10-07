@@ -2,6 +2,35 @@
 
 Checkpoint date: 2026-10-08 (Europe/Paris)
 
+## Retour d'écoute et correction de l'essai — 2026-10-08
+
+- Retour du 8 octobre vers 01 h 15 (Paris), retrouvé après les interruptions:
+  Jessica et Pierre sont toutes deux évaluées « naturelle »; commentaire:
+  « Pas mal, plutôt naturel globalement. » Le naturel du petit lot est donc
+  favorable, avec deux défauts précis: Jessica donne l'impression de
+  « je voudrait t'acheter » et les deux voix lisent le h de « 18h30 ».
+- Défauts reproduits dans l'entrée phonétique: `18 h 30` donne un son de lettre
+  h; `voudrais acheter` reçoit une consonne finale automatique et un schwa
+  supprimé dans acheter. Une préparation conserve le texte affiché mais
+  développe les heures. La phrase d'achat reçoit une prononciation explicite,
+  sans consonne après voudrais et avec schwa dans acheter; aucune règle
+  générale de suppression des liaisons n'est ajoutée.
+- Essai **2026-10-08-v2**: quatre MP3 régénérés, huit fichiers conservés par
+  hash; total **384 835 octets**. Le manifeste trace textes parlé/synthèse,
+  corrections, phonèmes générés et version d'origine des fichiers.
+- Tests locaux: **55 tests Node**, 6 Python Web et 5 Python export réussis;
+  validateurs global/cerf réussis. Les tests inspectent les véritables entrées
+  phonétiques et hashes; ils ne garantissent pas seuls le son perçu après
+  la correction.
+- Cache d'essai versionné v2, shell téléchargé sans réutiliser le cache HTTP
+  précédent et mises à jour du worker sans cache d'import. Le titre affiche
+  « ESSAI DES VOIX 2 ». Un onglet déjà ouvert peut nécessiter une actualisation.
+- La cause de « Stopped thinking » n'est pas observable ici. Les défauts de
+  prononciation sont traités dans le dépôt, sans les attribuer à l'interruption.
+  La recette des deux passages corrigés reste ouverte avant généralisation;
+  l'application stable et le Reader libre ne sont pas encore promus.
+
+
 ## Reconnexion — 2026-10-08
 
 - Checkout propre et aligné sur la PR #14, head distant vérifié

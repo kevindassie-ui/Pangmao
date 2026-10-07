@@ -150,3 +150,30 @@ un extrait déjà lu et vérifier qu'un extrait non téléchargé échoue claire
 Le cache peut être évincé par le téléphone. Accepter séparément naturel et
 prononciation pour chaque voix avant production du corpus. Le texte libre
 Reader reste une étape distincte; le journal n'est pas promu avec cet essai.
+
+## Correction après écoute — 8 octobre 2026
+
+Retour vers 01 h 15 (Paris): les deux profils Jessica/Pierre sont jugés
+« naturelle », « plutôt naturel globalement ». Les deux heures et la phrase
+d'achat de Jessica comportent des défauts. Le phonémiseur produit un son de
+lettre h pour `18 h 30`; il ajoute aussi une consonne après voudrais et réduit
+acheter en aʃte. Le texte affiché reste identique; `tools/web_voice_text.py`
+prépare séparément le texte parlé et l'entrée de synthèse. Les heures valides
+(0–23 h, minutes 00–59) sont développées; seule l'expression précise
+`je voudrais acheter` reçoit les phonèmes `ʒə vudʁˈɛ aʃətˈe`. Aucune règle
+universelle de liaison ni correction orthographique cachée n'est appliquée.
+
+Révision `2026-10-08-v2`: quatre MP3 régénérés (nombres et quotidien, deux
+profils), huit conservés par hash, total 384 835 octets. Le manifeste enregistre
+la préparation, les phonèmes et la version de génération des clips.
+Reproduction ciblée dans l'environnement Piper isolé:
+
+```bash
+ORT_DISABLE_TELEMETRY=1 python tools/generate_web_voice_trial.py --samples nombres quotidien
+```
+
+Le mode ciblé refuse de conserver un fichier dont le texte, l'entrée de
+synthèse, le modèle ou le hash diffère. Le cache et le titre de l'essai passent
+à la révision 2. Une actualisation peut être nécessaire dans un ancien onglet.
+Recette restante: écouter l'heure avec les deux profils et la phrase de Jessica;
+confirmer l'absence de consonne parasite et de lettre h avant extension.
