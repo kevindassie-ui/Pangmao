@@ -32,6 +32,26 @@ Checkpoint date: 2026-10-08 (Europe/Paris)
   publication. Ce contrôle d'intégrité ne certifie pas la qualité entendue.
   Recette utilisateur ouverte; stable Web 0.3.3 et PR #14 en brouillon.
 
+### Publication et preuves de la comparaison v3
+
+- Commit fonctionnel `b727fa7453312d20b16340b8e48f64468f3f4df6`,
+  [Web CI 37775162253](https://github.com/kevindassie-ui/Pangmao/actions/runs/37775162253)
+  réussie: 56 tests Node, 11 Python, deux variantes et audit strict.
+- Miroir `269ac01b2a99a7c43336319aaa567e627f7265a4`,
+  [Pages 37775367239](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37775367239)
+  réussie. Diff limité à 18 fichiers de `voice-trial/`; aucune promotion de
+  la racine stable 0.3.3. [Page d'essai](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/).
+- Chrome a conservé v2 au premier rechargement pendant la mise à jour du
+  worker, puis affiché « ESSAI DES VOIX 3 » au suivant. SIWIS et MLS lisent
+  la phrase d'achat jusqu'à sa fin, à 1×, avec les nouveaux hashes:
+  4,179592 et 5,085170 secondes. Basculer vers Jessica/Pierre arrête bien
+  le lecteur; revenir restaure l'avis de test propre à la nouvelle paire.
+  [Capture du titre et des voix](evidence/voice-trial-v3-20261008.jpg).
+- Les 24 fichiers publiés ont été relus par HTTP: tailles et SHA-256
+  conformes au manifeste v3, total 835 500 octets; package stable 0.3.3.
+- Ces preuves valident la livraison et le lecteur, sans certifier la
+  prononciation entendue sur iPhone/Android ni le hors-ligne réel de Safari.
+
 ## Retour d'écoute et correction de l'essai — 2026-10-08
 
 - Retour du 8 octobre vers 01 h 15 (Paris), retrouvé après les interruptions:

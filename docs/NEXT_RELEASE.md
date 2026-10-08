@@ -1,7 +1,7 @@
 # Pangmao — prochaine reprise dans Codex
 
 Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
-et nouveaux défauts indépendants de la vitesse. Comparaison v3 préparée. État et preuves: [STATUS.md](STATUS.md).
+et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée. État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
 
@@ -43,8 +43,8 @@ La révision 3 conserve les fichiers UPMC v2 et ajoute douze extraits candidats:
 préparation de v2, sans nouvelles substitutions ciblées.
 La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
 sert à la recette; l'application stable reste en 0.3.3. La CI Web du head
-`0c2a3bb` est réussie
-([run 37703131947](https://github.com/kevindassie-ui/Pangmao/actions/runs/37703131947)).
+`b727fa7` est réussie
+([run 37775162253](https://github.com/kevindassie-ui/Pangmao/actions/runs/37775162253)).
 Tester la phrase quotidienne et la phrase longue à 1×, puis les liaisons et
 nombres avec les deux voix. Évaluer qualité sur iPhone/Android,
 licences de redistribution, poids, délai, coût, confidentialité et hors-ligne.
