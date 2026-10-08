@@ -43,6 +43,14 @@ IPA pour médecin et avocat. Il sert à isoler compression/lecture et entrée
 phonétique; il ne constitue pas une correction acceptée des défauts. Recette
 auditive encore ouverte, avec résultats A/B et B/C à distinguer.
 
+Le retour vers 23 h 34 (Paris) clôt ce diagnostic sans solution globale:
+« avocat C » est bon, mais « médecin C » est pire, perçu comme « meucin »;
+le reste n'est pas concluant. Le locuteur n'est pas précisé. Médecin C est
+rejeté; avocat C reste un témoin positif, pas une validation des deux voix.
+La compression n'a pas fourni de piste concluante. Passer à la qualification
+d'une autre famille de synthèse plutôt qu'à de nouveaux bricolages phonétiques;
+la recherche de candidats et ses limites sont dans [STATUS.md](STATUS.md).
+
 Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
 Amélie est déclarée `fr-CA`, pas `fr-FR`; la locale ne certifie pas le naturel.
 La demande ultérieure exige une solution intégrée à Pangmao, sans réglages

@@ -4,6 +4,8 @@ Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrou
 et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée puis
 non acceptée: aucune amélioration, « médecin »→« meudecin » en plus.
 Diagnostic A/B/C d1 publié pour isoler codec et entrées phonétiques.
+Retour d1 reçu: avocat C positif, médecin C dégradé (« meucin »), reste non
+concluant. Prochaine piste: qualifier Pocket TTS français.
 État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
@@ -90,13 +92,22 @@ sans réglages système. La page exige une connexion, sans cache hors ligne
 promis ni envoi de texte ou d'avis.
 [Ouvrir le diagnostic publié](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/diagnostic/).
 Les 60 tests Node, validations du lot, CI et déploiement passent. Les 20 fichiers
-publics ont leurs tailles/hashes attendus; la qualification auditive sur
-téléphone reste ouverte, malgré la lecture vérifiée dans Chrome.
+publics ont leurs tailles/hashes attendus. Le dernier retour d'écoute juge
+avocat C bon, médecin C pire (« meucin »), et le reste non concluant.
 
-Interpréter séparément A/B (codec/conteneur et lecture) et B/C (deux hypothèses
-phonétiques). Un résultat sur ces deux mots ne valide ni baguette/fixé ni le
-Reader libre. Consigner le retour avant de choisir un autre moteur ou de
-généraliser ces voix. Reader libre et corpus complet restent à intégrer séparément.
+Conserver d1 comme référence: médecin C rejeté, avocat C témoin positif sans
+voix précisée. Pas de nouvelle demande d'écoute de ces mêmes variantes, ni
+d'ajout de substitutions pour tenter de réparer chaque mot. Aucun gain A/B
+concluant; la cause acoustique exacte reste à établir.
+
+La prochaine action est la qualification locale de **Pocket TTS français**:
+vérifier la révision, les licences et les deux références vocales françaises,
+puis le petit lot commun sans phonèmes forcés hérités de Piper. La recherche
+et les limites de taille/profils sont consignées dans [STATUS.md](STATUS.md).
+Ce moteur est un candidat à évaluer, pas un choix de production; aucun modèle
+n'a encore été chargé ni testé. Éviter les poids/runtime GPU inutiles et tout
+service payant. Les poids de génération restent hors PWA; conserver D-016
+pour le texte libre. Reader libre et corpus complet restent à intégrer séparément.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 

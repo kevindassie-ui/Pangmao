@@ -2,6 +2,49 @@
 
 Checkpoint date: 2026-10-08 (Europe/Paris)
 
+## Bilan d'écoute d1 et changement de piste — 2026-10-08
+
+- Retour utilisateur vers 23 h 34 (Paris): hormis « avocat C », jugé bon,
+  **rien de concluant**. « Médecin C » est encore pire, perçu comme « meucin ».
+  Le locuteur n'est pas précisé: ne pas étendre le résultat positif d'avocat
+  aux deux voix, ni considérer toute la préparation phonétique comme validée.
+- Médecin C est rejeté. Avocat C reste un témoin positif ciblé; aucune règle
+  de ces diagnostics n'a été intégrée au dictionnaire ou au Reader. Le reste
+  des défauts reste ouvert. Le retour A/B ne donne pas de piste concluante
+  sur la compression; il ne constitue pas une exclusion formelle du codec.
+- Une entrée IPA conforme peut donc rester mal réalisée par ces modèles.
+  Ne pas poursuivre une suite de substitutions de syllabes ou de réglages de
+  débit. Garder les fichiers diagnostiques comme références des essais ratés;
+  l'objectif demeure une voix intégrée fiable dès le premier usage.
+- Recherche de moteurs d'une autre famille, limitée aux sources officielles:
+  **Pocket TTS français** devient la piste prioritaire à qualifier. Le code
+  [v3.3.0, commit 3dbee45](https://github.com/kyutai-labs/pocket-tts/tree/3dbee45d343d7dddd0d105468d17f8dcba14db3e)
+  expose des configurations françaises 6/24 couches, un tokenizer de texte
+  et une exécution CPU. La config française est distincte de Piper/eSpeak.
+  Estelle est la référence française proposée; la
+  [source vocale](https://huggingface.co/kyutai/tts-voices) indique CC0 pour
+  ces enregistrements internes. La qualification d'une seconde référence
+  française et de leurs profils femme/homme reste nécessaire.
+- Taille des poids français relevée dans le
+  [dépôt modèle](https://huggingface.co/kyutai/pocket-tts/tree/3e82814a68665eec246ff649b14c71331f955c06):
+  219 029 196 octets (6 couches) / 672 178 676 octets (24 couches), hors codec,
+  références et runtime. Ces poids restent côté génération, pas dans la PWA.
+  Les configurations de v3.3.0 pointent vers d'autres révisions précises:
+  revérifier les tailles et licences à la révision effectivement retenue.
+- Alternatives examinées: Kokoro ne documente qu'une voix française féminine
+  dans son [catalogue](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md),
+  insuffisant seul pour D-042. Parler-TTS multilingual v1.1 propose des
+  locuteurs français nommés, sous Apache 2.0, mais son poids safetensors est
+  de 3 751 321 772 octets à la révision `11b27d57855dec1ce0914ba1f12363bf2ea75ba3`:
+  [fiche officielle](https://huggingface.co/parler-tts/parler-tts-mini-multilingual-v1.1).
+  Gardé en réserve; aucun genre n'est déduit des noms.
+- Prochaine qualification: petit lot français commun, sortie continue, mots
+  isolés et en phrase, sans substitutions héritées de Piper. Vérifier accès
+  aux poids, références/licences, coût local et stabilité avant publication.
+  Aucun de ces candidats n'a été exécuté ni accepté à ce checkpoint; aucun
+  téléchargement de poids supplémentaires, service payant ou texte distant.
+  Cette mise à jour sauvegarde le retour et la sélection de la prochaine piste.
+
 ## Diagnostic contrôlé du codec et des entrées phonétiques — 2026-10-08
 
 - Reprise autorisée après l'échec v3. Comparaison locale de Piper 1.4.1 avec
