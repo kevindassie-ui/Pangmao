@@ -10,7 +10,13 @@ are recorded in the trial manifest. Voice-source and redistributed-audio
 licence: CC BY-SA 4.0; full attributions and source links are in
 [`../webApp/voice-trial/NOTICE.md`](../webApp/voice-trial/NOTICE.md).
 Generation is offline after model acquisition, without user texts or telemetry.
-Only MP3 outputs are delivered to the browser; naturalness remains unaccepted.
+Only MP3 outputs are delivered to the browser. Feedback on 8 October found
+UPMC natural overall but reported consonant/vowel defects unchanged by speed.
+Revision 3 preserves those files for comparison and adds SIWIS (native French
+female source) and MLS source speaker 1840 (gender unassigned), six clips each.
+Their voice-specific sources are CC BY 4.0; outputs join the attributed
+CC BY-SA 4.0 collection. All three models use the same pinned revision, with
+per-model hashes in the manifest. Perceived accuracy remains unaccepted.
 
 ## Dictionary sources
 

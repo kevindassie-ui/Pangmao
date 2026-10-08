@@ -1,7 +1,7 @@
 # Pangmao — prochaine reprise dans Codex
 
 Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
-et deux corrections de prononciation implémentées. État et preuves: [STATUS.md](STATUS.md).
+et nouveaux défauts indépendants de la vitesse. Comparaison v3 préparée. État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
 
@@ -12,8 +12,8 @@ plans `V0.*` décrivent des versions Android historiques.
 
 - Base publiée: `main`, Web 0.3.3; Android signé `v0.12.2` gelé.
 - Candidat sauvegardé: `feat/web-missed-searches-20261003`,
-  head vérifié avant ce checkpoint documentaire:
-  `0c2a3bb6b9b2ff5ea1b3e1c034920d21c182a903`,
+  head vérifié avant le lot de comparaison v3:
+  `7b61890692571377813f240b0db0063470a571c5`,
   [PR #14 en brouillon](https://github.com/kevindassie-ui/Pangmao/pull/14).
 - Son plan [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md) existe
   sur cette branche et inclut maintenant le petit lot vocal. Le lire sur place,
@@ -37,8 +37,10 @@ demande une solution dans Pangmao, avec voix femme/homme et débit, sans parcour
 de réglage système complexe. Aucun moteur de production n'est encore choisi.
 
 Le petit lot est maintenant implémenté dans `webApp/voice-trial/`: deux voix
-UPMC Jessica/Pierre, six textes identiques. La révision 2 corrige les heures et
-« je voudrais acheter »; quatre extraits régénérés, 384 835 octets au total.
+UPMC Jessica/Pierre et candidats SIWIS / MLS 1840, six textes identiques.
+La révision 3 conserve les fichiers UPMC v2 et ajoute douze extraits candidats:
+24 fichiers, 835 500 octets. Les heures et « je voudrais acheter » gardent la
+préparation de v2, sans nouvelles substitutions ciblées.
 La [page d'essai publiée](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/)
 sert à la recette; l'application stable reste en 0.3.3. La CI Web du head
 `0c2a3bb` est réussie
@@ -51,12 +53,16 @@ cache à la demande, puis un moteur Reader local ou serveur à comparer. Une
 piste n'est ni un fournisseur validé ni un engagement de dépense. Un éventuel
 appel distant reste soumis au consentement explicite de D-016.
 
-Le retour d'écoute retrouvé vers 01 h 15 juge les deux voix « naturelle » et
-le rendu « plutôt naturel globalement ». Deux exceptions restent à recetter:
-la phrase d'achat de Jessica et « 18 heures 30 » pour les deux voix, corrigées
-dans l'essai `2026-10-08-v2`. Le titre doit afficher « ESSAI DES VOIX 2 »;
-actualiser un ancien onglet si nécessaire. Confirmer ces passages avant
-généralisation. Reader libre et corpus complet restent à intégrer séparément.
+Le naturel de Jessica/Pierre est favorable globalement, mais la recette v2
+signale encore « baguette », « avocat », « fixé » et le « et » avant « prendre »,
+aux différentes vitesses. Ne pas traiter ce retour par un simple réglage de débit.
+L'essai v3 conserve les fichiers v2 et permet une comparaison avec SIWIS / MLS
+1840, aux mêmes textes et vitesses. Le titre affiche « ESSAI DES VOIX 3 ».
+Le profil MLS reste non assigné; ne pas présenter l'ID comme une preuve de genre.
+La prochaine recette porte d'abord sur les passages signalés et le naturel
+comparé. Si les candidats les ratent aussi, poursuivre le choix du modèle,
+sans ajouter aveuglément des substitutions à chaque mot. Reader libre et
+corpus complet restent à intégrer séparément.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 

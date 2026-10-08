@@ -28,10 +28,13 @@ def verify_trial(root: Path) -> None:
         prepared = prepare_speech(text["text"])
         if any(sample.get(k) != v for k, v in prepared.items()):
             raise ValueError("Speech preparation differs from its recorded input")
+    voice_ids = [v["id"] for v in manifest["voices"]]
+    if manifest["schemaVersion"] != 2 or voice_ids != ["female", "male", "siwis", "mls"]:
+        raise ValueError("Unexpected trial voices")
     paths = set()
     total = 0
     for sample in manifest["samples"]:
-        for gender in ["female", "male"]:
+        for gender in voice_ids:
             clip = sample["clips"][gender]
             expected = f'audio/{gender}-{sample["id"]}.mp3'
             if clip["file"] != expected or expected in paths:

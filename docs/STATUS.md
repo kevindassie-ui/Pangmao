@@ -2,6 +2,36 @@
 
 Checkpoint date: 2026-10-08 (Europe/Paris)
 
+## Défauts phonétiques supplémentaires et comparaison — 2026-10-08
+
+- Retour utilisateur: « baguette » perçue comme « bagué » dans les deux voix,
+  « avocat » comme « avoqué », « fixé » comme « fissé » chez Pierre; Jessica
+  avale aussi « et » avant « prendre ». Résultat identique aux différentes
+  vitesses de lecture: ne pas proposer à nouveau un réglage du débit.
+- Inspection: un fichier continu par extrait; la phrase quotidienne est une
+  seule unité de synthèse. Les entrées contiennent `baɡˈɛt e`, `fiksˈe` et
+  `avokˈa`. Dix-huit générations diagnostiques WAV→MP3 ont conservé exactement
+  leur nombre d'échantillons. Cela ne prouve pas l'absence d'un défaut de
+  décodage sur téléphone, ni la bonne réalisation acoustique des phonèmes.
+- Le modèle UPMC reste suspect, sans cause acoustique démontrée. Les essais
+  de réduction de la variation de durée ont fortement comprimé Jessica;
+  cette piste est rejetée, sans publication ni ralentissement du lecteur.
+- Essai **2026-10-08-v3** préparé: comparaison des douze fichiers UPMC exacts
+  de v2 avec douze nouveaux fichiers SIWIS / MLS 1840, sur les mêmes six
+  textes et préparations. Aucun nouveau remplacement ciblé d'avocat, fixé
+  ou baguette. Sélecteur de paire, écoute immédiate et avis séparés conservés.
+- SIWIS: source professionnelle native française féminine vérifiée dans le
+  rapport Idiap; MLS: profil de genre non assigné, sans inférence par l'ID.
+  Modèles et corpus attribués, sources CC BY 4.0; poids non distribués.
+  Gilles est exclu car sa table ne couvre pas le marqueur nasal fourni par
+  ce phonémiseur. Aucun appel de synthèse distant ni texte personnel envoyé.
+- Total essai v3: **835 500 octets**, 24 fichiers; les 12 MP3 UPMC restent
+  strictement identiques à v2. **56 tests Node**, 6 Python Web et 5 Python
+  export réussis; validateurs canonique/cerf et audit lexical strict réussis.
+- Chaque nouveau MP3 est décodé et comparé au nombre d'échantillons WAV avant
+  publication. Ce contrôle d'intégrité ne certifie pas la qualité entendue.
+  Recette utilisateur ouverte; stable Web 0.3.3 et PR #14 en brouillon.
+
 ## Retour d'écoute et correction de l'essai — 2026-10-08
 
 - Retour du 8 octobre vers 01 h 15 (Paris), retrouvé après les interruptions:

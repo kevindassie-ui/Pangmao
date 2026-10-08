@@ -48,15 +48,30 @@ test("shipped corrected audio records expanded hours and the exact phrase phonem
     assert.doesNotMatch(clock.clips[gender].phonemes.join(" "), /ˈaʃ/);
     assert.match(clock.clips[gender].phonemes.join(" "), /ˈœʁ/);
     assert.match(purchase.clips[gender].phonemes.join(" "), /vudʁˈɛ aʃətˈe/);
-    assert.equal(purchase.clips[gender].generatedForVersion, manifest.version);
+    assert.equal(purchase.clips[gender].generatedForVersion, "2026-10-08-v2");
   }
   const worker = readFileSync(new URL("sw.js", root), "utf8");
   assert.ok(worker.includes(`TRIAL_VERSION = "${manifest.version}"`));
 });
 
-test("both French trial voices ship intact and stay under the audio budget", () => {
+test("new voices use the same prepared text and keep all generated PCM samples through MP3", () => {
+  for (const sample of manifest.samples) {
+    for (const id of ["siwis", "mls"]) {
+      const clip = sample.clips[id];
+      assert.equal(clip.generatedForVersion, manifest.version);
+      assert.equal(clip.pcmFrames, clip.decodedFrames);
+      assert.ok(clip.pcmFrames > 0);
+      assert.ok(clip.phonemes.length > 0);
+    }
+  }
+  assert.equal(manifest.voices.find((v) => v.id === "mls").profile, "unassigned");
+  assert.equal(manifest.models.siwis.license, "CC-BY-4.0");
+  assert.equal(manifest.models.mls.license, "CC-BY-4.0");
+});
+
+test("all French trial voices ship intact and stay under the audio budget", () => {
   validateManifest(manifest);
-  assert.deepEqual(manifest.voices.map((v) => [v.id, v.speakerId]), [["female", 0], ["male", 1]]);
+  assert.deepEqual(manifest.voices.map((v) => [v.id, v.speakerId]), [["female", 0], ["male", 1], ["siwis", 0], ["mls", 0]]);
   for (const sample of manifest.samples) {
     for (const clip of Object.values(sample.clips)) {
       const payload = readFileSync(new URL(clip.file, root));

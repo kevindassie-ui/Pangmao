@@ -1,7 +1,7 @@
 # Pangmao notices
 
 The optional Web voice comparison ships synthetic audio under CC BY-SA 4.0,
-prepared from the UPMC Jessica/Pierre Piper voice model. Complete provenance,
+prepared from the UPMC Jessica/Pierre, SIWIS and MLS Piper voice models. Complete provenance,
 speaker attribution and generation details are in
 [`webApp/voice-trial/NOTICE.md`](webApp/voice-trial/NOTICE.md). These samples are
 separate from dictionary data; no synthesis model or runtime is shipped.

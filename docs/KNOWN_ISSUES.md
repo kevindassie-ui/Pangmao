@@ -1,6 +1,6 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-10-07.
+Dernière mise à jour: 2026-10-08.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
@@ -20,7 +20,13 @@ système pour ces extraits. Le retour retrouvé le
 8 octobre juge les deux voix naturelles globalement, avec deux défauts:
 Jessica donne l'impression de « je voudrait t'acheter »; les deux voix épellent
 le h de 18h30. La révision 2 corrige la préparation des heures et les phonèmes
-de la phrase d'achat. Ces passages restent à recetter. Les voix ne remplacent
+de la phrase d'achat. Le retour suivant signale encore « baguette »→« bagué »
+(deux voix), « avocat »→« avoqué », « fixé »→« fissé » (Pierre) et « et » avalé
+(Jessica), indépendamment des vitesses de lecture. La cause acoustique n'est
+pas démontrée: phonèmes attendus présents, aucune perte d'échantillons dans
+les conversions diagnostiques. La révision 3 conserve v2 et ajoute une
+comparaison SIWIS / MLS 1840 sur les mêmes phrases. Aucun candidat n'est
+validé pour généralisation; comparer intelligibilité et naturel ensemble. Les voix ne remplacent
 pas encore le moteur du dictionnaire et du Reader libre.
 
 Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
