@@ -2,6 +2,41 @@
 
 Checkpoint date: 2026-10-08 (Europe/Paris)
 
+## Diagnostic contrôlé du codec et des entrées phonétiques — 2026-10-08
+
+- Reprise autorisée après l'échec v3. Comparaison locale de Piper 1.4.1 avec
+  l'ancienne chaîne `piper-phonemize` 2023.11.14-4: mêmes séquences de phonèmes
+  sur **six témoins**, dont médecin, avocat, fixé, baguette et les deux phrases
+  complètes. Le CLI historique aplatit les groupes de phrases; cet audit
+  compare les séquences, sans déduire l'identité des groupements. La version
+  exacte employée à l'entraînement n'est pas documentée par le modèle.
+- Ce résultat écarte un changement des phonèmes entre ces deux versions sur
+  ces témoins, sans prouver l'absence d'autres écarts de moteur. Il ne démontre
+  pas la cause acoustique des défauts. Schwa de médecin et `o` d'avocat sont
+  déjà présents dans la sortie historique; ce ne sont pas des ajouts de v3.
+- Nouveau **diagnostic d1**, distinct de l'essai v3:
+  `webApp/voice-trial/diagnostic/`, médecin, avocat, nombres/fixé et phrase
+  d'achat, Jessica/Pierre, **20 fichiers / 1 366 558 octets**. Les contrôles
+  sont régénérés pour cette expérience; les SHA des anciens extraits restent
+  référencés, et leurs fichiers ne sont pas remplacés.
+- Pour chaque passage/voix, **A** est un MP3 64 kbit/s et **B** le WAV PCM
+  exact qui lui a servi de source. Entrées, PCM source et nombres d'échantillons
+  sont communs. L'écoute A/B isole la compression/conteneur et le chemin de
+  lecture; aucune perte de frames ne garantit à elle seule l'intelligibilité.
+- **C**, seulement sur médecin et avocat, teste `medsˈɛ̃` et `avɔkˈa`, en
+  conformité avec les IPA du pack existant. Même modèle, locuteur, paramètres,
+  session fraîche, graine 0 et vitesse 1×. Ces hypothèses n'ajoutent pas de
+  règles au Reader ni au dictionnaire. Les formulations affichées restent
+  celles des témoins, avec attribution des IPA et des audios.
+- Quatre tests diagnostiques couvrent provenance A/B, inventaire/hashes,
+  chemins sûrs, changement d'extrait et geste Safari. **60 tests Node**,
+  **6 Python Web + 5 Python export**, validateurs canonique/cerf et audit
+  lexical strict réussis. Pas de build Android, poids ou traitement distant.
+- Page préparée pour une écoute ciblée sur appareil. A/B identiques mais
+  incorrects orienteront vers la synthèse; B meilleur orientera vers le
+  codec/chemin de lecture; C meilleur qualifiera la préparation de ces deux
+  mots seulement. Aucun résultat auditif ni correctif n'est encore validé.
+
 ## Échec de la recette v3 et nouveau témoin « médecin » — 2026-10-08
 
 - Dernier retour utilisateur: **aucune amélioration constatée**; « médecin »

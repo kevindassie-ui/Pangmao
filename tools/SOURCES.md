@@ -18,6 +18,14 @@ Their voice-specific sources are CC BY 4.0; outputs join the attributed
 CC BY-SA 4.0 collection. All three models use the same pinned revision, with
 per-model hashes in the manifest. Perceived accuracy remains unaccepted.
 
+The subsequent `voice-trial/diagnostic/` experiment reuses only UPMC and the
+same fixed texts: twenty MP3/WAV files, four passages, two voices. A/B share
+one PCM synthesis to isolate codec/container/playback; C tests the existing
+FreeDict/WikDict IPA for médecin and avocat only. All audio remains CC BY-SA
+4.0, with source licences and transformations in the diagnostic notice. The
+historical phonemizer is used only for a local compatibility audit; neither
+it nor model weights are deployed. No word override is accepted for production.
+
 ## Dictionary sources
 
 Pangmao contains no Pleco data, code, models, visual assets, or private APIs.

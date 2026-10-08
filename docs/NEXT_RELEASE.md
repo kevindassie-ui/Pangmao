@@ -3,6 +3,7 @@
 Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
 et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée puis
 non acceptée: aucune amélioration, « médecin »→« meudecin » en plus.
+Diagnostic A/B/C d1 préparé pour isoler codec et entrées phonétiques.
 État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
@@ -67,15 +68,32 @@ de modifier la vitesse ni considérer la bonne livraison des fichiers comme
 une preuve de bonne prononciation. Pierre est inchangé depuis v1 sur médecin;
 MLS est nouveau, et le retour ne distingue pas ces locuteurs.
 
-La prochaine action est de contrôler la conversion texte→phonèmes et sa
-réalisation acoustique avant de proposer une autre paire. SIWIS et MLS reçoivent
+La reprise a comparé la conversion texte→phonèmes avec l'ancienne chaîne
+Piper 2023.11.14-4: mêmes séquences sur six témoins (le CLI historique aplatit
+les groupes de phrases). Le modèle ne précise pas la version exacte de son
+phonémiseur d'entraînement. SIWIS et MLS reçoivent
 `medəsˈɛ̃`, avec un schwa après d absent des IPA du pack; leur première voyelle
 reste `e`, donc la cause exacte du « meu » entendu n'est pas établie. Les
 modèles comparés partagent encore eSpeak via Piper. Pour baguette et fixé,
 les consonnes attendues sont déjà présentes dans l'entrée: un audit du texte
 seul ne suffira pas. Conserver les extraits actuels comme témoins de défauts;
 ne pas ajouter aveuglément des substitutions à chaque mot ou généraliser ces
-voix. Reader libre et corpus complet restent à intégrer séparément.
+voix.
+
+Le diagnostic d1 est implémenté dans `webApp/voice-trial/diagnostic/`:
+Jessica/Pierre, quatre passages, 20 fichiers / 1 366 558 octets. Comparer d'abord
+A (MP3) et B (WAV issu exactement de la même synthèse) sur médecin et la phrase
+d'achat, puis C quand disponible. C change uniquement l'entrée phonétique de
+médecin ou avocat, d'après les IPA du pack. Les contrôles ont été régénérés pour
+ce diagnostic; ils ne remplacent pas les fichiers v3. Le lecteur reste à 1×,
+sans réglages système. La page exige une connexion, sans cache hors ligne
+promis ni envoi de texte ou d'avis. Les 60 tests Node et validations du lot
+passent; la qualification auditive sur téléphone reste ouverte.
+
+Interpréter séparément A/B (codec/conteneur et lecture) et B/C (deux hypothèses
+phonétiques). Un résultat sur ces deux mots ne valide ni baguette/fixé ni le
+Reader libre. Consigner le retour avant de choisir un autre moteur ou de
+généraliser ces voix. Reader libre et corpus complet restent à intégrer séparément.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 

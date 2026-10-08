@@ -35,6 +35,14 @@ L'essai v3 est non accepté. Aucun candidat n'est
 validé pour généralisation; comparer intelligibilité et naturel ensemble. Les voix ne remplacent
 pas encore le moteur du dictionnaire et du Reader libre.
 
+La reprise du 8 octobre vérifie la compatibilité avec l'ancienne chaîne Piper:
+séquences de phonèmes identiques sur six témoins, provenance exacte de
+l'entraînement non établie. Le diagnostic d1 ajoute des contrôles régénérés
+Jessica/Pierre, MP3 et WAV provenant de la même synthèse, puis deux variantes
+IPA pour médecin et avocat. Il sert à isoler compression/lecture et entrée
+phonétique; il ne constitue pas une correction acceptée des défauts. Recette
+auditive encore ouverte, avec résultats A/B et B/C à distinguer.
+
 Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
 Amélie est déclarée `fr-CA`, pas `fr-FR`; la locale ne certifie pas le naturel.
 La demande ultérieure exige une solution intégrée à Pangmao, sans réglages
