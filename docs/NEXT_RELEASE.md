@@ -1,7 +1,9 @@
 # Pangmao — prochaine reprise dans Codex
 
 Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
-et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée. État et preuves: [STATUS.md](STATUS.md).
+et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée puis
+non acceptée: aucune amélioration, « médecin »→« meudecin » en plus.
+État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
 
@@ -59,10 +61,21 @@ aux différentes vitesses. Ne pas traiter ce retour par un simple réglage de d�
 L'essai v3 conserve les fichiers v2 et permet une comparaison avec SIWIS / MLS
 1840, aux mêmes textes et vitesses. Le titre affiche « ESSAI DES VOIX 3 ».
 Le profil MLS reste non assigné; ne pas présenter l'ID comme une preuve de genre.
-La prochaine recette porte d'abord sur les passages signalés et le naturel
-comparé. Si les candidats les ratent aussi, poursuivre le choix du modèle,
-sans ajouter aveuglément des substitutions à chaque mot. Reader libre et
-corpus complet restent à intégrer séparément.
+Le dernier retour constate aucune amélioration et ajoute « médecin »→« meudecin »
+avec la voix masculine. **La recette v3 a échoué.** Ne pas demander à nouveau
+de modifier la vitesse ni considérer la bonne livraison des fichiers comme
+une preuve de bonne prononciation. Pierre est inchangé depuis v1 sur médecin;
+MLS est nouveau, et le retour ne distingue pas ces locuteurs.
+
+La prochaine action est de contrôler la conversion texte→phonèmes et sa
+réalisation acoustique avant de proposer une autre paire. SIWIS et MLS reçoivent
+`medəsˈɛ̃`, avec un schwa après d absent des IPA du pack; leur première voyelle
+reste `e`, donc la cause exacte du « meu » entendu n'est pas établie. Les
+modèles comparés partagent encore eSpeak via Piper. Pour baguette et fixé,
+les consonnes attendues sont déjà présentes dans l'entrée: un audit du texte
+seul ne suffira pas. Conserver les extraits actuels comme témoins de défauts;
+ne pas ajouter aveuglément des substitutions à chaque mot ou généraliser ces
+voix. Reader libre et corpus complet restent à intégrer séparément.
 
 ## Travail préparé — W1.5, journal local 0.3.4
 

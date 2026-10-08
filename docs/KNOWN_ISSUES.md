@@ -25,7 +25,13 @@ de la phrase d'achat. Le retour suivant signale encore « baguette »→« bagu�
 (Jessica), indépendamment des vitesses de lecture. La cause acoustique n'est
 pas démontrée: phonèmes attendus présents, aucune perte d'échantillons dans
 les conversions diagnostiques. La révision 3 conserve v2 et ajoute une
-comparaison SIWIS / MLS 1840 sur les mêmes phrases. Aucun candidat n'est
+comparaison SIWIS / MLS 1840 sur les mêmes phrases. Le dernier retour du
+8 octobre constate **aucune amélioration** et ajoute « médecin »→« meudecin »
+avec la voix masculine, sans nom de locuteur permettant de distinguer Pierre
+de MLS. L'extrait Pierre est inchangé depuis v1, et celui de MLS est nouveau.
+Les entrées SIWIS et MLS sont `medəsˈɛ̃`: schwa après d, première voyelle `e`.
+Cet écart avec les IPA du pack ne prouve pas la cause du « meu » entendu.
+L'essai v3 est non accepté. Aucun candidat n'est
 validé pour généralisation; comparer intelligibilité et naturel ensemble. Les voix ne remplacent
 pas encore le moteur du dictionnaire et du Reader libre.
 

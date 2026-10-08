@@ -2,6 +2,35 @@
 
 Checkpoint date: 2026-10-08 (Europe/Paris)
 
+## Échec de la recette v3 et nouveau témoin « médecin » — 2026-10-08
+
+- Dernier retour utilisateur: **aucune amélioration constatée**; « médecin »
+  est perçu comme « meudecin » avec la voix masculine. Ce défaut rejoint ceux
+  de baguette, avocat, fixé et « et ». L'essai v3 est non accepté; les preuves
+  techniques ci-dessous ne constituent pas une validation de prononciation.
+- Le retour ne nomme pas la voix masculine. Pour Pierre, le fichier médecin
+  est identique à v2 et a été généré pour v1; la comparaison des SHA-256 et du
+  fichier local le confirme. Il ne s'agit donc pas d'une modification de ce
+  fichier introduite par v3. MLS 1840 est nouveau dans v3, sans extrait antérieur
+  de ce locuteur permettant d'établir une régression. Ne pas trancher entre ces
+  deux cas ni attribuer un genre au profil MLS non assigné.
+- Le manifeste SIWIS et MLS enregistre `medəsˈɛ̃`, contre `med.sɛ̃` ou
+  `mɛd.sɛ̃` dans l'entrée canonique `fr:FreeDict-fra-zho:7217` du pack.
+  L'écart est un schwa **après d**; le premier son vocalique reste `e` dans
+  l'entrée de synthèse. Cela ne démontre pas la cause du « meu » entendu,
+  ni qu'une suppression du schwa résoudrait le problème acoustique.
+- Les candidats changent le modèle acoustique, mais conservent la conversion
+  eSpeak de Piper. Source de la version utilisée:
+  [Piper 1.4.1, phonemize](https://github.com/OHF-Voice/piper1-gpl/blob/v1.4.1/src/piper/voice.py#L173).
+  Le changement de modèle n'isole donc pas tous les maillons de la chaîne.
+- Prochaine investigation: distinguer écarts de conversion texte→phonèmes et
+  mauvaise réalisation acoustique sur les témoins signalés. Baguette et fixé
+  ont déjà leurs consonnes attendues en entrée: leur présence n'est pas une
+  garantie d'intelligibilité. Ne pas repartir sur le débit, des substitutions
+  orthographiques ou une nouvelle paire publiée sans ce diagnostic.
+- Aucun correctif acoustique validé à ce checkpoint. Mise à jour documentaire
+  seulement; les fichiers audio et leur publication restent ceux de v3.
+
 ## Défauts phonétiques supplémentaires et comparaison — 2026-10-08
 
 - Retour utilisateur: « baguette » perçue comme « bagué » dans les deux voix,
