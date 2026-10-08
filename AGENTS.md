@@ -18,7 +18,8 @@ implémenté, candidat sauvegardé, publication et validation sur appareil.
 
 ## Dépôt et travail en cours
 
-Le dépôt canonique privé est `kevindassie-ui/Pangmao`. `app/` est le client
+Le dépôt canonique est `kevindassie-ui/Pangmao`, redevenu public et vérifié le
+7 octobre 2026. `app/` est le client
 Android Kotlin/Compose; `webApp/` est une PWA statique JavaScript avec ses tests
 Node; `tools/` contient les constructions et audits Python. Le Web n'est pas un
 module Gradle. Les sorties `build/` et bases SQLite générées sont ignorées.
@@ -79,6 +80,11 @@ Il n'y a pas de dépendances npm à installer ni de bundler. Pour prévisualiser
 la variante. Garder version du pack, imports, HTML et service worker alignés.
 Les tests protègent notamment `affiche`, `avocat`, `banane`, `放屁` et `臭屁`.
 La baseline distingue revue humaine et comparaison inverse automatique.
+
+Le candidat contient `webApp/voice-trial/`: six textes fixes, deux voix et un
+cache audio séparé chargé à la demande. Le générateur est manuel, hors CI;
+il désactive la télémétrie ONNX avant initialisation. Ne pas distribuer les
+poids du modèle, ni présenter cet essai comme un moteur Reader validé.
 
 À la reprise Android seulement: JDK 17 et SDK Android 35, reconstruction ou
 restauration vérifiée des bases avec `tools/fetch_and_build_dictionary.sh` et

@@ -7,6 +7,10 @@ import argparse
 import hashlib
 import json
 import sys
+if __package__:
+    from .verify_web_voice_trial import verify_trial
+else:
+    from verify_web_voice_trial import verify_trial
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -470,6 +474,12 @@ def validate_static_app(web_root: Path) -> str:
         "readerSentences",
         "voiceSelect",
         "voiceTestButton",
+        "missedSearchEnabled",
+        "missedSearchList",
+        "missedSearchStatus",
+        "missedSearchCopy",
+        "missedSearchExport",
+        "missedSearchClear",
     ):
         require(f'id="{element_id}"' in html, f"Reader control is missing: {element_id}")
     for asset in ("styles.css", "manifest.webmanifest", "src/app.js"):
@@ -545,6 +555,7 @@ def validate_static_app(web_root: Path) -> str:
         "src/app.js",
         "src/chinese-fallback.js",
         "src/reader.js",
+        "src/missed-searches.js",
         "src/release.js",
         "src/tts.js",
         "data/french-pack.json",
@@ -564,6 +575,7 @@ def validate_static_app(web_root: Path) -> str:
     for module in (
         "chinese-fallback.js",
         "reader.js",
+        "missed-searches.js",
         "release.js",
         "search-engine.js",
         "storage.js",
@@ -592,6 +604,7 @@ def validate_static_app(web_root: Path) -> str:
                 seasonal_asset in service_worker,
                 f"Service worker does not precache the seasonal asset: {seasonal_asset}",
             )
+    verify_trial(web_root)
     return release_version
 
 

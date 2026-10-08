@@ -1,6 +1,6 @@
 # Roadmap produit Pangmao
 
-Dernière mise à jour: 2026-10-03.
+Dernière mise à jour: 2026-10-07.
 
 ## Principes
 
@@ -137,6 +137,10 @@ La décision ultérieure [D-042](PRODUCT_DECISIONS.md#d-042--voix-naturelles-int
 fixe la cible: voix naturelles, femme/homme et débit dans Pangmao, sans parcours
 de réglage iOS/Android complexe. Le choix système existant reste un secours;
 l'amélioration du débit seule ne remplace pas un moteur de meilleure qualité.
+Le 7 octobre, le petit lot comparatif est implémenté dans `webApp/voice-trial/`
+(six textes, Jessica/Pierre via Piper, 385 252 octets). La recette de naturel
+sur téléphone reste ouverte avant extension au corpus ou au Reader.
+
 Comparer d'abord un petit lot avec deux voix: audio de dictionnaire préparé en
 amont et mis en cache à la demande, puis moteur local ou serveur pour le Reader.
 Ces pistes exigent évaluation des licences, qualité, poids, délai, coût et

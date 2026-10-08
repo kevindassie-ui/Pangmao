@@ -1,6 +1,299 @@
 # Pangmao — release status
 
-Checkpoint date: 2026-10-03
+Checkpoint date: 2026-10-08 (Europe/Paris)
+
+## Bilan d'écoute d1 et changement de piste — 2026-10-08
+
+- Retour utilisateur vers 23 h 34 (Paris): hormis « avocat C », jugé bon,
+  **rien de concluant**. « Médecin C » est encore pire, perçu comme « meucin ».
+  Le locuteur n'est pas précisé: ne pas étendre le résultat positif d'avocat
+  aux deux voix, ni considérer toute la préparation phonétique comme validée.
+- Médecin C est rejeté. Avocat C reste un témoin positif ciblé; aucune règle
+  de ces diagnostics n'a été intégrée au dictionnaire ou au Reader. Le reste
+  des défauts reste ouvert. Le retour A/B ne donne pas de piste concluante
+  sur la compression; il ne constitue pas une exclusion formelle du codec.
+- Une entrée IPA conforme peut donc rester mal réalisée par ces modèles.
+  Ne pas poursuivre une suite de substitutions de syllabes ou de réglages de
+  débit. Garder les fichiers diagnostiques comme références des essais ratés;
+  l'objectif demeure une voix intégrée fiable dès le premier usage.
+- Recherche de moteurs d'une autre famille, limitée aux sources officielles:
+  **Pocket TTS français** devient la piste prioritaire à qualifier. Le code
+  [v3.3.0, commit 3dbee45](https://github.com/kyutai-labs/pocket-tts/tree/3dbee45d343d7dddd0d105468d17f8dcba14db3e)
+  expose des configurations françaises 6/24 couches, un tokenizer de texte
+  et une exécution CPU. La config française est distincte de Piper/eSpeak.
+  Estelle est la référence française proposée; la
+  [source vocale](https://huggingface.co/kyutai/tts-voices) indique CC0 pour
+  ces enregistrements internes. La qualification d'une seconde référence
+  française et de leurs profils femme/homme reste nécessaire.
+- Taille des poids français relevée dans le
+  [dépôt modèle](https://huggingface.co/kyutai/pocket-tts/tree/3e82814a68665eec246ff649b14c71331f955c06):
+  219 029 196 octets (6 couches) / 672 178 676 octets (24 couches), hors codec,
+  références et runtime. Ces poids restent côté génération, pas dans la PWA.
+  Les configurations de v3.3.0 pointent vers d'autres révisions précises:
+  revérifier les tailles et licences à la révision effectivement retenue.
+- Alternatives examinées: Kokoro ne documente qu'une voix française féminine
+  dans son [catalogue](https://huggingface.co/hexgrad/Kokoro-82M/blob/main/VOICES.md),
+  insuffisant seul pour D-042. Parler-TTS multilingual v1.1 propose des
+  locuteurs français nommés, sous Apache 2.0, mais son poids safetensors est
+  de 3 751 321 772 octets à la révision `11b27d57855dec1ce0914ba1f12363bf2ea75ba3`:
+  [fiche officielle](https://huggingface.co/parler-tts/parler-tts-mini-multilingual-v1.1).
+  Gardé en réserve; aucun genre n'est déduit des noms.
+- Prochaine qualification: petit lot français commun, sortie continue, mots
+  isolés et en phrase, sans substitutions héritées de Piper. Vérifier accès
+  aux poids, références/licences, coût local et stabilité avant publication.
+  Aucun de ces candidats n'a été exécuté ni accepté à ce checkpoint; aucun
+  téléchargement de poids supplémentaires, service payant ou texte distant.
+  Cette mise à jour sauvegarde le retour et la sélection de la prochaine piste.
+
+## Diagnostic contrôlé du codec et des entrées phonétiques — 2026-10-08
+
+- Reprise autorisée après l'échec v3. Comparaison locale de Piper 1.4.1 avec
+  l'ancienne chaîne `piper-phonemize` 2023.11.14-4: mêmes séquences de phonèmes
+  sur **six témoins**, dont médecin, avocat, fixé, baguette et les deux phrases
+  complètes. Le CLI historique aplatit les groupes de phrases; cet audit
+  compare les séquences, sans déduire l'identité des groupements. La version
+  exacte employée à l'entraînement n'est pas documentée par le modèle.
+- Ce résultat écarte un changement des phonèmes entre ces deux versions sur
+  ces témoins, sans prouver l'absence d'autres écarts de moteur. Il ne démontre
+  pas la cause acoustique des défauts. Schwa de médecin et `o` d'avocat sont
+  déjà présents dans la sortie historique; ce ne sont pas des ajouts de v3.
+- Nouveau **diagnostic d1**, distinct de l'essai v3:
+  `webApp/voice-trial/diagnostic/`, médecin, avocat, nombres/fixé et phrase
+  d'achat, Jessica/Pierre, **20 fichiers / 1 366 558 octets**. Les contrôles
+  sont régénérés pour cette expérience; les SHA des anciens extraits restent
+  référencés, et leurs fichiers ne sont pas remplacés.
+- Pour chaque passage/voix, **A** est un MP3 64 kbit/s et **B** le WAV PCM
+  exact qui lui a servi de source. Entrées, PCM source et nombres d'échantillons
+  sont communs. L'écoute A/B isole la compression/conteneur et le chemin de
+  lecture; aucune perte de frames ne garantit à elle seule l'intelligibilité.
+- **C**, seulement sur médecin et avocat, teste `medsˈɛ̃` et `avɔkˈa`, en
+  conformité avec les IPA du pack existant. Même modèle, locuteur, paramètres,
+  session fraîche, graine 0 et vitesse 1×. Ces hypothèses n'ajoutent pas de
+  règles au Reader ni au dictionnaire. Les formulations affichées restent
+  celles des témoins, avec attribution des IPA et des audios.
+- Quatre tests diagnostiques couvrent provenance A/B, inventaire/hashes,
+  chemins sûrs, changement d'extrait et geste Safari. **60 tests Node**,
+  **6 Python Web + 5 Python export**, validateurs canonique/cerf et audit
+  lexical strict réussis. Pas de build Android, poids ou traitement distant.
+- Page publiée pour une écoute ciblée sur appareil. A/B identiques mais
+  incorrects orienteront vers la synthèse; B meilleur orientera vers le
+  codec/chemin de lecture; C meilleur qualifiera la préparation de ces deux
+  mots seulement. Aucun résultat auditif ni correctif n'est encore validé.
+
+### Publication et preuves du diagnostic d1
+
+- Fonctionnel `ef7f5a704d6bfc5efec07a4d6357f7b8fd7ee046`,
+  [Web CI 37846401101](https://github.com/kevindassie-ui/Pangmao/actions/runs/37846401101)
+  réussie. Miroir `b6637960a0391bc107e09642aceb007bbe075c22`,
+  [Pages 37846560440](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37846560440)
+  réussie. Diff public limité aux 26 nouveaux fichiers du diagnostic; fichiers
+  v3 et racine stable inchangés.
+- [Diagnostic publié](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/diagnostic/).
+  Manifeste relu par HTTP et identique au build; 20 fichiers vérifiés par taille
+  et SHA-256, total 1 366 558 octets. Le package public reste 0.3.3.
+- Chrome: médecin B avec Pierre chargé à 1× sans erreur; médecin C terminé
+  avec Pierre (0,673379 s) et Jessica (0,499229 s). Phrase d'achat Jessica A
+  et B terminée sans erreur, même durée (4,400181 s). Changement de voix
+  arrête le lecteur et affiche les bons boutons.
+  [Capture des contrôles publiés](evidence/voice-diagnostic-d1-20261008.jpg).
+  Ces observations valident l'accès et la lecture; elles ne qualifient pas
+  la prononciation et ne remplacent pas l'écoute sur iPhone/Android.
+
+## Échec de la recette v3 et nouveau témoin « médecin » — 2026-10-08
+
+- Dernier retour utilisateur: **aucune amélioration constatée**; « médecin »
+  est perçu comme « meudecin » avec la voix masculine. Ce défaut rejoint ceux
+  de baguette, avocat, fixé et « et ». L'essai v3 est non accepté; les preuves
+  techniques ci-dessous ne constituent pas une validation de prononciation.
+- Le retour ne nomme pas la voix masculine. Pour Pierre, le fichier médecin
+  est identique à v2 et a été généré pour v1; la comparaison des SHA-256 et du
+  fichier local le confirme. Il ne s'agit donc pas d'une modification de ce
+  fichier introduite par v3. MLS 1840 est nouveau dans v3, sans extrait antérieur
+  de ce locuteur permettant d'établir une régression. Ne pas trancher entre ces
+  deux cas ni attribuer un genre au profil MLS non assigné.
+- Le manifeste SIWIS et MLS enregistre `medəsˈɛ̃`, contre `med.sɛ̃` ou
+  `mɛd.sɛ̃` dans l'entrée canonique `fr:FreeDict-fra-zho:7217` du pack.
+  L'écart est un schwa **après d**; le premier son vocalique reste `e` dans
+  l'entrée de synthèse. Cela ne démontre pas la cause du « meu » entendu,
+  ni qu'une suppression du schwa résoudrait le problème acoustique.
+- Les candidats changent le modèle acoustique, mais conservent la conversion
+  eSpeak de Piper. Source de la version utilisée:
+  [Piper 1.4.1, phonemize](https://github.com/OHF-Voice/piper1-gpl/blob/v1.4.1/src/piper/voice.py#L173).
+  Le changement de modèle n'isole donc pas tous les maillons de la chaîne.
+- Prochaine investigation: distinguer écarts de conversion texte→phonèmes et
+  mauvaise réalisation acoustique sur les témoins signalés. Baguette et fixé
+  ont déjà leurs consonnes attendues en entrée: leur présence n'est pas une
+  garantie d'intelligibilité. Ne pas repartir sur le débit, des substitutions
+  orthographiques ou une nouvelle paire publiée sans ce diagnostic.
+- Aucun correctif acoustique validé à ce checkpoint. Mise à jour documentaire
+  seulement; les fichiers audio et leur publication restent ceux de v3.
+
+## Défauts phonétiques supplémentaires et comparaison — 2026-10-08
+
+- Retour utilisateur: « baguette » perçue comme « bagué » dans les deux voix,
+  « avocat » comme « avoqué », « fixé » comme « fissé » chez Pierre; Jessica
+  avale aussi « et » avant « prendre ». Résultat identique aux différentes
+  vitesses de lecture: ne pas proposer à nouveau un réglage du débit.
+- Inspection: un fichier continu par extrait; la phrase quotidienne est une
+  seule unité de synthèse. Les entrées contiennent `baɡˈɛt e`, `fiksˈe` et
+  `avokˈa`. Dix-huit générations diagnostiques WAV→MP3 ont conservé exactement
+  leur nombre d'échantillons. Cela ne prouve pas l'absence d'un défaut de
+  décodage sur téléphone, ni la bonne réalisation acoustique des phonèmes.
+- Le modèle UPMC reste suspect, sans cause acoustique démontrée. Les essais
+  de réduction de la variation de durée ont fortement comprimé Jessica;
+  cette piste est rejetée, sans publication ni ralentissement du lecteur.
+- Essai **2026-10-08-v3** préparé: comparaison des douze fichiers UPMC exacts
+  de v2 avec douze nouveaux fichiers SIWIS / MLS 1840, sur les mêmes six
+  textes et préparations. Aucun nouveau remplacement ciblé d'avocat, fixé
+  ou baguette. Sélecteur de paire, écoute immédiate et avis séparés conservés.
+- SIWIS: source professionnelle native française féminine vérifiée dans le
+  rapport Idiap; MLS: profil de genre non assigné, sans inférence par l'ID.
+  Modèles et corpus attribués, sources CC BY 4.0; poids non distribués.
+  Gilles est exclu car sa table ne couvre pas le marqueur nasal fourni par
+  ce phonémiseur. Aucun appel de synthèse distant ni texte personnel envoyé.
+- Total essai v3: **835 500 octets**, 24 fichiers; les 12 MP3 UPMC restent
+  strictement identiques à v2. **56 tests Node**, 6 Python Web et 5 Python
+  export réussis; validateurs canonique/cerf et audit lexical strict réussis.
+- Chaque nouveau MP3 est décodé et comparé au nombre d'échantillons WAV avant
+  publication. Ce contrôle d'intégrité ne certifie pas la qualité entendue.
+  Recette utilisateur ouverte; stable Web 0.3.3 et PR #14 en brouillon.
+
+### Publication et preuves de la comparaison v3
+
+- Commit fonctionnel `b727fa7453312d20b16340b8e48f64468f3f4df6`,
+  [Web CI 37775162253](https://github.com/kevindassie-ui/Pangmao/actions/runs/37775162253)
+  réussie: 56 tests Node, 11 Python, deux variantes et audit strict.
+- Miroir `269ac01b2a99a7c43336319aaa567e627f7265a4`,
+  [Pages 37775367239](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37775367239)
+  réussie. Diff limité à 18 fichiers de `voice-trial/`; aucune promotion de
+  la racine stable 0.3.3. [Page d'essai](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/).
+- Chrome a conservé v2 au premier rechargement pendant la mise à jour du
+  worker, puis affiché « ESSAI DES VOIX 3 » au suivant. SIWIS et MLS lisent
+  la phrase d'achat jusqu'à sa fin, à 1×, avec les nouveaux hashes:
+  4,179592 et 5,085170 secondes. Basculer vers Jessica/Pierre arrête bien
+  le lecteur; revenir restaure l'avis de test propre à la nouvelle paire.
+  [Capture du titre et des voix](evidence/voice-trial-v3-20261008.jpg).
+- Les 24 fichiers publiés ont été relus par HTTP: tailles et SHA-256
+  conformes au manifeste v3, total 835 500 octets; package stable 0.3.3.
+- Ces preuves valident la livraison et le lecteur, sans certifier la
+  prononciation entendue sur iPhone/Android ni le hors-ligne réel de Safari.
+
+## Retour d'écoute et correction de l'essai — 2026-10-08
+
+- Retour du 8 octobre vers 01 h 15 (Paris), retrouvé après les interruptions:
+  Jessica et Pierre sont toutes deux évaluées « naturelle »; commentaire:
+  « Pas mal, plutôt naturel globalement. » Le naturel du petit lot est donc
+  favorable, avec deux défauts précis: Jessica donne l'impression de
+  « je voudrait t'acheter » et les deux voix lisent le h de « 18h30 ».
+- Défauts reproduits dans l'entrée phonétique: `18 h 30` donne un son de lettre
+  h; `voudrais acheter` reçoit une consonne finale automatique et un schwa
+  supprimé dans acheter. Une préparation conserve le texte affiché mais
+  développe les heures. La phrase d'achat reçoit une prononciation explicite,
+  sans consonne après voudrais et avec schwa dans acheter; aucune règle
+  générale de suppression des liaisons n'est ajoutée.
+- Essai **2026-10-08-v2**: quatre MP3 régénérés, huit fichiers conservés par
+  hash; total **384 835 octets**. Le manifeste trace textes parlé/synthèse,
+  corrections, phonèmes générés et version d'origine des fichiers.
+- Tests locaux: **55 tests Node**, 6 Python Web et 5 Python export réussis;
+  validateurs global/cerf réussis. Les tests inspectent les véritables entrées
+  phonétiques et hashes; ils ne garantissent pas seuls le son perçu après
+  la correction.
+- Cache d'essai versionné v2, shell téléchargé sans réutiliser le cache HTTP
+  précédent et mises à jour du worker sans cache d'import. Le titre affiche
+  « ESSAI DES VOIX 2 ». Un onglet déjà ouvert peut nécessiter une actualisation.
+- La cause de « Stopped thinking » n'est pas observable ici. Les défauts de
+  prononciation sont traités dans le dépôt, sans les attribuer à l'interruption.
+  La recette des deux passages corrigés reste ouverte avant généralisation;
+  l'application stable et le Reader libre ne sont pas encore promus.
+
+
+### Preuves de publication de la révision 2
+
+- Commit fonctionnel `0c2a3bb6b9b2ff5ea1b3e1c034920d21c182a903`,
+  [Web CI 37703131947](https://github.com/kevindassie-ui/Pangmao/actions/runs/37703131947)
+  réussie: 55 tests Node, 11 tests Python, deux variantes et audit strict.
+- Miroir au commit `1a645df23f612dc8062048dafb6145b3f322161a`,
+  [Pages 37703216302](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37703216302)
+  réussie. Le diff se limite aux dix fichiers de l'essai nécessaires à la
+  correction. L'application stable reste en 0.3.3.
+- Chrome a d'abord affiché l'ancien essai en cache, puis « ESSAI DES VOIX 2 »
+  après une actualisation. L'extrait des nombres de Jessica est chargé avec
+  le nouveau hash et décodé jusqu'à sa fin (6,606 secondes). La phrase
+  d'achat de Jessica est aussi décodée jusqu'à sa fin (3,622 secondes), avec
+  le nouveau hash. [Capture des passages](evidence/voice-trial-v2-20261008.jpg).
+- Les douze fichiers publiés ont été relus par HTTP: tailles et hashes
+  conformes au manifeste v2, total 384 835 octets, titre d'essai 2 et package
+  stable 0.3.3. La prononciation perçue reste à confirmer par l'utilisateur.
+
+## Reconnexion — 2026-10-08
+
+- Checkout propre et aligné sur la PR #14, head distant vérifié
+  `54078f51cfd0e6cf15ce690da5183c3e60c41757` avant ce lot documentaire.
+  La PR reste ouverte et en brouillon. Le journal et l'essai vocal sont conservés.
+- [Web CI 37659560197](https://github.com/kevindassie-ui/Pangmao/actions/runs/37659560197)
+  terminée avec succès sur ce head; aucun besoin de relancer les contrôles
+  fonctionnels pour corriger uniquement les références de reprise.
+- Miroir au commit `c96e6404a6ae363af88468d39660ca85a2b6e16e`.
+  La page d'essai répond HTTP 200; manifeste `2026-10-07-v1`, six textes,
+  douze extraits et 385 252 octets. Le package stable distant reste en 0.3.3.
+- `NEXT_RELEASE.md` pointait encore vers `b6095fd`, antérieur au petit lot
+  vocal. La référence de départ et la preuve CI sont corrigées à leur place.
+- Aucun nouveau retour d'écoute dans la demande de reconnexion. Le naturel
+  reste à évaluer sur téléphone avant production du dictionnaire complet ou
+  sélection d'un moteur Reader. Ce lot ne change que la documentation.
+
+## Reprise du développement — 2026-10-07
+
+- Le dépôt canonique `kevindassie-ui/Pangmao` est désormais public. La reprise
+  demandée par l'utilisateur récupère le candidat de la PR #14 et rapproche
+  `main` (`d0b1466`, nettoyage approuvé du 6 octobre), sans réécrire l'historique.
+- Le journal local 0.3.4 existant est conservé. La nouvelle étape W1.6 est
+  `webApp/voice-trial/`: six textes communs, douze extraits MP3, voix UPMC
+  Jessica/Pierre (français de France), produits avec Piper 1.4.1. L'essai
+  permet de comparer femme/homme, débit, liaisons, nombres et phrase longue
+  sans installer de voix ni fournir de compte ou de clé sur le téléphone.
+- Poids total des douze extraits: **385 252 octets**. Aucun audio préchargé;
+  seuls les fichiers écoutés sont téléchargés et mis en cache à la demande.
+  Le lecteur unique arrête l'extrait précédent; le cache audio gère les requêtes
+  partielles nécessaires à Safari et reste séparé du cache de l'application.
+- Modèle épinglé et vérifié par SHA-256, sources humaines attribuées,
+  CC BY-SA 4.0. Modèle et moteur restent hors du produit. Génération locale
+  sans service payant; télémétrie ONNX désactivée avant initialisation.
+- Vérification locale: 52 tests Node, 6 tests Python Web et 5 tests Python
+  d'export réussis; validateurs global/cerf et audit strict des 26 témoins
+  réussis (10 926 entrées, 11 562 sens, 15 187 couples).
+- L'essai est une étape de recette, pas une intégration de ces voix à tout le
+  dictionnaire ou au Reader libre. Le naturel exige une écoute iPhone/Android;
+  W1.6 reste ouvert, la PR #14 reste en brouillon et Web 0.3.3 reste la base
+  stable. Aucun service, coût récurrent, tag ou build Android n'est ajouté.
+- Le téléchargement des navigateurs Playwright n'a pas abouti dans cet
+  environnement; les tests Node de plages HTTP ne sont pas une recette Safari.
+  Les mesures de génération et le protocole d'écoute sont dans
+  [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
+
+### Sauvegarde et page de recette
+
+- Candidat sauvegardé dans la PR #14 au commit
+  `0315a7903df7ed1ee24a1f3feeae20bc4d25e6d9`, avec deux parents conservant
+  le candidat antérieur et le `main` courant. Aucun push forcé.
+- [Web CI 37658786608](https://github.com/kevindassie-ui/Pangmao/actions/runs/37658786608)
+  réussie sur ce commit: tests Node/Python, validation globale, variante cerf
+  et audit strict. Aucun build Android ni upload d'APK lancé pour ce lot.
+- Page de recette publiée seule dans le miroir au commit
+  `c96e6404a6ae363af88468d39660ca85a2b6e16e`:
+  [essai vocal](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/).
+  Le diff du miroir ajoute uniquement `voice-trial/`; le site stable garde
+  Web 0.3.3. Le lien d'essai du panneau À propos appartient au candidat.
+  Les douze audios publiés ont été relus par HTTP et leurs tailles/hashes
+  correspondent au manifeste; le package stable distant indique 0.3.3.
+- Vérification du site publié dans Chrome: les deux récits MP3 sont décodés
+  et atteignent leur fin, le débit passe à 0,85×, Arrêter retire la source,
+  le panneau signale le cache actif. [Capture](evidence/voice-trial-20261007.jpg).
+  Ceci ne valide ni la qualité à l'oreille, ni Safari/iPhone, ni une lecture
+  réellement hors ligne; ces points restent dans la recette téléphone.
+
+## Checkpoint historique du 3 octobre
+
 
 ## Codex handover checkpoint
 
@@ -106,6 +399,39 @@ Checkpoint date: 2026-10-03
   Account billing/Packages totals have not been read; the artifact inventory is
   exact for the accessible account repositories, not a billing-dashboard reading.
 - No feature, tag, APK build, PR #14 promotion or public deployment was performed.
+
+## Reprise Web — 2026-10-03
+
+- Le blocage de stockage GitHub Actions est levé: le packaging Web du commit
+  `3589e159` a réussi lors de la reprise ciblée du 2026-10-02. Les artefacts
+  temporaires Web expirent après un jour; aucune dépense ni runner personnel.
+- Retour utilisateur du 2026-10-03 vers 16 h 50 (Paris): le choix des voix
+  fonctionne sur l'iPhone. Amélie et Thomas donnent un véritable accent français,
+  nettement meilleur qu'avant, mais un rendu encore robotique et peu fluide.
+  La capture indique Amélie `fr-CA` (français canadien), pas `fr-FR`.
+  W1.6 est partiellement validé pour la sélection et l'accent; le naturel reste
+  à améliorer. La conservation après réouverture et le Reader ne sont pas
+  explicitement confirmés par ce retour.
+- Première piste de qualité: télécharger dans les réglages d'accessibilité iOS
+  une voix français (France) en qualité améliorée ou premium, puis vérifier
+  qu'elle apparaît dans Pangmao et comparer sur la même phrase. Les voix
+  disponibles dans Safari ne sont pas garanties par leur disponibilité dans
+  les réglages système. Références Apple:
+  <https://support.apple.com/fr-fr/111798> et
+  <https://support.apple.com/fr-fr/guide/iphone/iph96b214f0/ios>.
+- Le code impose actuellement `rate = 0.82`. Un débit réglable avec comparaison
+  au débit 1.0 est une piste complémentaire, pas un correctif du moteur vocal.
+  La visibilité des réglages (au bas de « À propos ») doit aussi être améliorée.
+- Le candidat Web 0.3.4 prépare la première tranche W1.5: journal local des
+  recherches explicitement soumises sans résultat, désactivé par défaut,
+  borné à 100 requêtes de 120 caractères, avec compteurs, reprise, copie,
+  export JSON et effacement. Les erreurs de complément chinois, les recherches
+  en cours de saisie et les résultats obsolètes ne sont pas enregistrés.
+- Le corpus reste à 10 926 entrées; aucun équivalent chinois ni exemple nouveau
+  n'est ajouté dans ce lot. Les sources, l'audit et les 26 témoins sont conservés.
+- Le candidat reste sur une branche de préparation. Aucune fusion ni mise à
+  jour du miroir public avant la recette des voix 0.3.3 sur l'iPhone. Recette et
+  promotion: [WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
 
 ## Current direction
 

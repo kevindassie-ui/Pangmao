@@ -1,5 +1,33 @@
 # Offline linguistic sources
 
+## Web voice comparison — 7 October 2026
+
+Six fixed original French texts, each synthesized with UPMC Jessica (female)
+and Pierre (male), are shipped as twelve MP3 samples in `webApp/voice-trial/`.
+The Piper `fr_FR-upmc-medium` model is pinned to revision
+`c10ece1aade47bb51c153c893d14e5bf8e5b7117`; its source hashes and output hashes
+are recorded in the trial manifest. Voice-source and redistributed-audio
+licence: CC BY-SA 4.0; full attributions and source links are in
+[`../webApp/voice-trial/NOTICE.md`](../webApp/voice-trial/NOTICE.md).
+Generation is offline after model acquisition, without user texts or telemetry.
+Only MP3 outputs are delivered to the browser. Feedback on 8 October found
+UPMC natural overall but reported consonant/vowel defects unchanged by speed.
+Revision 3 preserves those files for comparison and adds SIWIS (native French
+female source) and MLS source speaker 1840 (gender unassigned), six clips each.
+Their voice-specific sources are CC BY 4.0; outputs join the attributed
+CC BY-SA 4.0 collection. All three models use the same pinned revision, with
+per-model hashes in the manifest. Perceived accuracy remains unaccepted.
+
+The subsequent `voice-trial/diagnostic/` experiment reuses only UPMC and the
+same fixed texts: twenty MP3/WAV files, four passages, two voices. A/B share
+one PCM synthesis to isolate codec/container/playback; C tests the existing
+FreeDict/WikDict IPA for médecin and avocat only. All audio remains CC BY-SA
+4.0, with source licences and transformations in the diagnostic notice. The
+historical phonemizer is used only for a local compatibility audit; neither
+it nor model weights are deployed. No word override is accepted for production.
+
+## Dictionary sources
+
 Pangmao contains no Pleco data, code, models, visual assets, or private APIs.
 The generated `pangmao.db` is an aggregation of independently licensed sources.
 

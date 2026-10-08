@@ -89,6 +89,13 @@ chinois revus, un registre et un cas de test.
 
 ## Séquençage
 
+Point de reprise du 3 octobre 2026: le candidat Web 0.3.4 implémente le journal
+local exportable de l'étape 1. Il reste en préparation tant que la porte vocale
+W1.6 n'est pas acceptée sur l'iPhone; il n'élargit pas encore le corpus. La
+constitution du témoin équilibré et l'étude comparative des sources restent à
+faire dans les lots suivants. Voir
+[WEB_MISSED_SEARCHES_PLAN.md](WEB_MISSED_SEARCHES_PLAN.md).
+
 1. **Inventaire**: corpus témoin et export local des recherches manquées.
 2. **Étude de sources**: rapport couverture/licence/taille, sans modifier le
    paquet public.

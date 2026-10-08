@@ -11,10 +11,10 @@
       name="description"
       content="胖猫法语学习：可离线使用的法中双向词典与法语 Reader。"
     />
-    <link rel="manifest" href="./manifest.webmanifest?v=0.3.3" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=0.3.3" />
-    <link rel="icon" href="./icons/icon-192.png?v=0.3.3" />
-    <link rel="stylesheet" href="./styles.css?v=0.3.3" />
+    <link rel="manifest" href="./manifest.webmanifest?v=0.3.4" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=0.3.4" />
+    <link rel="icon" href="./icons/icon-192.png?v=0.3.4" />
+    <link rel="stylesheet" href="./styles.css?v=0.3.4" />
     <title>胖猫 · 学法语</title>
   </head>
   <body>
@@ -235,12 +235,30 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <header class="sheet-header">
         <div>
-          <span class="eyebrow">胖猫 Web <span id="webVersion">0.3.3</span></span>
+          <span class="eyebrow">胖猫 Web <span id="webVersion">0.3.4</span></span>
           <h2 id="aboutTitle">关于与数据来源</h2>
         </div>
         <button id="closeAbout" class="icon-button" type="button" aria-label="关闭">×</button>
       </header>
       <div class="about-content">
+        <p><a href="./voice-trial/" class="primary-button">声音试听 · 比较新的女声与男声</a></p>
+        <details class="missed-search-settings">
+          <summary>缺词记录</summary>
+          <p>默认关闭。启用后，只记录按“搜索”确认且没有结果的查询；输入过程和载入失败不会记录。仅保存在这台设备上，不会自动上传。</p>
+          <label class="missed-search-toggle" for="missedSearchEnabled">
+            <input id="missedSearchEnabled" type="checkbox" />
+            记录未找到的词
+          </label>
+          <p>关闭会停止新增记录，已有记录可随时清空。仅记录 120 字以内的词语，最多保留最近 100 个。</p>
+          <p id="missedSearchStatus" role="status"></p>
+          <ul id="missedSearchList" class="missed-search-list"></ul>
+          <div class="missed-search-actions">
+            <button id="missedSearchCopy" class="secondary-button" type="button" disabled>复制记录</button>
+            <button id="missedSearchExport" class="secondary-button" type="button" disabled>导出文件</button>
+            <button id="missedSearchClear" class="text-button" type="button" disabled>清空记录</button>
+          </div>
+          <p class="fine-print">分享前请检查是否包含私人信息。导出和复制都由你主动操作，胖猫不会发送记录。</p>
+        </details>
         <p>这是“我学法语”方向的私人测试版。搜索、收藏和发音不需要账户。</p>
         <dl>
           <div><dt>词典</dt><dd id="sourceName">FreeDict / WikDict</dd></div>
@@ -289,6 +307,6 @@
     </article>
 
     <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    <script type="module" src="./src/app.js?v=0.3.3"></script>
+    <script type="module" src="./src/app.js?v=0.3.4"></script>
   </body>
 </html>

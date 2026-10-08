@@ -1,6 +1,6 @@
 # Problèmes connus et retours appareil
 
-Dernière mise à jour: 2026-10-03.
+Dernière mise à jour: 2026-10-08.
 
 Ce fichier suit les défauts reproduits jusqu’à leur validation sur l’appareil.
 Ils restent séparés des idées produit de la roadmap et quittent cette liste une
@@ -12,6 +12,44 @@ fois le correctif publié puis confirmé.
 3 octobre; naturel insatisfaisant, persistance et Reader encore à confirmer.
 L'absence de voix dans le navigateur Web Android est le constat du 24 septembre,
 sans nouveau résultat appareil.
+
+Le 7 octobre, un essai indépendant des voix système est implémenté:
+`webApp/voice-trial/`, Jessica/Pierre via Piper, six textes et douze fichiers
+MP3 (385 252 octets), vitesse et cache à la demande. Il évite la configuration
+système pour ces extraits. Le retour retrouvé le
+8 octobre juge les deux voix naturelles globalement, avec deux défauts:
+Jessica donne l'impression de « je voudrait t'acheter »; les deux voix épellent
+le h de 18h30. La révision 2 corrige la préparation des heures et les phonèmes
+de la phrase d'achat. Le retour suivant signale encore « baguette »→« bagué »
+(deux voix), « avocat »→« avoqué », « fixé »→« fissé » (Pierre) et « et » avalé
+(Jessica), indépendamment des vitesses de lecture. La cause acoustique n'est
+pas démontrée: phonèmes attendus présents, aucune perte d'échantillons dans
+les conversions diagnostiques. La révision 3 conserve v2 et ajoute une
+comparaison SIWIS / MLS 1840 sur les mêmes phrases. Le dernier retour du
+8 octobre constate **aucune amélioration** et ajoute « médecin »→« meudecin »
+avec la voix masculine, sans nom de locuteur permettant de distinguer Pierre
+de MLS. L'extrait Pierre est inchangé depuis v1, et celui de MLS est nouveau.
+Les entrées SIWIS et MLS sont `medəsˈɛ̃`: schwa après d, première voyelle `e`.
+Cet écart avec les IPA du pack ne prouve pas la cause du « meu » entendu.
+L'essai v3 est non accepté. Aucun candidat n'est
+validé pour généralisation; comparer intelligibilité et naturel ensemble. Les voix ne remplacent
+pas encore le moteur du dictionnaire et du Reader libre.
+
+La reprise du 8 octobre vérifie la compatibilité avec l'ancienne chaîne Piper:
+séquences de phonèmes identiques sur six témoins, provenance exacte de
+l'entraînement non établie. Le diagnostic d1 ajoute des contrôles régénérés
+Jessica/Pierre, MP3 et WAV provenant de la même synthèse, puis deux variantes
+IPA pour médecin et avocat. Il sert à isoler compression/lecture et entrée
+phonétique; il ne constitue pas une correction acceptée des défauts. Recette
+auditive encore ouverte, avec résultats A/B et B/C à distinguer.
+
+Le retour vers 23 h 34 (Paris) clôt ce diagnostic sans solution globale:
+« avocat C » est bon, mais « médecin C » est pire, perçu comme « meucin »;
+le reste n'est pas concluant. Le locuteur n'est pas précisé. Médecin C est
+rejeté; avocat C reste un témoin positif, pas une validation des deux voix.
+La compression n'a pas fourni de piste concluante. Passer à la qualification
+d'une autre famille de synthèse plutôt qu'à de nouveaux bricolages phonétiques;
+la recherche de candidats et ses limites sont dans [STATUS.md](STATUS.md).
 
 Le retour du 3 octobre décrit un rendu toujours robotique et peu fluide.
 Amélie est déclarée `fr-CA`, pas `fr-FR`; la locale ne certifie pas le naturel.

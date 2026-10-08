@@ -1,6 +1,6 @@
 # Décisions produit
 
-Dernière mise à jour: 2026-10-03.
+Dernière mise à jour: 2026-10-07.
 
 ## D-001 — séparer interface et apprentissage
 
@@ -435,3 +435,9 @@ hors ligne.
 Aucun fournisseur, moteur ou coût récurrent n'est validé par cette décision.
 Elle est reprise du cadrage existant dans
 [WEB_MISSED_SEARCHES_PLAN.md, section « Direction vocale intégrée »](https://github.com/kevindassie-ui/Pangmao/blob/b6095fd6bd69cf69e6cba77177742502fbf01491/docs/WEB_MISSED_SEARCHES_PLAN.md#direction-vocale-intégrée--décision-utilisateur-du-3-octobre-2026).
+
+Le 7 octobre, la reprise autorisée réalise le petit lot avec Piper et les voix
+UPMC Jessica/Pierre, sous CC BY-SA 4.0. Ce choix sert uniquement à l'évaluation;
+il ne constitue pas une validation du moteur pour le Reader ou du naturel sur
+appareil. Aucun modèle n'est chargé sur le téléphone et aucun texte personnel
+n'est envoyé pour la synthèse.
