@@ -32,10 +32,29 @@ Checkpoint date: 2026-10-08 (Europe/Paris)
   chemins sûrs, changement d'extrait et geste Safari. **60 tests Node**,
   **6 Python Web + 5 Python export**, validateurs canonique/cerf et audit
   lexical strict réussis. Pas de build Android, poids ou traitement distant.
-- Page préparée pour une écoute ciblée sur appareil. A/B identiques mais
+- Page publiée pour une écoute ciblée sur appareil. A/B identiques mais
   incorrects orienteront vers la synthèse; B meilleur orientera vers le
   codec/chemin de lecture; C meilleur qualifiera la préparation de ces deux
   mots seulement. Aucun résultat auditif ni correctif n'est encore validé.
+
+### Publication et preuves du diagnostic d1
+
+- Fonctionnel `ef7f5a704d6bfc5efec07a4d6357f7b8fd7ee046`,
+  [Web CI 37846401101](https://github.com/kevindassie-ui/Pangmao/actions/runs/37846401101)
+  réussie. Miroir `b6637960a0391bc107e09642aceb007bbe075c22`,
+  [Pages 37846560440](https://github.com/kevindassie-ui/Pangmao-Web/actions/runs/37846560440)
+  réussie. Diff public limité aux 26 nouveaux fichiers du diagnostic; fichiers
+  v3 et racine stable inchangés.
+- [Diagnostic publié](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/diagnostic/).
+  Manifeste relu par HTTP et identique au build; 20 fichiers vérifiés par taille
+  et SHA-256, total 1 366 558 octets. Le package public reste 0.3.3.
+- Chrome: médecin B avec Pierre chargé à 1× sans erreur; médecin C terminé
+  avec Pierre (0,673379 s) et Jessica (0,499229 s). Phrase d'achat Jessica A
+  et B terminée sans erreur, même durée (4,400181 s). Changement de voix
+  arrête le lecteur et affiche les bons boutons.
+  [Capture des contrôles publiés](evidence/voice-diagnostic-d1-20261008.jpg).
+  Ces observations valident l'accès et la lecture; elles ne qualifient pas
+  la prononciation et ne remplacent pas l'écoute sur iPhone/Android.
 
 ## Échec de la recette v3 et nouveau témoin « médecin » — 2026-10-08
 

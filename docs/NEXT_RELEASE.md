@@ -3,7 +3,7 @@
 Checkpoint de développement: 2026-10-08 (Europe/Paris). Retour d'écoute retrouvé
 et nouveaux défauts indépendants de la vitesse. Comparaison v3 publiée puis
 non acceptée: aucune amélioration, « médecin »→« meudecin » en plus.
-Diagnostic A/B/C d1 préparé pour isoler codec et entrées phonétiques.
+Diagnostic A/B/C d1 publié pour isoler codec et entrées phonétiques.
 État et preuves: [STATUS.md](STATUS.md).
 
 ## Point de départ
@@ -87,8 +87,11 @@ d'achat, puis C quand disponible. C change uniquement l'entrée phonétique de
 médecin ou avocat, d'après les IPA du pack. Les contrôles ont été régénérés pour
 ce diagnostic; ils ne remplacent pas les fichiers v3. Le lecteur reste à 1×,
 sans réglages système. La page exige une connexion, sans cache hors ligne
-promis ni envoi de texte ou d'avis. Les 60 tests Node et validations du lot
-passent; la qualification auditive sur téléphone reste ouverte.
+promis ni envoi de texte ou d'avis.
+[Ouvrir le diagnostic publié](https://kevindassie-ui.github.io/Pangmao-Web/voice-trial/diagnostic/).
+Les 60 tests Node, validations du lot, CI et déploiement passent. Les 20 fichiers
+publics ont leurs tailles/hashes attendus; la qualification auditive sur
+téléphone reste ouverte, malgré la lecture vérifiée dans Chrome.
 
 Interpréter séparément A/B (codec/conteneur et lecture) et B/C (deux hypothèses
 phonétiques). Un résultat sur ces deux mots ne valide ni baguette/fixé ni le
